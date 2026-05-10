@@ -4,6 +4,8 @@ import {
   TransactionGroup,
   type EnrichedTransaction,
 } from "@/components/transaction-group"
+import { formatCurrency } from "../lib/utils"
+import { getPocketBalance } from "../lib/services/transaction-service"
 
 export function DashboardPage() {
   const data = useLiveQuery(
@@ -26,7 +28,7 @@ export function DashboardPage() {
       const txs = await db.transactions
         .orderBy("date")
         .reverse()
-        .limit(50)
+        .limit(200) // Limit to 200 just for safety, but we'll break after 5 days
         .toArray()
 
       const grouped: Record<
@@ -39,6 +41,8 @@ export function DashboardPage() {
         }
       > = {}
 
+      let daysCount = 0
+
       for (const tx of txs) {
         const d = new Date(tx.date)
         const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
@@ -47,12 +51,16 @@ export function DashboardPage() {
         )}-${String(d.getDate()).padStart(2, "0")}`
 
         if (!grouped[dateStr]) {
+          if (daysCount >= 5) {
+            break // Stop collecting after 5 unique days
+          }
           grouped[dateStr] = {
             date: d,
             income: 0,
             expense: 0,
             transactions: [],
           }
+          daysCount++
         }
 
         if (tx.type === "income") grouped[dateStr].income += tx.amount
