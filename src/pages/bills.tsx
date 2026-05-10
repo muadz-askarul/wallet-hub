@@ -1,1 +1,3 @@
-export function BillsPage() { return <div>Bills</div> }
+export function BillsPage() {
+  return <div>Bills</div>
+}

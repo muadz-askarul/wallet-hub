@@ -1,1 +1,3 @@
-export function BudgetPage() { return <div>Budget</div> }
+export function BudgetPage() {
+  return <div>Budget</div>
+}
