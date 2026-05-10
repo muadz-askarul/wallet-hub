@@ -9,7 +9,11 @@ import {
   PieChart,
   Wallet,
   Settings,
+  Plus,
+  ArrowUpRight,
 } from "lucide-react"
+import { GestureButton } from "@/components/ui/gesture-button"
+import { toast } from "sonner"
 
 export function RootLayout() {
   const location = useLocation()
@@ -20,7 +24,25 @@ export function RootLayout() {
         <Outlet />
       </main>
 
-      <BottomNavigationBar autoShowDelay={500}>
+      <BottomNavigationBar
+        autoShowDelay={500}
+        endSlot={
+          <GestureButton
+            icon={<Plus />}
+            onTap={() => toast("Tap: Open quick add")}
+            onHold={() => toast("Hold action triggered")}
+            holdTitle="Release for Action"
+            swipeActions={[
+              {
+                direction: "up",
+                title: "New Transaction",
+                icon: <ArrowUpRight className="h-4 w-4" />,
+                onSwipe: () => toast("Swipe Up: New Transaction"),
+              },
+            ]}
+          />
+        }
+      >
         <BottomNavigationItem
           active={location.pathname === "/"}
           render={<Link to="/" />}
