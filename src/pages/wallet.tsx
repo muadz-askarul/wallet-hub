@@ -4,6 +4,7 @@ import { db } from "@/lib/db"
 import { getPocketBalance } from "@/lib/services/transaction-service"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { NumericInput } from "@/components/ui/numeric-input"
 import { Label } from "@/components/ui/label"
 import {
   Drawer,
@@ -308,11 +309,10 @@ export function WalletPage() {
                           <Label className="text-xs text-muted-foreground">
                             Target Balance (Rp)
                           </Label>
-                          <Input
-                            type="number"
+                          <NumericInput
                             value={dp.amount}
-                            onChange={(e) =>
-                              updateDraftPocket(index, "amount", e.target.value)
+                            onValueChange={(val) =>
+                              updateDraftPocket(index, "amount", val)
                             }
                             placeholder="0"
                             className="h-8 text-sm"
