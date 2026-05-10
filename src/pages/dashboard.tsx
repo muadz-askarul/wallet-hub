@@ -3,7 +3,7 @@ import { db } from "@/lib/db"
 import { getPocketBalance } from "@/lib/services/transaction-service"
 import { formatCurrency, cn } from "@/lib/utils"
 
-import { Transaction } from "@/lib/db"
+import { type Transaction } from "@/lib/db"
 
 type EnrichedTransaction = Transaction & {
   categoryName: string
@@ -174,11 +174,11 @@ export function DashboardPage() {
                 </div>
 
                 {/* Transactions List */}
-                <div className="space-y-2 p-4">
+                <div className="space-y-1 py-1">
                   {group.transactions.map((tx) => (
                     <div
                       key={tx.id}
-                      className="flex items-center justify-between rounded-lg border px-4 py-3 transition-colors hover:bg-muted/50"
+                      className="flex items-center justify-between px-3 py-2 transition-colors hover:bg-muted/50"
                     >
                       <div className="flex min-w-0 flex-1 items-center gap-4">
                         <div className="flex w-28 shrink-0 items-center gap-2">
@@ -192,7 +192,7 @@ export function DashboardPage() {
                             {tx.note || "Adjustment"}
                           </span>
                           <span className="truncate text-xs text-muted-foreground">
-                            [{tx.walletName}] {tx.pocketName}
+                            {tx.pocketName}
                           </span>
                         </div>
                       </div>
