@@ -135,11 +135,14 @@ export function DashboardPage() {
             No recent transactions.
           </p>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
             {data.transactionGroups.map((group) => (
-              <div key={group.date.toISOString()} className="space-y-3">
+              <div
+                key={group.date.toISOString()}
+                className="overflow-hidden rounded-xl border bg-card shadow-sm"
+              >
                 {/* Group Header */}
-                <div className="flex items-center justify-between border-b border-muted/20 px-1 pb-2">
+                <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-3">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl font-bold tracking-tighter">
                       {String(group.date.getDate()).padStart(2, "0")}
@@ -171,11 +174,11 @@ export function DashboardPage() {
                 </div>
 
                 {/* Transactions List */}
-                <div className="space-y-1">
+                <div className="space-y-2 p-4">
                   {group.transactions.map((tx) => (
                     <div
                       key={tx.id}
-                      className="flex items-center justify-between rounded-lg px-2 py-2.5 transition-colors hover:bg-muted/30"
+                      className="flex items-center justify-between rounded-lg border px-4 py-3 transition-colors hover:bg-muted/50"
                     >
                       <div className="flex min-w-0 flex-1 items-center gap-4">
                         <div className="flex w-28 shrink-0 items-center gap-2">
