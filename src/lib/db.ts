@@ -12,6 +12,7 @@ export interface Pocket {
   walletId: string
   name: string
   createdAt: number
+  deletedAt?: number
 }
 
 export interface Category {
@@ -53,6 +54,10 @@ db.version(1).stores({
   categories: "id, type",
   transactions: "id, pocketId, type, date",
   settings: "id",
+})
+
+db.version(2).stores({
+  pockets: "id, walletId, deletedAt",
 })
 
 export { db }

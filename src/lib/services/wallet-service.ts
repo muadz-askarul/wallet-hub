@@ -74,9 +74,5 @@ export async function updatePocket(
 }
 
 export async function deletePocket(id: string): Promise<void> {
-  await db.transaction("rw", db.pockets, db.transactions, async () => {
-    await db.pockets.delete(id)
-    const txs = await db.transactions.where("pocketId").equals(id).toArray()
-    await db.transactions.bulkDelete(txs.map((t) => t.id))
-  })
+  await db.pockets.update(id, { deletedAt: Date.now() })
 }

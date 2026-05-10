@@ -28,16 +28,17 @@ export function DashboardPage() {
 
   return (
     <div className="p-6 pb-24">
+      <div className="mb-6 rounded-xl bg-primary p-6 text-primary-foreground shadow-sm">
+        <p className="text-sm tracking-wider uppercase opacity-80">
+          Total Balance
+        </p>
+        <h2 className="mt-2 text-4xl font-bold tracking-tight">
+          Rp {balances.total.toLocaleString("id-ID")}
+        </h2>
+      </div>
+
       <div className="mb-8 flex h-20 w-full overflow-hidden rounded-xl border bg-card shadow-sm">
-        <div className="flex flex-1 flex-col justify-center bg-primary p-3 text-primary-foreground">
-          <p className="text-[10px] tracking-wider uppercase opacity-80">
-            Total Balance
-          </p>
-          <h2 className="text-lg leading-tight font-bold">
-            Rp {balances.total.toLocaleString("id-ID")}
-          </h2>
-        </div>
-        <div className="flex flex-1 flex-col justify-center border-l p-3">
+        <div className="flex flex-1 flex-col justify-center p-3">
           <p className="text-[10px] tracking-wider text-muted-foreground uppercase">
             Assets
           </p>

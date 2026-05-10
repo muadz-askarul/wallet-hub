@@ -77,24 +77,13 @@ describe("Wallet Service", () => {
     expect(updated?.name).toBe("Updated Pocket")
   })
 
-  it("deletes a pocket and cascades", async () => {
+  it("soft deletes a pocket", async () => {
     const wallet = await createWallet("Wallet")
     const pocket = await db.pockets.where("walletId").equals(wallet.id).first()
-    await db.transactions.add({
-      id: crypto.randomUUID(),
-      pocketId: pocket!.id,
-      amount: 100,
-      type: "income",
-      date: Date.now(),
-      note: "test",
-    })
 
     await deletePocket(pocket!.id)
-    expect(await db.pockets.get(pocket!.id)).toBeUndefined()
-    const txs = await db.transactions
-      .where("pocketId")
-      .equals(pocket!.id)
-      .toArray()
-    expect(txs.length).toBe(0)
+
+    const softDeleted = await db.pockets.get(pocket!.id)
+    expect(softDeleted?.deletedAt).toBeDefined()
   })
 })
