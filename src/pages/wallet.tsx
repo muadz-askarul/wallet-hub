@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
+import { formatCurrency } from "@/lib/utils"
 import { db } from "@/lib/db"
 import { getPocketBalance } from "@/lib/services/transaction-service"
 import { Button } from "@/components/ui/button"
@@ -195,7 +196,7 @@ export function WalletPage() {
     >
       <span className="font-medium">{pocket.name}</span>
       <span className="font-medium">
-        Rp {(pocketBalances[pocket.id] || 0).toLocaleString("id-ID")}
+        Rp {formatCurrency(pocketBalances[pocket.id] || 0)}
       </span>
     </div>
   )
@@ -226,8 +227,7 @@ export function WalletPage() {
                   <div className="flex flex-1 items-center justify-between pr-4">
                     <h3 className="text-lg font-semibold">{wallet.name}</h3>
                     <p className="font-semibold text-muted-foreground">
-                      Rp{" "}
-                      {(walletBalances[wallet.id] || 0).toLocaleString("id-ID")}
+                      Rp {formatCurrency(walletBalances[wallet.id] || 0)}
                     </p>
                   </div>
                   <Button
