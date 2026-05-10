@@ -5,12 +5,11 @@ import {
 } from "@/components/ui/bottom-navigation-bar"
 import {
   LayoutDashboard,
-  Receipt,
-  PieChart,
   Wallet,
   Settings,
   Plus,
-  ArrowUpRight,
+  ArrowUpDown,
+  MessageSquareText,
 } from "lucide-react"
 import { GestureButton } from "@/components/ui/gesture-button"
 import { toast } from "sonner"
@@ -26,17 +25,20 @@ export function RootLayout() {
 
       <BottomNavigationBar
         autoShowDelay={500}
+        size={"sm"}
         endSlot={
           <GestureButton
-            icon={<Plus />}
+            className="h-14 w-14 shadow-lg"
+            icon={<Plus className="size-6" />}
             onTap={() => toast("Tap: Open quick add")}
             onHold={() => toast("Hold action triggered")}
             holdTitle="Release for Action"
+            holdTitlePosition="left"
             swipeActions={[
               {
                 direction: "up",
                 title: "New Transaction",
-                icon: <ArrowUpRight className="h-4 w-4" />,
+                icon: <MessageSquareText className="size-4" />,
                 onSwipe: () => toast("Swipe Up: New Transaction"),
               },
             ]}
@@ -47,35 +49,28 @@ export function RootLayout() {
           active={location.pathname === "/"}
           render={<Link to="/" />}
         >
-          <LayoutDashboard className="h-6 w-6" strokeWidth={1.5} />
+          <LayoutDashboard className="size-6" strokeWidth={1.5} />
           <span className="sr-only">Dashboard</span>
         </BottomNavigationItem>
         <BottomNavigationItem
-          active={location.pathname === "/bills"}
-          render={<Link to="/bills" />}
+          active={location.pathname === "/transactions"}
+          render={<Link to="/transactions" />}
         >
-          <Receipt className="h-6 w-6" strokeWidth={1.5} />
-          <span className="sr-only">Bills</span>
-        </BottomNavigationItem>
-        <BottomNavigationItem
-          active={location.pathname === "/budget"}
-          render={<Link to="/budget" />}
-        >
-          <PieChart className="h-6 w-6" strokeWidth={1.5} />
-          <span className="sr-only">Budget</span>
+          <ArrowUpDown className="size-6" strokeWidth={1.5} />
+          <span className="sr-only">Transactions</span>
         </BottomNavigationItem>
         <BottomNavigationItem
           active={location.pathname === "/wallet"}
           render={<Link to="/wallet" />}
         >
-          <Wallet className="h-6 w-6" strokeWidth={1.5} />
+          <Wallet className="size-6" strokeWidth={1.5} />
           <span className="sr-only">Wallet</span>
         </BottomNavigationItem>
         <BottomNavigationItem
           active={location.pathname === "/settings"}
           render={<Link to="/settings" />}
         >
-          <Settings className="h-6 w-6" strokeWidth={1.5} />
+          <Settings className="size-6" strokeWidth={1.5} />
           <span className="sr-only">Settings</span>
         </BottomNavigationItem>
       </BottomNavigationBar>

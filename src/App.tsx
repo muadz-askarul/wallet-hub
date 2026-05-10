@@ -4,6 +4,8 @@ import { DashboardPage } from "./pages/dashboard"
 import { BillsPage } from "./pages/bills"
 import { BudgetPage } from "./pages/budget"
 import { WalletPage } from "./pages/wallet"
+import { TransactionsPage } from "./pages/transactions"
+import { GoalsPage } from "./pages/goals"
 import { SettingsPage } from "./pages/settings"
 
 export function App() {
@@ -14,6 +16,8 @@ export function App() {
           <Route index element={<DashboardPage />} />
           <Route path="bills" element={<BillsPage />} />
           <Route path="budget" element={<BudgetPage />} />
+          <Route path="goals" element={<GoalsPage />} />
+          <Route path="transactions" element={<TransactionsPage />} />
           <Route path="wallet" element={<WalletPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>

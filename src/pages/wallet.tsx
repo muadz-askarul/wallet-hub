@@ -255,7 +255,7 @@ export function WalletPage() {
 
       {/* Full-Screen Wallet Drawer for Editing */}
       <Drawer open={walletDrawerOpen} onOpenChange={setWalletDrawerOpen}>
-        <DrawerContent className="mt-0 h-[100dvh] rounded-none">
+        <DrawerContent className="mt-0 h-dvh rounded-none">
           <DrawerHeader className="border-b text-left">
             <DrawerTitle>
               {editingWallet ? "Edit Wallet" : "Add Wallet"}
