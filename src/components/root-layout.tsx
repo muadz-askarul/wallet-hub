@@ -1,10 +1,6 @@
 import { Outlet, Link, useLocation } from "react-router-dom"
-import {
-  BottomNavigationBar,
-  BottomNavigationItem,
-} from "@/components/ui/bottom-navigation-bar"
-import { LayoutDashboard, MessageSquare, User, Plus, Lock } from "lucide-react"
-import { GestureButton } from "@/components/ui/gesture-button"
+import { BottomNavigationBar, BottomNavigationItem } from "@/components/ui/bottom-navigation-bar"
+import { LayoutDashboard, Receipt, PieChart, Wallet, Settings } from "lucide-react"
 
 export function RootLayout() {
   const location = useLocation()
@@ -15,44 +11,26 @@ export function RootLayout() {
         <Outlet />
       </main>
 
-      <BottomNavigationBar
-        autoShowDelay={500}
-        endSlot={
-          <GestureButton
-            icon={<Plus className="h-6 w-6" />}
-            className="h-12 w-12 border border-border bg-primary text-primary-foreground shadow-lg dark:border-white/10"
-            onTap={() => alert("Tapped! (e.g. Quick Add)")}
-            onHold={() => alert("Held & Released! (e.g. Action Executed)")}
-            holdTitle="Release for details"
-            holdTitlePosition="left"
-            swipeActions={[
-              {
-                direction: "up",
-                title: "Slide up to lock",
-                icon: <Lock className="h-5 w-5" />,
-                onSwipe: () => alert("Swiped Up! (e.g. Lock Wallet)"),
-              },
-            ]}
-          />
-        }
-      >
-        <BottomNavigationItem
-          active={location.pathname === "/"}
-          render={<Link to="/" />}
-        >
+      <BottomNavigationBar autoShowDelay={500}>
+        <BottomNavigationItem active={location.pathname === "/"} render={<Link to="/" />}>
           <LayoutDashboard className="h-6 w-6" strokeWidth={1.5} />
+          <span className="sr-only">Dashboard</span>
         </BottomNavigationItem>
-        <BottomNavigationItem
-          active={location.pathname === "/messages"}
-          render={<Link to="/messages" />}
-        >
-          <MessageSquare className="h-6 w-6" strokeWidth={1.5} />
+        <BottomNavigationItem active={location.pathname === "/bills"} render={<Link to="/bills" />}>
+          <Receipt className="h-6 w-6" strokeWidth={1.5} />
+          <span className="sr-only">Bills</span>
         </BottomNavigationItem>
-        <BottomNavigationItem
-          active={location.pathname === "/profile"}
-          render={<Link to="/profile" />}
-        >
-          <User className="h-6 w-6" strokeWidth={1.5} />
+        <BottomNavigationItem active={location.pathname === "/budget"} render={<Link to="/budget" />}>
+          <PieChart className="h-6 w-6" strokeWidth={1.5} />
+          <span className="sr-only">Budget</span>
+        </BottomNavigationItem>
+        <BottomNavigationItem active={location.pathname === "/wallet"} render={<Link to="/wallet" />}>
+          <Wallet className="h-6 w-6" strokeWidth={1.5} />
+          <span className="sr-only">Wallet</span>
+        </BottomNavigationItem>
+        <BottomNavigationItem active={location.pathname === "/settings"} render={<Link to="/settings" />}>
+          <Settings className="h-6 w-6" strokeWidth={1.5} />
+          <span className="sr-only">Settings</span>
         </BottomNavigationItem>
       </BottomNavigationBar>
     </div>
