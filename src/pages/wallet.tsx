@@ -257,7 +257,12 @@ export function WalletPage() {
       return { wallets: w, pockets: p, pocketBalances: pb, walletBalances: wb }
     },
     [],
-    { wallets: [], pockets: [], pocketBalances: {}, walletBalances: {} }
+    {
+      wallets: [],
+      pockets: [],
+      pocketBalances: {} as Record<string, number>,
+      walletBalances: {} as Record<string, number>,
+    }
   )
 
   // DnD sensors — pointer + touch for mobile
