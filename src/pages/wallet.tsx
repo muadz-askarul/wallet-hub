@@ -39,21 +39,200 @@ import {
   updatePocket,
   deletePocket,
 } from "@/lib/services/wallet-service"
-import {
-  Plus,
-  Trash,
-  MoreVertical,
-  ArrowUp,
-  ArrowDown,
-  GripVertical,
-} from "lucide-react"
+import { Plus, Trash, MoreVertical, GripVertical } from "lucide-react"
 import { toast } from "sonner"
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 type DraftPocket = {
   id?: string
   name: string
   amount: string
+  _key: string // stable drag key
 }
+
+// ─── Sortable Wallet Card ──────────────────────────────────────────────────────
+
+interface SortableWalletProps {
+  walletId: string
+  walletName: string
+  walletBalance: number
+  pockets: { id: string; name: string; walletId: string }[]
+  pocketBalances: Record<string, number>
+  orderMode: boolean
+  onEdit: () => void
+}
+
+function SortableWallet({
+  walletId,
+  walletName,
+  walletBalance,
+  pockets,
+  pocketBalances,
+  orderMode,
+  onEdit,
+}: SortableWalletProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: walletId })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="overflow-hidden rounded-xl border bg-card shadow-sm"
+    >
+      <div className="flex items-center border-b bg-muted/30 px-4 py-3">
+        {/* Drag handle */}
+        {orderMode && (
+          <button
+            {...attributes}
+            {...listeners}
+            className="mr-3 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
+          >
+            <GripVertical className="size-5" />
+          </button>
+        )}
+
+        <div className="flex flex-1 items-center justify-between">
+          <h3 className="text-lg font-semibold">{walletName}</h3>
+          <p className="font-semibold text-muted-foreground">
+            Rp {formatCurrency(walletBalance)}
+          </p>
+        </div>
+
+        {!orderMode && (
+          <Button variant="ghost" size="sm" className="ml-2" onClick={onEdit}>
+            <MoreVertical className="size-4" />
+          </Button>
+        )}
+      </div>
+
+      <div className="space-y-1 py-1">
+        {pockets.map((pocket) => (
+          <div
+            key={pocket.id}
+            className="flex items-center justify-between px-4 py-2.5"
+          >
+            <span className="font-medium">{pocket.name}</span>
+            <span className="font-medium">
+              Rp {formatCurrency(pocketBalances[pocket.id] || 0)}
+            </span>
+          </div>
+        ))}
+        {pockets.length === 0 && (
+          <p className="py-2 text-center text-sm text-muted-foreground">
+            No pockets. Edit wallet to add pockets.
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ─── Sortable Pocket Row (in edit drawer) ─────────────────────────────────────
+
+interface SortablePocketRowProps {
+  pocket: DraftPocket
+  onUpdateName: (val: string) => void
+  onUpdateAmount: (val: string) => void
+  onDelete: () => void
+}
+
+function SortablePocketRow({
+  pocket,
+  onUpdateName,
+  onUpdateAmount,
+  onDelete,
+}: SortablePocketRowProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: pocket._key })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-start gap-2 rounded-lg border bg-muted/10 p-3"
+    >
+      {/* Drag handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="mt-1.5 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
+      >
+        <GripVertical className="size-5" />
+      </button>
+
+      <div className="flex-1 space-y-2">
+        <div>
+          <Label className="text-xs text-muted-foreground">Name</Label>
+          <Input
+            value={pocket.name}
+            onChange={(e) => onUpdateName(e.target.value)}
+            placeholder="Pocket Name"
+            className="h-8 text-sm"
+          />
+        </div>
+        <div>
+          <Label className="text-xs text-muted-foreground">Balance (Rp)</Label>
+          <NumericInput
+            value={pocket.amount}
+            onValueChange={onUpdateAmount}
+            placeholder="0"
+            className="h-8 text-sm"
+          />
+        </div>
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="mt-0.5 size-8 self-start text-destructive"
+        onClick={onDelete}
+      >
+        <Trash className="size-4" />
+      </Button>
+    </div>
+  )
+}
+
+// ─── Main WalletPage ──────────────────────────────────────────────────────────
 
 export function WalletPage() {
   const { wallets, pockets, pocketBalances, walletBalances } = useLiveQuery(
@@ -66,22 +245,26 @@ export function WalletPage() {
       const pb: Record<string, number> = {}
       const wb: Record<string, number> = {}
 
-      for (const wallet of w) {
-        wb[wallet.id] = 0
-      }
+      for (const wallet of w) wb[wallet.id] = 0
 
       for (const pocket of p) {
         const balance = await getPocketBalance(pocket.id)
         pb[pocket.id] = balance
-        if (wb[pocket.walletId] !== undefined) {
-          wb[pocket.walletId] += balance
-        }
+        if (wb[pocket.walletId] !== undefined) wb[pocket.walletId] += balance
       }
 
       return { wallets: w, pockets: p, pocketBalances: pb, walletBalances: wb }
     },
     [],
     { wallets: [], pockets: [], pocketBalances: {}, walletBalances: {} }
+  )
+
+  // DnD sensors — pointer + touch for mobile
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    })
   )
 
   // UI State
@@ -96,22 +279,37 @@ export function WalletPage() {
   const [deletedPocketIds, setDeletedPocketIds] = useState<string[]>([])
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
-  // Wallet Order handlers
-  const moveWallet = async (index: number, direction: "up" | "down") => {
-    const swapIndex = direction === "up" ? index - 1 : index + 1
-    if (swapIndex < 0 || swapIndex >= wallets.length) return
-    await db.wallets.update(wallets[index].id, { order: swapIndex })
-    await db.wallets.update(wallets[swapIndex].id, { order: index })
+  // ── Wallet DnD ────────────────────────────────────────────────────────────
+
+  const handleWalletDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = wallets.findIndex((w) => w.id === active.id)
+    const newIndex = wallets.findIndex((w) => w.id === over.id)
+    if (oldIndex === -1 || newIndex === -1) return
+
+    const reordered = arrayMove(wallets, oldIndex, newIndex)
+    // Persist order
+    await Promise.all(
+      reordered.map((w, i) => db.wallets.update(w.id, { order: i }))
+    )
   }
 
-  // Pocket Order handlers (within draft)
-  const movePocket = (index: number, direction: "up" | "down") => {
-    const swapIndex = direction === "up" ? index - 1 : index + 1
-    if (swapIndex < 0 || swapIndex >= draftPockets.length) return
-    const updated = [...draftPockets]
-    ;[updated[index], updated[swapIndex]] = [updated[swapIndex], updated[index]]
-    setDraftPockets(updated)
+  // ── Pocket DnD (draft) ────────────────────────────────────────────────────
+
+  const handlePocketDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = draftPockets.findIndex((p) => p._key === active.id)
+    const newIndex = draftPockets.findIndex((p) => p._key === over.id)
+    if (oldIndex === -1 || newIndex === -1) return
+
+    setDraftPockets(arrayMove(draftPockets, oldIndex, newIndex))
   }
+
+  // ── Wallet CRUD ───────────────────────────────────────────────────────────
 
   const openAddWallet = () => {
     setEditingWallet(null)
@@ -132,6 +330,7 @@ export function WalletPage() {
         id: p.id,
         name: p.name,
         amount: (pocketBalances[p.id] || 0).toString(),
+        _key: p.id,
       }))
     )
     setDeletedPocketIds([])
@@ -139,19 +338,20 @@ export function WalletPage() {
   }
 
   const handleAddDraftPocket = () => {
-    setDraftPockets([...draftPockets, { name: "", amount: "" }])
+    setDraftPockets([
+      ...draftPockets,
+      { name: "", amount: "", _key: crypto.randomUUID() },
+    ])
   }
 
   const handleDeleteDraftPocket = (index: number, id?: string) => {
-    if (id) {
-      setDeletedPocketIds([...deletedPocketIds, id])
-    }
+    if (id) setDeletedPocketIds([...deletedPocketIds, id])
     setDraftPockets(draftPockets.filter((_, i) => i !== index))
   }
 
   const updateDraftPocket = (
     index: number,
-    field: keyof DraftPocket,
+    field: "name" | "amount",
     value: string
   ) => {
     const updated = [...draftPockets]
@@ -169,13 +369,10 @@ export function WalletPage() {
       } else {
         const newWallet = await createWallet(walletName)
         walletId = newWallet.id
-        // Set order to end
         await db.wallets.update(newWallet.id, { order: wallets.length })
       }
 
-      for (const id of deletedPocketIds) {
-        await deletePocket(id)
-      }
+      for (const id of deletedPocketIds) await deletePocket(id)
 
       for (let i = 0; i < draftPockets.length; i++) {
         const dp = draftPockets[i]
@@ -227,15 +424,13 @@ export function WalletPage() {
 
   return (
     <>
-      {/* Sticky Header — same style as transactions page */}
+      {/* Sticky Header */}
       <div className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
         <h1 className="text-lg font-semibold">Wallets</h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="size-9">
-              <MoreVertical className="size-5" />
-            </Button>
+          <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="size-9" />}>
+            <MoreVertical className="size-5" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={openAddWallet}>
@@ -256,82 +451,35 @@ export function WalletPage() {
             No wallets configured.
           </p>
         ) : (
-          <div className="space-y-6">
-            {wallets.map((wallet, wIndex) => {
-              const walletPockets = pockets.filter(
-                (p) => p.walletId === wallet.id
-              )
-              return (
-                <div
-                  key={wallet.id}
-                  className="overflow-hidden rounded-xl border bg-card shadow-sm"
-                >
-                  <div className="flex items-center border-b bg-muted/30 px-4 py-3">
-                    {/* Order controls */}
-                    {orderMode && (
-                      <div className="mr-3 flex flex-col gap-0.5">
-                        <button
-                          onClick={() => moveWallet(wIndex, "up")}
-                          disabled={wIndex === 0}
-                          className="rounded p-0.5 hover:bg-muted disabled:opacity-30"
-                        >
-                          <ArrowUp className="size-3.5" />
-                        </button>
-                        <button
-                          onClick={() => moveWallet(wIndex, "down")}
-                          disabled={wIndex === wallets.length - 1}
-                          className="rounded p-0.5 hover:bg-muted disabled:opacity-30"
-                        >
-                          <ArrowDown className="size-3.5" />
-                        </button>
-                      </div>
-                    )}
-
-                    <div className="flex flex-1 items-center justify-between">
-                      <h3 className="text-lg font-semibold">{wallet.name}</h3>
-                      <p className="font-semibold text-muted-foreground">
-                        Rp {formatCurrency(walletBalances[wallet.id] || 0)}
-                      </p>
-                    </div>
-
-                    {!orderMode && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="ml-2"
-                        onClick={() => openEditWallet(wallet)}
-                      >
-                        <MoreVertical className="size-4" />
-                      </Button>
-                    )}
-                  </div>
-
-                  <div className="space-y-1 py-1">
-                    {walletPockets.map((pocket) => (
-                      <div
-                        key={pocket.id}
-                        className="flex items-center justify-between px-4 py-2.5"
-                      >
-                        <span className="font-medium">{pocket.name}</span>
-                        <span className="font-medium">
-                          Rp {formatCurrency(pocketBalances[pocket.id] || 0)}
-                        </span>
-                      </div>
-                    ))}
-                    {walletPockets.length === 0 && (
-                      <p className="py-2 text-center text-sm text-muted-foreground">
-                        No pockets. Edit wallet to add pockets.
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleWalletDragEnd}
+          >
+            <SortableContext
+              items={wallets.map((w) => w.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-6">
+                {wallets.map((wallet) => (
+                  <SortableWallet
+                    key={wallet.id}
+                    walletId={wallet.id}
+                    walletName={wallet.name}
+                    walletBalance={walletBalances[wallet.id] || 0}
+                    pockets={pockets.filter((p) => p.walletId === wallet.id)}
+                    pocketBalances={pocketBalances}
+                    orderMode={orderMode}
+                    onEdit={() => openEditWallet(wallet)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 
-      {/* Full-Screen Wallet Drawer for Editing */}
+      {/* Full-Screen Wallet Drawer */}
       <Drawer open={walletDrawerOpen} onOpenChange={setWalletDrawerOpen}>
         <DrawerContent className="mt-0 h-dvh rounded-none">
           <DrawerHeader className="border-b text-left">
@@ -363,75 +511,38 @@ export function WalletPage() {
                   </Button>
                 </div>
 
-                <div className="space-y-3">
-                  {draftPockets.map((dp, index) => (
-                    <div
-                      key={dp.id || index}
-                      className="flex items-start gap-2 rounded-lg border bg-muted/10 p-3"
-                    >
-                      {/* Pocket order controls */}
-                      <div className="flex flex-col gap-0.5 pt-1">
-                        <button
-                          onClick={() => movePocket(index, "up")}
-                          disabled={index === 0}
-                          className="rounded p-0.5 text-muted-foreground hover:bg-muted disabled:opacity-30"
-                        >
-                          <ArrowUp className="size-3.5" />
-                        </button>
-                        <button
-                          onClick={() => movePocket(index, "down")}
-                          disabled={index === draftPockets.length - 1}
-                          className="rounded p-0.5 text-muted-foreground hover:bg-muted disabled:opacity-30"
-                        >
-                          <ArrowDown className="size-3.5" />
-                        </button>
-                      </div>
-
-                      <div className="flex-1 space-y-2">
-                        <div>
-                          <Label className="text-xs text-muted-foreground">
-                            Name
-                          </Label>
-                          <Input
-                            value={dp.name}
-                            onChange={(e) =>
-                              updateDraftPocket(index, "name", e.target.value)
-                            }
-                            placeholder="Pocket Name"
-                            className="h-8 text-sm"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs text-muted-foreground">
-                            Balance (Rp)
-                          </Label>
-                          <NumericInput
-                            value={dp.amount}
-                            onValueChange={(val) =>
-                              updateDraftPocket(index, "amount", val)
-                            }
-                            placeholder="0"
-                            className="h-8 text-sm"
-                          />
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-0.5 size-8 self-start text-destructive"
-                        onClick={() => handleDeleteDraftPocket(index, dp.id)}
-                      >
-                        <Trash className="size-4" />
-                      </Button>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handlePocketDragEnd}
+                >
+                  <SortableContext
+                    items={draftPockets.map((p) => p._key)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-3">
+                      {draftPockets.map((dp, index) => (
+                        <SortablePocketRow
+                          key={dp._key}
+                          pocket={dp}
+                          onUpdateName={(val) =>
+                            updateDraftPocket(index, "name", val)
+                          }
+                          onUpdateAmount={(val) =>
+                            updateDraftPocket(index, "amount", val)
+                          }
+                          onDelete={() => handleDeleteDraftPocket(index, dp.id)}
+                        />
+                      ))}
                     </div>
-                  ))}
+                  </SortableContext>
+                </DndContext>
 
-                  {draftPockets.length === 0 && (
-                    <p className="py-4 text-center text-sm text-muted-foreground">
-                      No pockets added yet.
-                    </p>
-                  )}
-                </div>
+                {draftPockets.length === 0 && (
+                  <p className="py-4 text-center text-sm text-muted-foreground">
+                    No pockets added yet.
+                  </p>
+                )}
               </div>
             </div>
           </div>

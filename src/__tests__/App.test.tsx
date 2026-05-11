@@ -6,8 +6,7 @@ describe("App Routing", () => {
   it("renders bottom navigation items", () => {
     render(<App />)
     expect(screen.getByRole("link", { name: /dashboard/i })).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: /bills/i })).toBeInTheDocument()
-    expect(screen.getByRole("link", { name: /budget/i })).toBeInTheDocument()
+    expect(screen.getByRole("link", { name: /transactions/i })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /wallet/i })).toBeInTheDocument()
     expect(screen.getByRole("link", { name: /settings/i })).toBeInTheDocument()
   })

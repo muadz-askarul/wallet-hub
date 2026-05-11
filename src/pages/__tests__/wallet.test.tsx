@@ -5,7 +5,7 @@ import { WalletPage } from "../wallet"
 describe("WalletPage", () => {
   it("renders wallet page with add button", () => {
     render(<WalletPage />)
-    expect(screen.getByText("Wallets & Pockets")).toBeInTheDocument()
-    expect(screen.getByText("Add Wallet")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: /^wallets$/i })).toBeInTheDocument()
+    expect(screen.getByText("No wallets configured.")).toBeInTheDocument()
   })
 })
