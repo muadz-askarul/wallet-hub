@@ -99,13 +99,12 @@ export async function seedDefaultCategories() {
   const count = await db.categories.count()
   if (count > 0) return
 
-  const all = [
-    ...DEFAULT_EXPENSE_CATEGORIES,
-    ...DEFAULT_INCOME_CATEGORIES,
-  ].map((cat, i) => ({
-    ...cat,
-    id: `default-cat-${i}`,
-  }))
+  const all = [...DEFAULT_EXPENSE_CATEGORIES, ...DEFAULT_INCOME_CATEGORIES].map(
+    (cat, i) => ({
+      ...cat,
+      id: `default-cat-${i}`,
+    })
+  )
 
   await db.categories.bulkAdd(all)
 }
