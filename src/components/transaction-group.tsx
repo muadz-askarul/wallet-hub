@@ -1,5 +1,6 @@
 import { formatCurrency, cn } from "@/lib/utils"
 import { type Transaction } from "@/lib/db"
+import { Link } from "react-router-dom"
 
 export type EnrichedTransaction = Transaction & {
   categoryName: string
@@ -55,8 +56,9 @@ export function TransactionGroup({ group }: TransactionGroupProps) {
       {/* Transactions List */}
       <div className="space-y-1 py-1">
         {group.transactions.map((tx) => (
-          <div
+          <Link
             key={tx.id}
+            to={`/transactions/edit/${tx.id}`}
             className="flex items-center justify-between px-3 py-2 transition-colors hover:bg-muted/50"
           >
             <div className="flex min-w-0 flex-1 items-center gap-4">
@@ -67,7 +69,7 @@ export function TransactionGroup({ group }: TransactionGroupProps) {
                 </span>
               </div>
               <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-[15px] font-medium">
+                <span className="truncate text-[15px] font-medium text-foreground">
                   {tx.note || "Adjustment"}
                 </span>
                 <span className="truncate text-xs text-muted-foreground">
@@ -87,7 +89,7 @@ export function TransactionGroup({ group }: TransactionGroupProps) {
             >
               Rp {formatCurrency(tx.amount)}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

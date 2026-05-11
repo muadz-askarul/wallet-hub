@@ -221,12 +221,7 @@ export function TransactionsPage() {
                 <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
                   Total
                 </span>
-                <span
-                  className={cn(
-                    "mt-0.5 text-sm font-bold",
-                    summary.net >= 0 ? "text-primary" : "text-destructive"
-                  )}
-                >
+                <span className="mt-0.5 text-sm font-bold">
                   {formatCurrency(summary.net)}
                 </span>
               </div>

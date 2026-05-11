@@ -5,6 +5,7 @@ import { BillsPage } from "./pages/bills"
 import { BudgetPage } from "./pages/budget"
 import { WalletPage } from "./pages/wallet"
 import { TransactionsPage } from "./pages/transactions"
+import { TransactionFormPage } from "./pages/transaction-form"
 import { GoalsPage } from "./pages/goals"
 import { SettingsPage } from "./pages/settings"
 
@@ -18,6 +19,11 @@ export function App() {
           <Route path="budget" element={<BudgetPage />} />
           <Route path="goals" element={<GoalsPage />} />
           <Route path="transactions" element={<TransactionsPage />} />
+          <Route path="transactions/new" element={<TransactionFormPage />} />
+          <Route
+            path="transactions/edit/:id"
+            element={<TransactionFormPage />}
+          />
           <Route path="wallet" element={<WalletPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
