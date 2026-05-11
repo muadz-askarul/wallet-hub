@@ -8,12 +8,13 @@ export async function createWallet(
   const pocketId = crypto.randomUUID()
   const now = Date.now()
 
-  const wallet: Wallet = { id: walletId, name, icon, createdAt: now }
+  const wallet: Wallet = { id: walletId, name, icon, createdAt: now, order: 0 }
   const pocket: Pocket = {
     id: pocketId,
     walletId,
     name: `${name} pocket`,
     createdAt: now,
+    order: 0,
   }
 
   await db.transaction("rw", db.wallets, db.pockets, async () => {
