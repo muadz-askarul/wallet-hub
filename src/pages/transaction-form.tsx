@@ -206,7 +206,7 @@ export function TransactionFormPage() {
             <NumericInput
               value={amount}
               onValueChange={(v) => setAmount(v ? parseFloat(v) : 0)}
-              className="h-auto flex-1 border-none bg-transparent p-0 text-right text-3xl font-black text-white focus-visible:ring-0"
+              className="h-auto flex-1 border-none bg-transparent p-0 text-right text-3xl font-black text-white shadow-none focus-visible:ring-0 dark:bg-transparent"
               placeholder="0"
             />
           </div>
@@ -352,6 +352,13 @@ export function TransactionFormPage() {
           ) : (
             <>
               <Button
+                className="h-11 w-2/3 text-base font-semibold"
+                onClick={() => handleSave(false)}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Save"}
+              </Button>
+              <Button
                 type="button"
                 variant="outline"
                 className="h-11 w-1/3 text-base font-semibold"
@@ -359,13 +366,6 @@ export function TransactionFormPage() {
                 disabled={saving}
               >
                 Continue
-              </Button>
-              <Button
-                className="h-11 w-2/3 text-base font-semibold"
-                onClick={() => handleSave(false)}
-                disabled={saving}
-              >
-                {saving ? "Saving..." : "Save Transaction"}
               </Button>
             </>
           )}
