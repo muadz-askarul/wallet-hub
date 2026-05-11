@@ -87,7 +87,7 @@ export function TransactionFormPage() {
   )
   const selectedCategory = categories?.find((c) => c.id === categoryId)
 
-  const handleSave = async () => {
+  const handleSave = async (isContinue = false) => {
     if (!amount || amount <= 0) {
       toast.error("Please enter an amount")
       return
@@ -127,7 +127,14 @@ export function TransactionFormPage() {
         })
         toast.success("Transaction added")
       }
-      navigate("/transactions")
+
+      if (isContinue) {
+        setAmount(0)
+        setNote("")
+        setDate(now())
+      } else {
+        navigate("/transactions")
+      }
     } catch (e) {
       console.error(e)
       toast.error("Failed to save transaction")
@@ -342,24 +349,45 @@ export function TransactionFormPage() {
 
         {/* Form Actions */}
         <div className="flex gap-2 pt-4">
-          {id && (
-            <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              className="h-11 w-11 shrink-0"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              <Trash className="size-5" />
-            </Button>
+          {id ? (
+            <>
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                className="h-11 w-11 shrink-0"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
+                <Trash className="size-5" />
+              </Button>
+              <Button
+                className="h-11 flex-1 text-base font-semibold"
+                onClick={() => handleSave(false)}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 w-1/3 text-base font-semibold"
+                onClick={() => handleSave(true)}
+                disabled={saving}
+              >
+                Continue
+              </Button>
+              <Button
+                className="h-11 w-2/3 text-base font-semibold"
+                onClick={() => handleSave(false)}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Save Transaction"}
+              </Button>
+            </>
           )}
-          <Button
-            className="h-11 flex-1 text-base font-semibold"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? "Saving..." : id ? "Save Changes" : "Save Transaction"}
-          </Button>
         </div>
       </div>
 
