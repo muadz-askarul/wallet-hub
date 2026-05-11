@@ -237,7 +237,8 @@ function SortablePocketRow({
 export function WalletPage() {
   const { wallets, pockets, pocketBalances, walletBalances } = useLiveQuery(
     async () => {
-      const w = await db.wallets.orderBy("order").toArray()
+      const w = await db.wallets.toArray()
+      w.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
       const p = await db.pockets
         .filter((p) => !p.deletedAt)
         .toArray()
@@ -429,7 +430,9 @@ export function WalletPage() {
         <h1 className="text-lg font-semibold">Wallets</h1>
 
         <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="size-9" />}>
+          <DropdownMenuTrigger
+            render={<Button variant="ghost" size="icon" className="size-9" />}
+          >
             <MoreVertical className="size-5" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

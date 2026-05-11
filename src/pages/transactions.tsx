@@ -219,7 +219,7 @@ export function TransactionsPage() {
               </div>
               <div className="flex flex-1 flex-col items-center py-3">
                 <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-                  Net
+                  Total
                 </span>
                 <span
                   className={cn(
