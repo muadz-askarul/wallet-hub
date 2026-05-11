@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
-import { cn } from "@/lib/utils"
+import { cn, formatCurrency } from "@/lib/utils"
 import { Link } from "react-router-dom"
 import {
   ChevronLeft,
@@ -104,6 +104,13 @@ export function TransactionsPage() {
     []
   )
 
+  const summary = useMemo(() => {
+    if (!data) return { income: 0, expense: 0, net: 0 }
+    const income = data.reduce((s, g) => s + g.income, 0)
+    const expense = data.reduce((s, g) => s + g.expense, 0)
+    return { income, expense, net: income - expense }
+  }, [data])
+
   const handlePrevMonth = () => {
     setCurrentDate((prev) => {
       const d = new Date(prev)
@@ -190,6 +197,43 @@ export function TransactionsPage() {
       </div>
 
       <div className="p-4">
+        {/* Monthly Summary Card */}
+        {!showAll && (
+          <div className="mb-4 overflow-hidden rounded-xl border bg-card shadow-sm">
+            <div className="flex divide-x">
+              <div className="flex flex-1 flex-col items-center py-3">
+                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  Income
+                </span>
+                <span className="mt-0.5 text-sm font-bold text-primary">
+                  {formatCurrency(summary.income)}
+                </span>
+              </div>
+              <div className="flex flex-1 flex-col items-center py-3">
+                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  Expense
+                </span>
+                <span className="mt-0.5 text-sm font-bold text-destructive">
+                  {formatCurrency(summary.expense)}
+                </span>
+              </div>
+              <div className="flex flex-1 flex-col items-center py-3">
+                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                  Net
+                </span>
+                <span
+                  className={cn(
+                    "mt-0.5 text-sm font-bold",
+                    summary.net >= 0 ? "text-primary" : "text-destructive"
+                  )}
+                >
+                  {formatCurrency(summary.net)}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {data.length === 0 ? (
           <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
             <p>No transactions found.</p>

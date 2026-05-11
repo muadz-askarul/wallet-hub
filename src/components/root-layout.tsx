@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Outlet, Link, useLocation } from "react-router-dom"
 import {
   BottomNavigationBar,
@@ -12,10 +13,11 @@ import {
   MessageSquareText,
 } from "lucide-react"
 import { GestureButton } from "@/components/ui/gesture-button"
-import { toast } from "sonner"
+import { AddTransactionSheet } from "@/components/add-transaction-sheet"
 
 export function RootLayout() {
   const location = useLocation()
+  const [addTxOpen, setAddTxOpen] = useState(false)
 
   return (
     <div className="flex min-h-svh flex-col pb-32">
@@ -30,8 +32,8 @@ export function RootLayout() {
           <GestureButton
             className="h-14 w-14 shadow-lg"
             icon={<Plus className="size-6" />}
-            onTap={() => toast("Tap: Open quick add")}
-            onHold={() => toast("Hold action triggered")}
+            onTap={() => setAddTxOpen(true)}
+            onHold={() => setAddTxOpen(true)}
             holdTitle="Release for Action"
             holdTitlePosition="left"
             swipeActions={[
@@ -39,7 +41,7 @@ export function RootLayout() {
                 direction: "up",
                 title: "New Transaction",
                 icon: <MessageSquareText className="size-4" />,
-                onSwipe: () => toast("Swipe Up: New Transaction"),
+                onSwipe: () => setAddTxOpen(true),
               },
             ]}
           />
@@ -74,6 +76,8 @@ export function RootLayout() {
           <span className="sr-only">Settings</span>
         </BottomNavigationItem>
       </BottomNavigationBar>
+
+      <AddTransactionSheet open={addTxOpen} onOpenChange={setAddTxOpen} />
     </div>
   )
 }
