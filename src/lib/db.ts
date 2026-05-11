@@ -5,6 +5,7 @@ export interface Wallet {
   name: string
   icon?: string
   createdAt: number
+  order: number
 }
 
 export interface Pocket {
@@ -13,6 +14,7 @@ export interface Pocket {
   name: string
   createdAt: number
   deletedAt?: number
+  order: number
 }
 
 export interface Category {
@@ -20,6 +22,7 @@ export interface Category {
   name: string
   type: "income" | "expense"
   icon?: string
+  color?: string
 }
 
 export interface Transaction {
@@ -59,5 +62,52 @@ db.version(1).stores({
 db.version(2).stores({
   pockets: "id, walletId, deletedAt",
 })
+
+db.version(3).stores({
+  wallets: "id, name, order",
+  pockets: "id, walletId, deletedAt, order",
+  categories: "id, type, color",
+})
+
+// Seed default categories on first run
+const DEFAULT_EXPENSE_CATEGORIES: Omit<Category, "id">[] = [
+  { name: "Shopping", type: "expense", icon: "🛍️", color: "#f59e0b" },
+  { name: "Grocery", type: "expense", icon: "🛒", color: "#10b981" },
+  { name: "Bill", type: "expense", icon: "📋", color: "#6366f1" },
+  { name: "Health", type: "expense", icon: "🏥", color: "#ef4444" },
+  { name: "Beauty", type: "expense", icon: "💄", color: "#ec4899" },
+  { name: "Food", type: "expense", icon: "🍜", color: "#f97316" },
+  { name: "Snack", type: "expense", icon: "🍿", color: "#eab308" },
+  { name: "Beverage", type: "expense", icon: "☕", color: "#a16207" },
+  { name: "Transportation", type: "expense", icon: "🚗", color: "#3b82f6" },
+  { name: "Apparel", type: "expense", icon: "👗", color: "#8b5cf6" },
+  { name: "Education", type: "expense", icon: "📚", color: "#0ea5e9" },
+  { name: "Household", type: "expense", icon: "🏠", color: "#14b8a6" },
+  { name: "Gift", type: "expense", icon: "🎁", color: "#f43f5e" },
+  { name: "Other", type: "expense", icon: "📦", color: "#6b7280" },
+]
+
+const DEFAULT_INCOME_CATEGORIES: Omit<Category, "id">[] = [
+  { name: "Salary", type: "income", icon: "💼", color: "#10b981" },
+  { name: "Petty Cash", type: "income", icon: "💵", color: "#3b82f6" },
+  { name: "Allowance", type: "income", icon: "🎓", color: "#8b5cf6" },
+  { name: "Bonus", type: "income", icon: "🎉", color: "#f59e0b" },
+  { name: "Other", type: "income", icon: "💰", color: "#6b7280" },
+]
+
+export async function seedDefaultCategories() {
+  const count = await db.categories.count()
+  if (count > 0) return
+
+  const all = [
+    ...DEFAULT_EXPENSE_CATEGORIES,
+    ...DEFAULT_INCOME_CATEGORIES,
+  ].map((cat, i) => ({
+    ...cat,
+    id: `default-cat-${i}`,
+  }))
+
+  await db.categories.bulkAdd(all)
+}
 
 export { db }
