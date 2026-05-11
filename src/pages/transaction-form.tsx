@@ -154,24 +154,6 @@ export function TransactionFormPage() {
     }
   }
 
-  const typeConfig = {
-    income: {
-      label: "Income",
-      color: "text-primary",
-      border: "border-primary",
-    },
-    expense: {
-      label: "Expense",
-      color: "text-destructive",
-      border: "border-destructive",
-    },
-    transfer: {
-      label: "Transfer",
-      color: "text-foreground",
-      border: "border-border",
-    },
-  }
-
   return (
     <>
       {/* Sticky Header */}
@@ -217,15 +199,14 @@ export function TransactionFormPage() {
           <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Amount
           </label>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-muted-foreground">Rp</span>
+          <div className="flex items-center justify-between gap-2 border-b pb-2">
+            <span className="shrink-0 text-2xl font-bold text-muted-foreground">
+              Rp
+            </span>
             <NumericInput
               value={amount}
               onValueChange={(v) => setAmount(v ? parseFloat(v) : 0)}
-              className={cn(
-                "h-auto border-none bg-transparent p-0 text-3xl font-black focus-visible:ring-0",
-                typeConfig[type].color
-              )}
+              className="h-auto flex-1 border-none bg-transparent p-0 text-right text-3xl font-black text-white focus-visible:ring-0"
               placeholder="0"
             />
           </div>
