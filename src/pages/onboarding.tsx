@@ -34,17 +34,7 @@ export function OnboardingPage() {
     {
       id: "w-cash",
       name: "Cash",
-      pockets: [
-        { id: "p-cash-main", name: "Main Cash", initialBalance: 100000 },
-      ],
-    },
-    {
-      id: "w-bank",
-      name: "Bank Wallet",
-      pockets: [
-        { id: "p-bank-main", name: "Main Account", initialBalance: 1000000 },
-        { id: "p-bank-saving", name: "Savings", initialBalance: 500000 },
-      ],
+      pockets: [{ id: "p-cash-main", name: "Main Cash", initialBalance: 0 }],
     },
   ])
 
@@ -181,10 +171,20 @@ export function OnboardingPage() {
             id: localP.id,
             walletId: localW.id,
             name: localP.name.trim(),
-            initialBalance: localP.initialBalance,
             createdAt: Date.now(),
             order: pocketOrder++,
           })
+
+          if (localP.initialBalance > 0) {
+            await db.transactions.add({
+              id: crypto.randomUUID(),
+              type: "income",
+              amount: localP.initialBalance,
+              date: Date.now(),
+              note: "Starting Balance",
+              pocketId: localP.id,
+            })
+          }
         }
       }
 
@@ -212,7 +212,7 @@ export function OnboardingPage() {
         <div className="flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
           <Coins className="size-8" />
         </div>
-        <h1 className="mt-2 bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-3xl font-black tracking-tight text-transparent">
+        <h1 className="mt-2 bg-primary bg-clip-text text-3xl font-black tracking-tight text-transparent">
           Wallet Hub
         </h1>
         <p className="text-sm text-muted-foreground">
@@ -296,13 +296,13 @@ export function OnboardingPage() {
                                   name: e.target.value,
                                 })
                               }
-                              className="h-7 rounded-md border-none bg-transparent p-0 px-1 text-xs font-semibold text-foreground shadow-none focus:bg-muted/30 focus-visible:ring-0 focus-visible:outline-none"
+                              className="h-10 rounded-md border-none bg-transparent p-0 px-1 text-xs font-semibold text-foreground shadow-none focus:bg-muted/30 focus-visible:ring-0 focus-visible:outline-none"
                               placeholder="Pocket Name"
                             />
 
                             {/* Pocket Initial Amount */}
                             <div className="flex items-center gap-1 border-b border-muted">
-                              <span className="text-[10px] font-bold text-muted-foreground">
+                              <span className="text-sm font-bold text-muted-foreground">
                                 Rp
                               </span>
                               <NumericInput
@@ -312,7 +312,7 @@ export function OnboardingPage() {
                                     initialBalance: v ? parseFloat(v) : 0,
                                   })
                                 }
-                                className="h-6 flex-1 border-none bg-transparent p-0 text-right text-xs font-bold text-foreground shadow-none focus-visible:ring-0 focus-visible:outline-none dark:bg-transparent"
+                                className="h-10 flex-1 border-none bg-transparent p-0 text-right text-sm font-bold text-foreground shadow-none focus-visible:ring-0 focus-visible:outline-none dark:bg-transparent"
                                 placeholder="0"
                               />
                             </div>
@@ -323,7 +323,7 @@ export function OnboardingPage() {
                             onClick={() =>
                               handleRemovePocket(wallet.id, pocket.id)
                             }
-                            className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive"
+                            className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:text-destructive"
                           >
                             <Trash className="size-3.5" />
                           </button>

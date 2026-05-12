@@ -12,7 +12,7 @@ export async function createWallet(
   const pocket: Pocket = {
     id: pocketId,
     walletId,
-    name: `${name} pocket`,
+    name: `${name}'s Pocket`,
     createdAt: now,
     order: 0,
   }
@@ -43,7 +43,7 @@ export async function deleteWallet(id: string): Promise<void> {
       const pockets = await db.pockets.where("walletId").equals(id).toArray()
       const pocketIds = pockets.map((p) => p.id)
       await db.pockets.bulkDelete(pocketIds)
-      
+
       // delete all transactions in those pockets
       if (pocketIds.length > 0) {
         const txs = await db.transactions
@@ -62,11 +62,13 @@ export async function createPocket(
   walletId: string,
   name: string
 ): Promise<Pocket> {
+  const existing = await db.pockets.where("walletId").equals(walletId).toArray()
   const pocket: Pocket = {
     id: crypto.randomUUID(),
     walletId,
     name,
     createdAt: Date.now(),
+    order: existing.length,
   }
   await db.pockets.add(pocket)
   return pocket

@@ -25,7 +25,7 @@ describe("Wallet Service", () => {
       .equals(wallet.id)
       .toArray()
     expect(pockets.length).toBe(1)
-    expect(pockets[0].name).toBe("Cash pocket")
+    expect(pockets[0].name).toBe("Cash's Pocket")
   })
 
   it("updates a wallet", async () => {
