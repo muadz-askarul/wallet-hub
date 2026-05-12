@@ -34,7 +34,11 @@ export function DashboardPage() {
 
       // Load upcoming bills for the current month
       const now = new Date()
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime()
+      const endOfMonth = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        1
+      ).getTime()
 
       const bills = await db.schedules
         .where("type")
@@ -44,7 +48,9 @@ export function DashboardPage() {
 
       const enrichedBills = bills.map((b) => {
         const pocket = pockets.find((pk) => pk.id === b.pocketId)
-        const wallet = pocket ? wallets.find((wl) => wl.id === pocket.walletId) : undefined
+        const wallet = pocket
+          ? wallets.find((wl) => wl.id === pocket.walletId)
+          : undefined
         const category = categories.find((cg) => cg.id === b.categoryId)
 
         return {
@@ -133,7 +139,13 @@ export function DashboardPage() {
       }
     },
     [],
-    { assets: 0, liabilities: 0, total: 0, transactionGroups: [], enrichedBills: [] }
+    {
+      assets: 0,
+      liabilities: 0,
+      total: 0,
+      transactionGroups: [],
+      enrichedBills: [],
+    }
   )
 
   const handlePayBill = async (id: string, note: string) => {
@@ -180,7 +192,9 @@ export function DashboardPage() {
       {data.enrichedBills && data.enrichedBills.length > 0 && (
         <div className="mb-8">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-medium text-foreground">Bills Due This Month</h3>
+            <h3 className="text-lg font-medium text-foreground">
+              Bills Due This Month
+            </h3>
             <Link
               to="/bills"
               className="flex items-center text-xs font-semibold text-primary hover:underline"
@@ -199,7 +213,9 @@ export function DashboardPage() {
                   <div
                     className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
                     style={{
-                      backgroundColor: bill.categoryColor ? `${bill.categoryColor}15` : "#6b728015",
+                      backgroundColor: bill.categoryColor
+                        ? `${bill.categoryColor}15`
+                        : "#6b728015",
                     }}
                   >
                     {bill.categoryIcon}
@@ -208,23 +224,32 @@ export function DashboardPage() {
                     <p className="text-sm font-semibold text-foreground">
                       {bill.note || bill.categoryName}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      Due {new Date(bill.nextDueDate).toLocaleDateString("id-ID", { day: "numeric", month: "short" })} • {bill.walletName}
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Due{" "}
+                      {new Date(bill.nextDueDate).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                      })}{" "}
+                      • {bill.walletName}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <span className="text-sm font-bold text-foreground shrink-0">
+                  <span className="shrink-0 text-sm font-bold text-foreground">
                     Rp {formatCurrency(bill.amount)}
                   </span>
                   <Button
                     size="icon"
-                    className="size-8 rounded-lg cursor-pointer shrink-0"
+                    className="size-8 shrink-0 cursor-pointer rounded-lg"
                     disabled={processingId === bill.id}
                     onClick={() => handlePayBill(bill.id, bill.note || "Bill")}
                   >
-                    {processingId === bill.id ? "..." : <Check className="size-4" />}
+                    {processingId === bill.id ? (
+                      "..."
+                    ) : (
+                      <Check className="size-4" />
+                    )}
                   </Button>
                 </div>
               </div>

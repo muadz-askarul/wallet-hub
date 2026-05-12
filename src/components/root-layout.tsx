@@ -78,7 +78,12 @@ export function RootLayout() {
             active={location.pathname === "/wallet"}
             render={<Link to="/wallet" />}
           >
-            <Wallet className="size-6" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+            <Wallet
+              className="size-6"
+              strokeWidth={1.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
             <span className="sr-only">Wallet</span>
           </BottomNavigationItem>
           <BottomNavigationItem

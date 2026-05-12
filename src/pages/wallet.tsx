@@ -558,11 +558,12 @@ export function WalletPage() {
 
           <DrawerFooter className="border-t bg-background">
             {confirmDelete ? (
-              <div className="flex flex-col gap-3 w-full p-1">
-                <p className="text-xs text-destructive font-semibold text-center leading-relaxed">
-                  Permanently delete &quot;{editingWallet?.name}&quot; and all its pockets? This cannot be undone.
+              <div className="flex w-full flex-col gap-3 p-1">
+                <p className="text-center text-xs leading-relaxed font-semibold text-destructive">
+                  Permanently delete &quot;{editingWallet?.name}&quot; and all
+                  its pockets? This cannot be undone.
                 </p>
-                <div className="flex gap-2 w-full">
+                <div className="flex w-full gap-2">
                   <Button
                     variant="outline"
                     className="flex-1 cursor-pointer"
@@ -595,9 +596,13 @@ export function WalletPage() {
                 )}
                 <div className="flex gap-2">
                   <DrawerClose asChild>
-                    <Button variant="outline" className="cursor-pointer">Cancel</Button>
+                    <Button variant="outline" className="cursor-pointer">
+                      Cancel
+                    </Button>
                   </DrawerClose>
-                  <Button onClick={handleSaveWallet} className="cursor-pointer">Save Wallet</Button>
+                  <Button onClick={handleSaveWallet} className="cursor-pointer">
+                    Save Wallet
+                  </Button>
                 </div>
               </div>
             )}

@@ -16,7 +16,9 @@ export interface PinInputFormProps {
   icon?: React.ReactNode
   title?: string
   description?: string
-  onSubmit: (values: { pin: string }) => void | boolean | Promise<void | boolean>
+  onSubmit: (values: {
+    pin: string
+  }) => void | boolean | Promise<void | boolean>
   className?: string
 }
 

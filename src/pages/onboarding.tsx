@@ -346,7 +346,7 @@ export function OnboardingPage() {
             </div>
 
             <Button
-              className="mt-8 h-12 w-full cursor-pointer gap-2 bg-gradient-to-r from-primary to-blue-600 text-base font-bold text-white"
+              className="mt-8 h-12 w-full cursor-pointer gap-2 bg-primary text-base font-bold text-white"
               onClick={handleCompleteSetup}
             >
               Complete Setup

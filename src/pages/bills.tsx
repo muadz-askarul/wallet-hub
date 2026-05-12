@@ -23,7 +23,11 @@ export function BillsPage() {
   const [processingId, setProcessingId] = useState<string | null>(null)
 
   // Load all schedules, wallets, pockets, and categories
-  const schedules = useLiveQuery(() => db.schedules.where("isActive").equals(1).toArray(), [], [])
+  const schedules = useLiveQuery(
+    () => db.schedules.where("isActive").equals(1).toArray(),
+    [],
+    []
+  )
   const wallets = useLiveQuery(() => db.wallets.toArray(), [], [])
   const pockets = useLiveQuery(() => db.pockets.toArray(), [], [])
   const categories = useLiveQuery(() => db.categories.toArray(), [], [])
@@ -86,7 +90,7 @@ export function BillsPage() {
             type="button"
             onClick={() => setActiveTab("bills")}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-center text-sm font-semibold transition-all cursor-pointer",
+              "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
               activeTab === "bills"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
@@ -99,7 +103,7 @@ export function BillsPage() {
             type="button"
             onClick={() => setActiveTab("templates")}
             className={cn(
-              "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-center text-sm font-semibold transition-all cursor-pointer",
+              "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
               activeTab === "templates"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
@@ -118,9 +122,12 @@ export function BillsPage() {
                 <div className="mb-4 rounded-full bg-primary/10 p-4 text-primary">
                   <CreditCard className="h-10 w-10" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">No active bills</h3>
+                <h3 className="text-lg font-semibold text-foreground">
+                  No active bills
+                </h3>
                 <p className="max-w-xs text-sm text-muted-foreground">
-                  Create a manual bill from the New Transaction page to track upcoming items.
+                  Create a manual bill from the New Transaction page to track
+                  upcoming items.
                 </p>
               </div>
             ) : (
@@ -128,7 +135,9 @@ export function BillsPage() {
                 const p = pockets?.find((pk) => pk.id === bill.pocketId)
                 const w = wallets?.find((wl) => wl.id === p?.walletId)
                 const c = categories?.find((cg) => cg.id === bill.categoryId)
-                const destP = pockets?.find((pk) => pk.id === bill.destinationPocketId)
+                const destP = pockets?.find(
+                  (pk) => pk.id === bill.destinationPocketId
+                )
                 const destW = wallets?.find((wl) => wl.id === destP?.walletId)
 
                 return (
@@ -143,7 +152,9 @@ export function BillsPage() {
                           <div
                             className="flex size-10 shrink-0 items-center justify-center rounded-full text-base font-semibold"
                             style={{
-                              backgroundColor: c?.color ? `${c.color}15` : "#6b728015",
+                              backgroundColor: c?.color
+                                ? `${c.color}15`
+                                : "#6b728015",
                             }}
                           >
                             {c?.icon || "📦"}
@@ -155,8 +166,11 @@ export function BillsPage() {
                         )}
 
                         <div>
-                          <p className="font-semibold text-foreground text-sm">
-                            {bill.note || (bill.transactionType === "transfer" ? "Transfer" : c?.name || "Expense")}
+                          <p className="text-sm font-semibold text-foreground">
+                            {bill.note ||
+                              (bill.transactionType === "transfer"
+                                ? "Transfer"
+                                : c?.name || "Expense")}
                           </p>
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
@@ -172,13 +186,16 @@ export function BillsPage() {
                             </span>
                           </div>
                           <p className="mt-2 text-xs font-medium text-muted-foreground">
-                            Next due: <span className="text-foreground font-semibold">{formatDate(bill.nextDueDate)}</span>
+                            Next due:{" "}
+                            <span className="font-semibold text-foreground">
+                              {formatDate(bill.nextDueDate)}
+                            </span>
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-end gap-3 shrink-0">
-                        <span className="font-bold text-foreground text-sm">
+                      <div className="flex shrink-0 flex-col items-end gap-3">
+                        <span className="text-sm font-bold text-foreground">
                           Rp {formatCurrency(bill.amount)}
                         </span>
                         <div className="flex items-center gap-2">
@@ -192,9 +209,11 @@ export function BillsPage() {
                           </Button>
                           <Button
                             size="sm"
-                            className="h-8 gap-1 rounded-lg px-2 text-xs cursor-pointer"
+                            className="h-8 cursor-pointer gap-1 rounded-lg px-2 text-xs"
                             disabled={processingId === bill.id}
-                            onClick={() => handleCompleteBill(bill.id, bill.note || "Bill")}
+                            onClick={() =>
+                              handleCompleteBill(bill.id, bill.note || "Bill")
+                            }
                           >
                             {processingId === bill.id ? (
                               "..."
@@ -220,17 +239,24 @@ export function BillsPage() {
                 <div className="mb-4 rounded-full bg-primary/10 p-4 text-primary">
                   <Repeat className="h-10 w-10" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">No auto-repeat items</h3>
+                <h3 className="text-lg font-semibold text-foreground">
+                  No auto-repeat items
+                </h3>
                 <p className="max-w-xs text-sm text-muted-foreground">
-                  Set up automated transactions inside the New Transaction form to make them record themselves!
+                  Set up automated transactions inside the New Transaction form
+                  to make them record themselves!
                 </p>
               </div>
             ) : (
               templates.map((template) => {
                 const p = pockets?.find((pk) => pk.id === template.pocketId)
                 const w = wallets?.find((wl) => wl.id === p?.walletId)
-                const c = categories?.find((cg) => cg.id === template.categoryId)
-                const destP = pockets?.find((pk) => pk.id === template.destinationPocketId)
+                const c = categories?.find(
+                  (cg) => cg.id === template.categoryId
+                )
+                const destP = pockets?.find(
+                  (pk) => pk.id === template.destinationPocketId
+                )
                 const destW = wallets?.find((wl) => wl.id === destP?.walletId)
 
                 return (
@@ -245,7 +271,9 @@ export function BillsPage() {
                           <div
                             className="flex size-10 shrink-0 items-center justify-center rounded-full text-base font-semibold"
                             style={{
-                              backgroundColor: c?.color ? `${c.color}15` : "#6b728015",
+                              backgroundColor: c?.color
+                                ? `${c.color}15`
+                                : "#6b728015",
                             }}
                           >
                             {c?.icon || "📦"}
@@ -257,8 +285,11 @@ export function BillsPage() {
                         )}
 
                         <div>
-                          <p className="font-semibold text-foreground text-sm">
-                            {template.note || (template.transactionType === "transfer" ? "Transfer" : c?.name || "Expense")}
+                          <p className="text-sm font-semibold text-foreground">
+                            {template.note ||
+                              (template.transactionType === "transfer"
+                                ? "Transfer"
+                                : c?.name || "Expense")}
                           </p>
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
@@ -274,13 +305,16 @@ export function BillsPage() {
                             </span>
                           </div>
                           <p className="mt-2 text-xs font-medium text-muted-foreground">
-                            Next execution: <span className="text-foreground font-semibold">{formatDate(template.nextDueDate)}</span>
+                            Next execution:{" "}
+                            <span className="font-semibold text-foreground">
+                              {formatDate(template.nextDueDate)}
+                            </span>
                           </p>
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-end gap-3 shrink-0">
-                        <span className="font-bold text-foreground text-sm">
+                      <div className="flex shrink-0 flex-col items-end gap-3">
+                        <span className="text-sm font-bold text-foreground">
                           Rp {formatCurrency(template.amount)}
                         </span>
                         <Button

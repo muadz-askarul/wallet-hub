@@ -31,7 +31,7 @@ export function LockScreenOverlay() {
           onSubmit={handleSubmit}
         />
         {errorCount > 0 && (
-          <p className="mt-4 text-center text-xs text-muted-foreground animate-pulse">
+          <p className="mt-4 animate-pulse text-center text-xs text-muted-foreground">
             Attempts: {errorCount}
           </p>
         )}

@@ -29,7 +29,9 @@ export function SettingsPage() {
   const handleLockDelayChange = async (minutes: number) => {
     try {
       await db.settings.update("user_settings", { lockDelayMinutes: minutes })
-      toast.success(`Auto-lock delay set to ${minutes === 99999 ? "Never" : `${minutes} min`}`)
+      toast.success(
+        `Auto-lock delay set to ${minutes === 99999 ? "Never" : `${minutes} min`}`
+      )
     } catch (err) {
       console.error(err)
       toast.error("Failed to update auto-lock settings")
@@ -102,7 +104,7 @@ export function SettingsPage() {
           </div>
 
           {/* Auto-Lock Delay */}
-          <div className="flex items-center justify-between px-4 py-4 border-t">
+          <div className="flex items-center justify-between border-t px-4 py-4">
             <div className="flex items-center gap-3">
               <div className="flex size-9 items-center justify-center rounded-full bg-muted">
                 <Clock className="size-4 text-muted-foreground" />
@@ -117,7 +119,7 @@ export function SettingsPage() {
             <select
               value={lockDelay}
               onChange={(e) => handleLockDelayChange(Number(e.target.value))}
-              className="rounded-lg border border-input bg-background px-2.5 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+              className="cursor-pointer rounded-lg border border-input bg-background px-2.5 py-1.5 text-xs font-semibold focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             >
               <option value={1}>1 Minute</option>
               <option value={5}>5 Minutes</option>
@@ -156,7 +158,7 @@ export function SettingsPage() {
           {/* Recurring Schedules */}
           <Button
             variant="ghost"
-            className="flex h-auto w-full items-center justify-between rounded-none border-t px-4 py-4 text-left cursor-pointer"
+            className="flex h-auto w-full cursor-pointer items-center justify-between rounded-none border-t px-4 py-4 text-left"
             onClick={() => navigate("/bills")}
           >
             <div className="flex items-center gap-3">
@@ -176,7 +178,7 @@ export function SettingsPage() {
           {/* Reset App & Onboarding */}
           <Button
             variant="ghost"
-            className="flex h-auto w-full items-center justify-between rounded-none border-t px-4 py-4 text-left cursor-pointer hover:bg-destructive/10 hover:text-destructive group"
+            className="group flex h-auto w-full cursor-pointer items-center justify-between rounded-none border-t px-4 py-4 text-left hover:bg-destructive/10 hover:text-destructive"
             onClick={handleResetApp}
           >
             <div className="flex items-center gap-3">

@@ -31,7 +31,11 @@ export function calculateNextDueDate(currentDate: Date, period: string): Date {
       next.setMonth(next.getMonth() + 1)
       break
     case "The end of the month": {
-      const firstOfNextNext = new Date(next.getFullYear(), next.getMonth() + 2, 1)
+      const firstOfNextNext = new Date(
+        next.getFullYear(),
+        next.getMonth() + 2,
+        1
+      )
       firstOfNextNext.setDate(firstOfNextNext.getDate() - 1)
       return firstOfNextNext
     }

@@ -35,10 +35,7 @@ function AppContent() {
         <Route path="goals" element={<GoalsPage />} />
         <Route path="transactions" element={<TransactionsPage />} />
         <Route path="transactions/new" element={<TransactionFormPage />} />
-        <Route
-          path="transactions/edit/:id"
-          element={<TransactionFormPage />}
-        />
+        <Route path="transactions/edit/:id" element={<TransactionFormPage />} />
         <Route path="wallet" element={<WalletPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>

@@ -78,7 +78,10 @@ export async function triggerBillPayment(scheduleId: string) {
     await db.transactions.add(newTx)
 
     schedule.lastTriggeredDate = schedule.nextDueDate
-    const nextDue = calculateNextDueDate(new Date(schedule.nextDueDate), schedule.period)
+    const nextDue = calculateNextDueDate(
+      new Date(schedule.nextDueDate),
+      schedule.period
+    )
 
     if (schedule.endDate && nextDue.getTime() > schedule.endDate) {
       schedule.isActive = 0
