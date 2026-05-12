@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { db } from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -33,7 +32,6 @@ interface LocalWallet {
 }
 
 export function OnboardingPage() {
-  const navigate = useNavigate()
   const { refreshLockState } = useAppLock()
   const [step, setStep] = useState<1 | 2>(1)
 
@@ -218,7 +216,6 @@ export function OnboardingPage() {
       await refreshLockState()
 
       toast.success("Setup completed! Enjoy Wallet Hub.")
-      navigate("/")
     } catch (err) {
       console.error(err)
       toast.error("Failed to complete onboarding setup")
