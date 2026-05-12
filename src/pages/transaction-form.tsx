@@ -7,6 +7,7 @@ import { calculateNextDueDate } from "@/lib/utils/date-calculator"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { NumericInput } from "@/components/ui/numeric-input"
+import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { ChevronLeft, ChevronRight, Trash } from "lucide-react"
@@ -374,12 +375,10 @@ export function TransactionFormPage() {
                     Schedule this transaction to repeat
                   </p>
                 </div>
-                <input
+                <Checkbox
                   id="recurring-toggle"
-                  type="checkbox"
                   checked={isRecurring}
-                  onChange={(e) => setIsRecurring(e.target.checked)}
-                  className="size-5 rounded-md border-muted accent-primary cursor-pointer"
+                  onCheckedChange={(checked) => setIsRecurring(!!checked)}
                 />
               </div>
 
