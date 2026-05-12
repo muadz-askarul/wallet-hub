@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom"
 import {
   BottomNavigationBar,
@@ -12,10 +13,17 @@ import {
   MessageSquareText,
 } from "lucide-react"
 import { GestureButton } from "@/components/ui/gesture-button"
+import { processAutoRepeatTransactions } from "@/lib/services/recurring-service"
 
 export function RootLayout() {
   const location = useLocation()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    processAutoRepeatTransactions().catch((err) => {
+      console.error("Failed to process auto-repeat schedules:", err)
+    })
+  }, [])
 
   return (
     <div className="flex min-h-svh flex-col pb-32">
