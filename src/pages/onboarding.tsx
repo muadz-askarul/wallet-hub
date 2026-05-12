@@ -349,14 +349,13 @@ export function OnboardingPage() {
                           placeholder="Wallet Name"
                         />
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
+                      <button
+                        type="button"
                         onClick={() => handleRemoveWallet(wallet.id)}
-                        className="size-8 text-destructive hover:bg-destructive/10 shrink-0 cursor-pointer"
+                        className="flex size-8 items-center justify-center rounded-lg text-destructive hover:bg-destructive/10 shrink-0 cursor-pointer transition-colors"
                       >
                         <Trash className="size-4" />
-                      </Button>
+                      </button>
                     </div>
 
                     {/* Pockets List */}
@@ -397,16 +396,15 @@ export function OnboardingPage() {
                             </div>
                           </div>
 
-                          <Button
-                            variant="ghost"
-                            size="icon"
+                          <button
+                            type="button"
                             onClick={() =>
                               handleRemovePocket(wallet.id, pocket.id)
                             }
-                            className="size-7 text-muted-foreground hover:text-destructive shrink-0 cursor-pointer"
+                            className="flex size-7 items-center justify-center rounded-md text-muted-foreground hover:text-destructive shrink-0 cursor-pointer transition-colors"
                           >
                             <Trash className="size-3.5" />
-                          </Button>
+                          </button>
                         </div>
                       ))}
 
