@@ -19,8 +19,10 @@ export function RootLayout() {
 
   return (
     <div className="flex min-h-svh flex-col pb-32">
-      <main className="flex-1">
-        <Outlet />
+      <main className="relative flex-1 overflow-x-hidden">
+        <div key={location.pathname} className="page-transition">
+          <Outlet />
+        </div>
       </main>
 
       <BottomNavigationBar
