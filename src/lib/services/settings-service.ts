@@ -3,8 +3,10 @@ import { db, type Settings } from "../db"
 const defaultSettings: Settings = {
   id: "user_settings",
   darkMode: false,
-  currency: "USD",
+  currency: "Rp",
   pin: "",
+  lockDelayMinutes: 5,
+  isOnboarded: false,
 }
 
 export async function getSettings(): Promise<Settings> {

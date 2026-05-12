@@ -11,7 +11,7 @@ describe("Settings Service", () => {
   it("should get default settings and update them", async () => {
     const settings = await getSettings()
     expect(settings.darkMode).toBe(false)
-    expect(settings.currency).toBe("USD")
+    expect(settings.currency).toBe("Rp")
 
     await updateSettings({ darkMode: true, currency: "IDR" })
     const updated = await getSettings()

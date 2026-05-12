@@ -40,7 +40,9 @@ export interface Settings {
   id: "user_settings"
   darkMode: boolean
   currency: string
-  pin: string
+  pin?: string
+  lockDelayMinutes?: number
+  isOnboarded?: boolean
 }
 
 export interface Schedule {

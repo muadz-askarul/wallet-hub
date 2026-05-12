@@ -1,15 +1,21 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTheme } from "@/components/theme-provider"
+import { useLiveQuery } from "dexie-react-hooks"
+import { db } from "@/lib/db"
 import { Switch } from "@/components/ui/switch"
 import { CategoryManagementSheet } from "@/components/category-management-sheet"
-import { ChevronRight, Moon, Tag, Repeat } from "lucide-react"
+import { ChevronRight, Moon, Tag, Repeat, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 export function SettingsPage() {
   const navigate = useNavigate()
   const { theme, setTheme } = useTheme()
   const [categorySheetOpen, setCategorySheetOpen] = useState(false)
+
+  const settings = useLiveQuery(() => db.settings.get("user_settings"))
+  const lockDelay = settings?.lockDelayMinutes ?? 5
 
   const isDark =
     theme === "dark" ||
@@ -18,6 +24,16 @@ export function SettingsPage() {
 
   const handleDarkModeToggle = (checked: boolean) => {
     setTheme(checked ? "dark" : "light")
+  }
+
+  const handleLockDelayChange = async (minutes: number) => {
+    try {
+      await db.settings.update("user_settings", { lockDelayMinutes: minutes })
+      toast.success(`Auto-lock delay set to ${minutes === 99999 ? "Never" : `${minutes} min`}`)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update auto-lock settings")
+    }
   }
 
   return (
@@ -51,6 +67,32 @@ export function SettingsPage() {
               checked={isDark}
               onCheckedChange={handleDarkModeToggle}
             />
+          </div>
+
+          {/* Auto-Lock Delay */}
+          <div className="flex items-center justify-between px-4 py-4 border-t">
+            <div className="flex items-center gap-3">
+              <div className="flex size-9 items-center justify-center rounded-full bg-muted">
+                <Clock className="size-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="font-medium">Auto-Lock Delay</p>
+                <p className="text-xs text-muted-foreground">
+                  Lock delay when app is out of focus
+                </p>
+              </div>
+            </div>
+            <select
+              value={lockDelay}
+              onChange={(e) => handleLockDelayChange(Number(e.target.value))}
+              className="rounded-lg border border-input bg-background px-2.5 py-1.5 text-xs font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+            >
+              <option value={1}>1 Minute</option>
+              <option value={5}>5 Minutes</option>
+              <option value={10}>10 Minutes</option>
+              <option value={30}>30 Minutes</option>
+              <option value={99999}>Never</option>
+            </select>
           </div>
         </div>
 

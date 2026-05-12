@@ -1,6 +1,8 @@
 import { db } from "../db"
 
 export async function getPocketBalance(pocketId: string): Promise<number> {
+  const pocket = await db.pockets.get(pocketId)
+  const initial = pocket?.initialBalance || 0
   const transactions = await db.transactions.toArray()
 
   return transactions.reduce((acc, tx) => {
@@ -13,5 +15,5 @@ export async function getPocketBalance(pocketId: string): Promise<number> {
       return acc + tx.amount // Incoming transfer
     }
     return acc
-  }, 0)
+  }, initial)
 }
