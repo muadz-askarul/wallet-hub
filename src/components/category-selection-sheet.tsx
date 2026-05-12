@@ -79,9 +79,7 @@ export function CategorySelectionSheet({
                   <div
                     className="flex size-9 items-center justify-center rounded-full text-lg shadow-inner"
                     style={{
-                      backgroundColor: cat.color
-                        ? `${cat.color}20`
-                        : "#6b728020",
+                      backgroundColor: cat.color ? `${cat.color}` : "#6b728050",
                     }}
                   >
                     {cat.icon || "📦"}

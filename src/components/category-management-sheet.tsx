@@ -56,21 +56,21 @@ const COMMON_ICONS = [
 ]
 
 const PRESET_COLORS = [
-  "#ef4444",
-  "#f97316",
-  "#f59e0b",
-  "#eab308",
-  "#84cc16",
-  "#10b981",
-  "#14b8a6",
-  "#06b6d4",
-  "#3b82f6",
-  "#6366f1",
-  "#8b5cf6",
-  "#a855f7",
-  "#ec4899",
-  "#f43f5e",
-  "#6b7280",
+  "#ef444450",
+  "#f9731650",
+  "#f59e0b50",
+  "#eab30850",
+  "#84cc1650",
+  "#10b98150",
+  "#14b8a650",
+  "#06b6d450",
+  "#3b82f650",
+  "#6366f150",
+  "#8b5cf650",
+  "#a855f750",
+  "#ec489950",
+  "#f43f5e50",
+  "#6b728050",
 ]
 
 interface CategoryFormData {
@@ -194,9 +194,7 @@ export function CategoryManagementSheet({ open, onOpenChange }: Props) {
                   <div
                     className="flex size-10 shrink-0 items-center justify-center rounded-full text-xl"
                     style={{
-                      backgroundColor: cat.color
-                        ? `${cat.color}CC`
-                        : "#6b728066",
+                      backgroundColor: cat.color ? `${cat.color}` : "#6b728066",
                     }}
                   >
                     {cat.icon || "📦"}
@@ -296,7 +294,7 @@ export function CategoryManagementSheet({ open, onOpenChange }: Props) {
             <div className="flex items-center gap-3 rounded-xl border px-4 py-3">
               <div
                 className="flex size-10 shrink-0 items-center justify-center rounded-full text-xl"
-                style={{ backgroundColor: `${form.color}CC` }}
+                style={{ backgroundColor: `${form.color}` }}
               >
                 {form.icon}
               </div>

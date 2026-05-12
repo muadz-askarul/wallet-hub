@@ -56,7 +56,7 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+import { CSS, type Transform } from "@dnd-kit/utilities"
 
 type DraftPocket = {
   id?: string
@@ -86,19 +86,13 @@ function SortableWallet({
   orderMode,
   onEdit,
 }: SortableWalletProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: walletId })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: walletId })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: 1,
   }
 
   return (
@@ -170,19 +164,13 @@ function SortablePocketRow({
   onUpdateAmount,
   onDelete,
 }: SortablePocketRowProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: pocket._key })
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: pocket._key })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: 1,
   }
 
   return (
@@ -231,6 +219,11 @@ function SortablePocketRow({
     </div>
   )
 }
+
+const restrictToVerticalAxis = ({ transform }: { transform: Transform }) => ({
+  ...transform,
+  x: 0,
+})
 
 // ─── Main WalletPage ──────────────────────────────────────────────────────────
 
@@ -434,23 +427,35 @@ export function WalletPage() {
       <div className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
         <h1 className="text-lg font-semibold">Wallets</h1>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={<Button variant="ghost" size="icon" className="size-9" />}
+        {!orderMode && (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={<Button variant="ghost" size="icon" className="size-9" />}
+            >
+              <MoreVertical className="size-5" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={openAddWallet}>
+                <Plus className="mr-2 size-4" />
+                Add
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setOrderMode((prev) => !prev)}>
+                <GripVertical className="mr-2 size-4" />
+                Order
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        {orderMode && (
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => setOrderMode(false)}
           >
-            <MoreVertical className="size-5" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={openAddWallet}>
-              <Plus className="mr-2 size-4" />
-              Add Wallet
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setOrderMode((prev) => !prev)}>
-              <GripVertical className="mr-2 size-4" />
-              {orderMode ? "Done Ordering" : "Order Wallets"}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            Save
+          </Button>
+        )}
       </div>
 
       <div className="p-4 pb-24">
@@ -463,6 +468,7 @@ export function WalletPage() {
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleWalletDragEnd}
+            modifiers={[restrictToVerticalAxis]}
           >
             <SortableContext
               items={wallets.map((w) => w.id)}
@@ -523,6 +529,7 @@ export function WalletPage() {
                   sensors={sensors}
                   collisionDetection={closestCenter}
                   onDragEnd={handlePocketDragEnd}
+                  modifiers={[restrictToVerticalAxis]}
                 >
                   <SortableContext
                     items={draftPockets.map((p) => p._key)}
