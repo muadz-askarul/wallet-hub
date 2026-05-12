@@ -43,12 +43,17 @@ export async function deleteWallet(id: string): Promise<void> {
       const pockets = await db.pockets.where("walletId").equals(id).toArray()
       const pocketIds = pockets.map((p) => p.id)
       await db.pockets.bulkDelete(pocketIds)
+      
       // delete all transactions in those pockets
-      const txs = await db.transactions
-        .where("pocketId")
-        .anyOf(pocketIds)
-        .toArray()
-      await db.transactions.bulkDelete(txs.map((t) => t.id))
+      if (pocketIds.length > 0) {
+        const txs = await db.transactions
+          .where("pocketId")
+          .anyOf(pocketIds)
+          .toArray()
+        if (txs.length > 0) {
+          await db.transactions.bulkDelete(txs.map((t) => t.id))
+        }
+      }
     }
   )
 }
