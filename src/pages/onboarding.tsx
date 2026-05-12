@@ -153,8 +153,8 @@ export function OnboardingPage() {
 
   // Step 1 Submit
   const handleStep1Submit = () => {
-    if (pin.length !== 6 || !/^\d+$/.test(pin)) {
-      toast.error("PIN must be exactly 6 digits")
+    if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+      toast.error("PIN must be exactly 4 digits")
       return
     }
     if (pin !== confirmPin) {
@@ -262,14 +262,14 @@ export function OnboardingPage() {
                   {/* PIN Input */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                      New 6-Digit PIN
+                      New 4-Digit PIN
                     </label>
                     <Input
                       type="password"
                       pattern="[0-9]*"
                       inputMode="numeric"
-                      maxLength={6}
-                      placeholder="••••••"
+                      maxLength={4}
+                      placeholder="••••"
                       value={pin}
                       onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
                       className="h-11 text-center font-bold tracking-widest text-lg"
@@ -285,8 +285,8 @@ export function OnboardingPage() {
                       type="password"
                       pattern="[0-9]*"
                       inputMode="numeric"
-                      maxLength={6}
-                      placeholder="••••••"
+                      maxLength={4}
+                      placeholder="••••"
                       value={confirmPin}
                       onChange={(e) =>
                         setConfirmPin(e.target.value.replace(/\D/g, ""))

@@ -12,9 +12,11 @@ export function LockScreenOverlay() {
     const success = await unlock(values.pin)
     if (success) {
       toast.success("Welcome back!")
+      return true
     } else {
       setErrorCount((prev) => prev + 1)
       toast.error("Incorrect PIN. Please try again.")
+      return false
     }
   }
 
@@ -22,10 +24,10 @@ export function LockScreenOverlay() {
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
         <PinInputForm
-          length={6}
+          length={4}
           icon={<Lock className="size-6" />}
           title="App Locked"
-          description="Enter your 6-digit PIN to unlock Wallet Hub"
+          description="Enter your 4-digit PIN to unlock Wallet Hub"
           onSubmit={handleSubmit}
         />
         {errorCount > 0 && (

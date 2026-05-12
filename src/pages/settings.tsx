@@ -5,7 +5,7 @@ import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 import { Switch } from "@/components/ui/switch"
 import { CategoryManagementSheet } from "@/components/category-management-sheet"
-import { ChevronRight, Moon, Tag, Repeat, Clock } from "lucide-react"
+import { ChevronRight, Moon, Tag, Repeat, Clock, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
@@ -33,6 +33,38 @@ export function SettingsPage() {
     } catch (err) {
       console.error(err)
       toast.error("Failed to update auto-lock settings")
+    }
+  }
+
+  const handleResetApp = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to reset the app? This will delete all wallets, pockets, transactions, bills, and lock settings."
+      )
+    ) {
+      return
+    }
+    try {
+      await db.transaction(
+        "rw",
+        db.settings,
+        db.wallets,
+        db.pockets,
+        db.transactions,
+        db.bills,
+        async () => {
+          await db.settings.clear()
+          await db.wallets.clear()
+          await db.pockets.clear()
+          await db.transactions.clear()
+          await db.bills.clear()
+        }
+      )
+      toast.success("App reset successfully!")
+      window.location.reload()
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to reset app")
     }
   }
 
@@ -139,6 +171,26 @@ export function SettingsPage() {
               </div>
             </div>
             <ChevronRight className="size-4 text-muted-foreground" />
+          </Button>
+
+          {/* Reset App & Onboarding */}
+          <Button
+            variant="ghost"
+            className="flex h-auto w-full items-center justify-between rounded-none border-t px-4 py-4 text-left cursor-pointer hover:bg-destructive/10 hover:text-destructive group"
+            onClick={handleResetApp}
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex size-9 items-center justify-center rounded-full bg-muted group-hover:bg-destructive/20">
+                <Trash className="size-4 text-muted-foreground group-hover:text-destructive" />
+              </div>
+              <div>
+                <p className="font-medium">Reset & Retry Onboarding</p>
+                <p className="text-xs text-muted-foreground group-hover:text-destructive/80">
+                  Delete all data and start the onboarding wizard again
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground group-hover:text-destructive" />
           </Button>
         </div>
 

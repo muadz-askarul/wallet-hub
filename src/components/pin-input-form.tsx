@@ -16,12 +16,12 @@ export interface PinInputFormProps {
   icon?: React.ReactNode
   title?: string
   description?: string
-  onSubmit: (values: { pin: string }) => void
+  onSubmit: (values: { pin: string }) => void | boolean | Promise<void | boolean>
   className?: string
 }
 
 export function PinInputForm({
-  length = 6,
+  length = 4,
   icon,
   title,
   description,
@@ -53,11 +53,20 @@ export function PinInputForm({
     if (pinValue.length === length && !isSubmitting) {
       // Small delay to let the UI update (showing the last digit) before submitting
       const timer = setTimeout(() => {
-        handleSubmit(onSubmit)()
+        handleSubmit(async (values) => {
+          try {
+            const res = await onSubmit(values)
+            if (res === false) {
+              setValue("pin", "")
+            }
+          } catch {
+            setValue("pin", "")
+          }
+        })()
       }, 100)
       return () => clearTimeout(timer)
     }
-  }, [pinValue, length, handleSubmit, onSubmit, isSubmitting])
+  }, [pinValue, length, handleSubmit, onSubmit, isSubmitting, setValue])
 
   const handleNumberPress = (num: string) => {
     if (pinValue.length < length) {
