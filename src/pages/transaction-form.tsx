@@ -50,7 +50,9 @@ export function TransactionFormPage() {
 
   // Recurring schedule states
   const [isRecurring, setIsRecurring] = useState(false)
-  const [recurringType, setRecurringType] = useState<"bill" | "repeat">("repeat")
+  const [recurringType, setRecurringType] = useState<"bill" | "repeat">(
+    "repeat"
+  )
   const [recurringPeriod, setRecurringPeriod] = useState<string>("Every Month")
   const [endDateStr, setEndDateStr] = useState("")
 
@@ -232,17 +234,17 @@ export function TransactionFormPage() {
 
         {/* Amount Section */}
         <div className="space-y-1.5 rounded-2xl border bg-muted/5 p-4">
-          <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+          <label className="text-xs font-semibold tracking-wider text-foreground uppercase">
             Amount
           </label>
           <div className="flex items-center justify-between gap-2 border-b pb-2">
-            <span className="shrink-0 text-2xl font-bold text-muted-foreground">
+            <span className="shrink-0 text-2xl font-bold text-foreground">
               Rp
             </span>
             <NumericInput
               value={amount}
               onValueChange={(v) => setAmount(v ? parseFloat(v) : 0)}
-              className="h-auto flex-1 border-none bg-transparent p-0 text-right text-3xl font-black text-white shadow-none focus-visible:ring-0 dark:bg-transparent"
+              className="h-auto flex-1 border-none bg-transparent p-0 text-right text-3xl font-black text-foreground shadow-none focus-visible:ring-0 dark:bg-transparent"
               placeholder="0"
             />
           </div>
@@ -368,7 +370,10 @@ export function TransactionFormPage() {
             <div className="space-y-4 rounded-2xl border bg-card p-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
-                  <label htmlFor="recurring-toggle" className="text-sm font-semibold text-foreground">
+                  <label
+                    htmlFor="recurring-toggle"
+                    className="text-sm font-semibold text-foreground"
+                  >
                     Set repeating schedule
                   </label>
                   <p className="text-xs text-muted-foreground">
@@ -386,7 +391,7 @@ export function TransactionFormPage() {
                 <div className="space-y-4 border-t pt-4">
                   {/* Schedule Type */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                       Schedule Type
                     </label>
                     <div className="flex rounded-xl bg-muted p-1">
@@ -419,13 +424,13 @@ export function TransactionFormPage() {
 
                   {/* Period Selection */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                       Repeat Period
                     </label>
                     <select
                       value={recurringPeriod}
                       onChange={(e) => setRecurringPeriod(e.target.value)}
-                      className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                     >
                       {[
                         "Every Day",
@@ -451,7 +456,7 @@ export function TransactionFormPage() {
 
                   {/* End Date (Optional) */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                       End Date (Optional)
                     </label>
                     <Input
