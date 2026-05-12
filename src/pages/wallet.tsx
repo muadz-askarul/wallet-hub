@@ -585,30 +585,30 @@ export function WalletPage() {
               </div>
             </div>
           </DrawerFooter>
+
+          {/* Delete Wallet Confirmation */}
+          <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Wallet?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete &quot;{editingWallet?.name}&quot; and
+                  all its pockets. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
+                  onClick={handleDeleteWallet}
+                >
+                  Delete Wallet
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </DrawerContent>
       </Drawer>
-
-      {/* Delete Wallet Confirmation */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Wallet?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete &quot;{editingWallet?.name}&quot; and
-              all its pockets. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
-              onClick={handleDeleteWallet}
-            >
-              Delete Wallet
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   )
 }
