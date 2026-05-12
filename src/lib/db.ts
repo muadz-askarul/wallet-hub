@@ -43,12 +43,43 @@ export interface Settings {
   pin: string
 }
 
+export interface Schedule {
+  id: string
+  type: "bill" | "repeat" // bill: user-triggered; repeat: auto-triggers
+  period:
+    | "Every Day"
+    | "Weekdays"
+    | "Weekend"
+    | "Every Week"
+    | "Every 2 Weeks"
+    | "Every 4 Weeks"
+    | "Every Month"
+    | "The end of the month"
+    | "Every 2 Month"
+    | "Every 3 Month"
+    | "Every 4 Month"
+    | "Every 6 Month"
+    | "Anually"
+  amount: number
+  note?: string
+  pocketId: string
+  categoryId?: string
+  destinationPocketId?: string
+  transactionType: "income" | "expense" | "transfer"
+  startDate: number
+  endDate?: number // optional date after which schedule stops repeating
+  nextDueDate: number // epoch ms
+  lastTriggeredDate?: number
+  isActive: number // 1 for active, 0 for inactive/ended
+}
+
 const db = new Dexie("WalletHubDB") as Dexie & {
   wallets: EntityTable<Wallet, "id">
   pockets: EntityTable<Pocket, "id">
   categories: EntityTable<Category, "id">
   transactions: EntityTable<Transaction, "id">
   settings: EntityTable<Settings, "id">
+  schedules: EntityTable<Schedule, "id">
 }
 
 db.version(1).stores({
@@ -67,6 +98,10 @@ db.version(3).stores({
   wallets: "id, name, order",
   pockets: "id, walletId, deletedAt, order",
   categories: "id, type, color",
+})
+
+db.version(4).stores({
+  schedules: "id, type, isActive, nextDueDate, pocketId",
 })
 
 // Seed default categories on first run
