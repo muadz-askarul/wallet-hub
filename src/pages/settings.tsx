@@ -1,11 +1,13 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useTheme } from "@/components/theme-provider"
 import { Switch } from "@/components/ui/switch"
 import { CategoryManagementSheet } from "@/components/category-management-sheet"
-import { ChevronRight, Moon, Tag } from "lucide-react"
+import { ChevronRight, Moon, Tag, Repeat } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function SettingsPage() {
+  const navigate = useNavigate()
   const { theme, setTheme } = useTheme()
   const [categorySheetOpen, setCategorySheetOpen] = useState(false)
 
@@ -71,6 +73,26 @@ export function SettingsPage() {
                 <p className="font-medium">Categories</p>
                 <p className="text-xs text-muted-foreground">
                   Manage income and expense categories
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </Button>
+
+          {/* Recurring Schedules */}
+          <Button
+            variant="ghost"
+            className="flex h-auto w-full items-center justify-between rounded-none border-t px-4 py-4 text-left cursor-pointer"
+            onClick={() => navigate("/bills")}
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex size-9 items-center justify-center rounded-full bg-muted">
+                <Repeat className="size-4 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="font-medium">Recurring & Schedules</p>
+                <p className="text-xs text-muted-foreground">
+                  Manage repeating transactions and bills
                 </p>
               </div>
             </div>

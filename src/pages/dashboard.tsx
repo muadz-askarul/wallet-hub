@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 import {
@@ -6,8 +7,15 @@ import {
 } from "@/components/transaction-group"
 import { formatCurrency } from "../lib/utils"
 import { getPocketBalance } from "../lib/services/transaction-service"
+import { triggerBillPayment } from "@/lib/services/recurring-service"
+import { Link } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
+import { ChevronRight, Check } from "lucide-react"
 
 export function DashboardPage() {
+  const [processingId, setProcessingId] = useState<string | null>(null)
+
   const data = useLiveQuery(
     async () => {
       const pockets = await db.pockets.toArray()
@@ -23,6 +31,31 @@ export function DashboardPage() {
         if (balance >= 0) assets += balance
         else liabilities += Math.abs(balance)
       }
+
+      // Load upcoming bills for the current month
+      const now = new Date()
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime()
+
+      const bills = await db.schedules
+        .where("type")
+        .equals("bill")
+        .filter((s) => s.isActive === 1 && s.nextDueDate <= endOfMonth)
+        .toArray()
+
+      const enrichedBills = bills.map((b) => {
+        const pocket = pockets.find((pk) => pk.id === b.pocketId)
+        const wallet = pocket ? wallets.find((wl) => wl.id === pocket.walletId) : undefined
+        const category = categories.find((cg) => cg.id === b.categoryId)
+
+        return {
+          ...b,
+          pocketName: pocket?.name || "Unknown Pocket",
+          walletName: wallet?.name || "Unknown Wallet",
+          categoryName: category?.name || "Uncategorized",
+          categoryIcon: category?.icon || "📋",
+          categoryColor: category?.color || "#6b7280",
+        }
+      })
 
       // Fetch more transactions for better grouping visibility
       const txs = await db.transactions
@@ -96,11 +129,25 @@ export function DashboardPage() {
         liabilities,
         total: assets - liabilities,
         transactionGroups,
+        enrichedBills,
       }
     },
     [],
-    { assets: 0, liabilities: 0, total: 0, transactionGroups: [] }
+    { assets: 0, liabilities: 0, total: 0, transactionGroups: [], enrichedBills: [] }
   )
+
+  const handlePayBill = async (id: string, note: string) => {
+    setProcessingId(id)
+    try {
+      await triggerBillPayment(id)
+      toast.success(`Bill completed: ${note}`)
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to complete bill payment")
+    } finally {
+      setProcessingId(null)
+    }
+  }
 
   return (
     <div className="p-6 pb-24">
@@ -128,6 +175,63 @@ export function DashboardPage() {
           </h2>
         </div>
       </div>
+
+      {/* Bills due this month widget */}
+      {data.enrichedBills && data.enrichedBills.length > 0 && (
+        <div className="mb-8">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-medium text-foreground">Bills Due This Month</h3>
+            <Link
+              to="/bills"
+              className="flex items-center text-xs font-semibold text-primary hover:underline"
+            >
+              See All ({data.enrichedBills.length})
+              <ChevronRight className="ml-1 size-3" />
+            </Link>
+          </div>
+          <div className="space-y-3">
+            {data.enrichedBills.map((bill) => (
+              <div
+                key={bill.id}
+                className="flex items-center justify-between gap-3 rounded-2xl border bg-card p-3.5 shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                    style={{
+                      backgroundColor: bill.categoryColor ? `${bill.categoryColor}15` : "#6b728015",
+                    }}
+                  >
+                    {bill.categoryIcon}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {bill.note || bill.categoryName}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Due {new Date(bill.nextDueDate).toLocaleDateString("id-ID", { day: "numeric", month: "short" })} • {bill.walletName}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <span className="text-sm font-bold text-foreground shrink-0">
+                    Rp {formatCurrency(bill.amount)}
+                  </span>
+                  <Button
+                    size="icon"
+                    className="size-8 rounded-lg cursor-pointer shrink-0"
+                    disabled={processingId === bill.id}
+                    onClick={() => handlePayBill(bill.id, bill.note || "Bill")}
+                  >
+                    {processingId === bill.id ? "..." : <Check className="size-4" />}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div>
         <h3 className="mb-4 text-lg font-medium">Recent Transactions</h3>
