@@ -23,16 +23,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import {
   createWallet,
   updateWallet,
   deleteWallet,
@@ -278,7 +268,7 @@ export function WalletPage() {
   const [walletName, setWalletName] = useState("")
   const [draftPockets, setDraftPockets] = useState<DraftPocket[]>([])
   const [deletedPocketIds, setDeletedPocketIds] = useState<string[]>([])
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   // ── Wallet DnD ────────────────────────────────────────────────────────────
 
@@ -317,6 +307,7 @@ export function WalletPage() {
     setWalletName("")
     setDraftPockets([])
     setDeletedPocketIds([])
+    setConfirmDelete(false)
     setWalletDrawerOpen(true)
   }
 
@@ -335,6 +326,7 @@ export function WalletPage() {
       }))
     )
     setDeletedPocketIds([])
+    setConfirmDelete(false)
     setWalletDrawerOpen(true)
   }
 
@@ -417,7 +409,7 @@ export function WalletPage() {
       await deleteWallet(editingWallet.id)
       toast.success("Wallet deleted")
       setWalletDrawerOpen(false)
-      setDeleteDialogOpen(false)
+      setConfirmDelete(false)
     } catch {
       toast.error("Failed to delete wallet")
     }
@@ -565,48 +557,51 @@ export function WalletPage() {
           </div>
 
           <DrawerFooter className="border-t bg-background">
-            <div className="flex w-full items-center justify-between">
-              {editingWallet ? (
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => setDeleteDialogOpen(true)}
-                >
-                  <Trash className="size-4" />
-                </Button>
-              ) : (
-                <div />
-              )}
-              <div className="flex gap-2">
-                <DrawerClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DrawerClose>
-                <Button onClick={handleSaveWallet}>Save Wallet</Button>
+            {confirmDelete ? (
+              <div className="flex flex-col gap-3 w-full p-1">
+                <p className="text-xs text-destructive font-semibold text-center leading-relaxed">
+                  Permanently delete &quot;{editingWallet?.name}&quot; and all its pockets? This cannot be undone.
+                </p>
+                <div className="flex gap-2 w-full">
+                  <Button
+                    variant="outline"
+                    className="flex-1 cursor-pointer"
+                    onClick={() => setConfirmDelete(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1 cursor-pointer bg-destructive hover:bg-destructive/95"
+                    onClick={handleDeleteWallet}
+                  >
+                    Yes, Delete
+                  </Button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex w-full items-center justify-between">
+                {editingWallet ? (
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => setConfirmDelete(true)}
+                    className="cursor-pointer"
+                  >
+                    <Trash className="size-4" />
+                  </Button>
+                ) : (
+                  <div />
+                )}
+                <div className="flex gap-2">
+                  <DrawerClose asChild>
+                    <Button variant="outline" className="cursor-pointer">Cancel</Button>
+                  </DrawerClose>
+                  <Button onClick={handleSaveWallet} className="cursor-pointer">Save Wallet</Button>
+                </div>
+              </div>
+            )}
           </DrawerFooter>
-
-          {/* Delete Wallet Confirmation */}
-          <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete Wallet?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete &quot;{editingWallet?.name}&quot; and
-                  all its pockets. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
-                  onClick={handleDeleteWallet}
-                >
-                  Delete Wallet
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </DrawerContent>
       </Drawer>
     </>
