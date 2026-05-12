@@ -9,7 +9,7 @@
 | 5 | Phase 2: Update DB Schema & Types | `done` |
 | 6 | Phase 2: Implement Due Date Calculator | `done` |
 | 7 | Phase 2: Build Recurring Services Engine | `done` |
-| 8 | Phase 2: Connect Recurring Engine to Init | `todo` |
-| 9 | Phase 2: Add Option in Create Transaction Form | `todo` |
+| 8 | Phase 2: Connect Recurring Engine to Init | `done` |
+| 9 | Phase 2: Add Option in Create Transaction Form | `done` |
 | 10| Phase 2: Build Schedules & Templates Hub | `todo` |
 | 11| Phase 2: Build Dashboard Bills Widget | `todo` |
