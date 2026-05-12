@@ -27,31 +27,31 @@ function AppContent() {
 
   // 3. Normal secure routing
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<RootLayout />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="bills" element={<BillsPage />} />
-          <Route path="budget" element={<BudgetPage />} />
-          <Route path="goals" element={<GoalsPage />} />
-          <Route path="transactions" element={<TransactionsPage />} />
-          <Route path="transactions/new" element={<TransactionFormPage />} />
-          <Route
-            path="transactions/edit/:id"
-            element={<TransactionFormPage />}
-          />
-          <Route path="wallet" element={<WalletPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<RootLayout />}>
+        <Route index element={<DashboardPage />} />
+        <Route path="bills" element={<BillsPage />} />
+        <Route path="budget" element={<BudgetPage />} />
+        <Route path="goals" element={<GoalsPage />} />
+        <Route path="transactions" element={<TransactionsPage />} />
+        <Route path="transactions/new" element={<TransactionFormPage />} />
+        <Route
+          path="transactions/edit/:id"
+          element={<TransactionFormPage />}
+        />
+        <Route path="wallet" element={<WalletPage />} />
+        <Route path="settings" element={<SettingsPage />} />
+      </Route>
+    </Routes>
   )
 }
 
 export function App() {
   return (
     <AppLockProvider>
-      <AppContent />
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
     </AppLockProvider>
   )
 }
