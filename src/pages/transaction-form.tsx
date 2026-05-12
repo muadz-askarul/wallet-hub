@@ -256,7 +256,7 @@ export function TransactionFormPage() {
               type="datetime-local"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="h-11 [&::-webkit-calendar-picker-indicator]:invert"
+              className="h-11 dark:[&::-webkit-calendar-picker-indicator]:invert"
             />
           </div>
 
@@ -459,7 +459,7 @@ export function TransactionFormPage() {
                       type="date"
                       value={endDateStr}
                       onChange={(e) => setEndDateStr(e.target.value)}
-                      className="h-11 [&::-webkit-calendar-picker-indicator]:invert"
+                      className="h-11 dark:[&::-webkit-calendar-picker-indicator]:invert"
                     />
                   </div>
                 </div>
