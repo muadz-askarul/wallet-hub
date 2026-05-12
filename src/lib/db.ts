@@ -106,28 +106,28 @@ db.version(4).stores({
 
 // Seed default categories on first run
 const DEFAULT_EXPENSE_CATEGORIES: Omit<Category, "id">[] = [
-  { name: "Shopping", type: "expense", icon: "🛍️", color: "#f59e0b" },
-  { name: "Grocery", type: "expense", icon: "🛒", color: "#10b981" },
-  { name: "Bill", type: "expense", icon: "📋", color: "#6366f1" },
-  { name: "Health", type: "expense", icon: "🏥", color: "#ef4444" },
-  { name: "Beauty", type: "expense", icon: "💄", color: "#ec4899" },
-  { name: "Food", type: "expense", icon: "🍜", color: "#f97316" },
-  { name: "Snack", type: "expense", icon: "🍿", color: "#eab308" },
-  { name: "Beverage", type: "expense", icon: "☕", color: "#a16207" },
-  { name: "Transportation", type: "expense", icon: "🚗", color: "#3b82f6" },
-  { name: "Apparel", type: "expense", icon: "👗", color: "#8b5cf6" },
-  { name: "Education", type: "expense", icon: "📚", color: "#0ea5e9" },
-  { name: "Household", type: "expense", icon: "🏠", color: "#14b8a6" },
-  { name: "Gift", type: "expense", icon: "🎁", color: "#f43f5e" },
-  { name: "Other", type: "expense", icon: "📦", color: "#6b7280" },
+  { name: "Shopping", type: "expense", icon: "🛍️", color: "#f59e0b50" },
+  { name: "Grocery", type: "expense", icon: "🛒", color: "#10b98150" },
+  { name: "Bill", type: "expense", icon: "📋", color: "#6366f150" },
+  { name: "Health", type: "expense", icon: "🏥", color: "#ef444450" },
+  { name: "Beauty", type: "expense", icon: "💄", color: "#ec489950" },
+  { name: "Food", type: "expense", icon: "🍜", color: "#f9731650" },
+  { name: "Snack", type: "expense", icon: "🍿", color: "#eab30850" },
+  { name: "Beverage", type: "expense", icon: "☕", color: "#a1620750" },
+  { name: "Transportation", type: "expense", icon: "🚗", color: "#3b82f650" },
+  { name: "Apparel", type: "expense", icon: "👗", color: "#8b5cf650" },
+  { name: "Education", type: "expense", icon: "📚", color: "#0ea5e950" },
+  { name: "Household", type: "expense", icon: "🏠", color: "#14b8a650" },
+  { name: "Gift", type: "expense", icon: "🎁", color: "#f43f5e50" },
+  { name: "Other", type: "expense", icon: "📦", color: "#6b728050" },
 ]
 
 const DEFAULT_INCOME_CATEGORIES: Omit<Category, "id">[] = [
-  { name: "Salary", type: "income", icon: "💼", color: "#10b981" },
-  { name: "Petty Cash", type: "income", icon: "💵", color: "#3b82f6" },
-  { name: "Allowance", type: "income", icon: "🎓", color: "#8b5cf6" },
-  { name: "Bonus", type: "income", icon: "🎉", color: "#f59e0b" },
-  { name: "Other", type: "income", icon: "💰", color: "#6b7280" },
+  { name: "Salary", type: "income", icon: "💼", color: "#10b98150" },
+  { name: "Petty Cash", type: "income", icon: "💵", color: "#3b82f650" },
+  { name: "Allowance", type: "income", icon: "🎓", color: "#8b5cf650" },
+  { name: "Bonus", type: "income", icon: "🎉", color: "#f59e0b50" },
+  { name: "Other", type: "income", icon: "💰", color: "#6b728050" },
 ]
 
 export async function seedDefaultCategories() {
