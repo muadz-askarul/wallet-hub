@@ -55,42 +55,44 @@ export function TransactionGroup({ group }: TransactionGroupProps) {
 
       {/* Transactions List */}
       <div className="space-y-1 py-1">
-        {group.transactions.map((tx) => (
-          <Link
-            key={tx.id}
-            to={`/transactions/edit/${tx.id}`}
-            className="flex items-center justify-between px-3 py-2 transition-colors hover:bg-muted/50"
-          >
-            <div className="flex min-w-0 flex-1 items-center gap-4">
-              <div className="flex w-28 shrink-0 items-center gap-2">
-                <span className="text-lg">{tx.categoryIcon}</span>
-                <span className="truncate text-sm text-muted-foreground">
-                  {tx.categoryName}
-                </span>
-              </div>
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-[15px] font-medium text-foreground">
-                  {tx.note || "Adjustment"}
-                </span>
-                <span className="truncate text-xs text-muted-foreground">
-                  {tx.pocketName}
-                </span>
-              </div>
-            </div>
-            <span
-              className={cn(
-                "ml-3 shrink-0 text-[15px] font-medium",
-                tx.type === "income"
-                  ? "text-primary"
-                  : tx.type === "expense"
-                    ? "text-destructive"
-                    : "text-foreground"
-              )}
+        {[...group.transactions]
+          .sort((a, b) => b.date - a.date)
+          .map((tx) => (
+            <Link
+              key={tx.id}
+              to={`/transactions/edit/${tx.id}`}
+              className="flex items-center justify-between px-3 py-2 transition-colors hover:bg-muted/50"
             >
-              Rp {formatCurrency(tx.amount)}
-            </span>
-          </Link>
-        ))}
+              <div className="flex min-w-0 flex-1 items-center gap-4">
+                <div className="flex w-28 shrink-0 items-center gap-2">
+                  <span className="text-lg">{tx.categoryIcon}</span>
+                  <span className="truncate text-sm text-muted-foreground">
+                    {tx.categoryName}
+                  </span>
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-[15px] font-medium text-foreground">
+                    {tx.note || tx.pocketName}
+                  </span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {tx.note && tx.pocketName}
+                  </span>
+                </div>
+              </div>
+              <span
+                className={cn(
+                  "ml-3 shrink-0 text-[15px] font-medium",
+                  tx.type === "income"
+                    ? "text-primary"
+                    : tx.type === "expense"
+                      ? "text-destructive"
+                      : "text-foreground"
+                )}
+              >
+                Rp {formatCurrency(tx.amount)}
+              </span>
+            </Link>
+          ))}
       </div>
     </div>
   )
