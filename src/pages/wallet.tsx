@@ -40,7 +40,7 @@ import {
   updatePocket,
   deletePocket,
 } from "@/lib/services/wallet-service"
-import { Plus, Trash, MoreVertical, GripVertical } from "lucide-react"
+import { Plus, Trash, MoreVertical, GripVertical, Edit } from "lucide-react"
 import { toast } from "sonner"
 import {
   DndContext,
@@ -102,7 +102,7 @@ function SortableWallet({
       style={style}
       className="overflow-hidden rounded-xl border bg-card shadow-sm"
     >
-      <div className="flex items-center border-b bg-muted/30 px-4 py-3">
+      <div className="flex items-center border-b bg-muted/30 px-4 py-2">
         {/* Drag handle */}
         {orderMode && (
           <button
@@ -123,7 +123,7 @@ function SortableWallet({
 
         {!orderMode && (
           <Button variant="ghost" size="sm" className="ml-2" onClick={onEdit}>
-            <MoreVertical className="size-4" />
+            <Edit className="size-4" />
           </Button>
         )}
       </div>
