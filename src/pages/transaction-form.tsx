@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useLiveQuery } from "dexie-react-hooks"
-import { db } from "@/lib/db"
+import { db, type Schedule } from "@/lib/db"
 import { Button } from "@/components/ui/button"
+import { calculateNextDueDate } from "@/lib/utils/date-calculator"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { NumericInput } from "@/components/ui/numeric-input"
@@ -45,6 +46,12 @@ export function TransactionFormPage() {
   const [note, setNote] = useState("")
   const [saving, setSaving] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+
+  // Recurring schedule states
+  const [isRecurring, setIsRecurring] = useState(false)
+  const [recurringType, setRecurringType] = useState<"bill" | "repeat">("repeat")
+  const [recurringPeriod, setRecurringPeriod] = useState<string>("Every Month")
+  const [endDateStr, setEndDateStr] = useState("")
 
   // Bottom sheets
   const [pocketSheetOpen, setPocketSheetOpen] = useState(false)
@@ -121,17 +128,45 @@ export function TransactionFormPage() {
         await db.transactions.update(id, txData)
         toast.success("Transaction updated")
       } else {
+        const savedTxId = crypto.randomUUID()
         await db.transactions.add({
-          id: crypto.randomUUID(),
+          id: savedTxId,
           ...txData,
         })
-        toast.success("Transaction added")
+
+        if (isRecurring) {
+          const selectedDate = new Date(date)
+          const nextDue = calculateNextDueDate(selectedDate, recurringPeriod)
+
+          const schedule: Schedule = {
+            id: crypto.randomUUID(),
+            type: recurringType,
+            period: recurringPeriod as any,
+            amount,
+            note: note.trim() || undefined,
+            pocketId: pocketId!,
+            categoryId: type !== "transfer" ? categoryId : undefined,
+            destinationPocketId: type === "transfer" ? destPocketId : undefined,
+            transactionType: type,
+            startDate: selectedDate.getTime(),
+            nextDueDate: nextDue.getTime(),
+            isActive: 1,
+            endDate: endDateStr ? new Date(endDateStr).getTime() : undefined,
+          }
+
+          await db.schedules.add(schedule)
+          toast.success("Recurring schedule created")
+        } else {
+          toast.success("Transaction added")
+        }
       }
 
       if (isContinue) {
         setAmount(0)
         setNote("")
         setDate(now())
+        setIsRecurring(false)
+        setEndDateStr("")
       } else {
         navigate("/transactions")
       }
@@ -326,6 +361,111 @@ export function TransactionFormPage() {
               rows={3}
             />
           </div>
+
+          {/* Repeating Options (Only for New transactions) */}
+          {!id && (
+            <div className="space-y-4 rounded-2xl border bg-card p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label htmlFor="recurring-toggle" className="text-sm font-semibold text-foreground">
+                    Set repeating schedule
+                  </label>
+                  <p className="text-xs text-muted-foreground">
+                    Schedule this transaction to repeat
+                  </p>
+                </div>
+                <input
+                  id="recurring-toggle"
+                  type="checkbox"
+                  checked={isRecurring}
+                  onChange={(e) => setIsRecurring(e.target.checked)}
+                  className="size-5 rounded-md border-muted accent-primary cursor-pointer"
+                />
+              </div>
+
+              {isRecurring && (
+                <div className="space-y-4 border-t pt-4">
+                  {/* Schedule Type */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Schedule Type
+                    </label>
+                    <div className="flex rounded-xl bg-muted p-1">
+                      <button
+                        type="button"
+                        onClick={() => setRecurringType("repeat")}
+                        className={cn(
+                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all",
+                          recurringType === "repeat"
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        Auto-Repeat
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRecurringType("bill")}
+                        className={cn(
+                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all",
+                          recurringType === "bill"
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        Manual Bill
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Period Selection */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Repeat Period
+                    </label>
+                    <select
+                      value={recurringPeriod}
+                      onChange={(e) => setRecurringPeriod(e.target.value)}
+                      className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      {[
+                        "Every Day",
+                        "Weekdays",
+                        "Weekend",
+                        "Every Week",
+                        "Every 2 Weeks",
+                        "Every 4 Weeks",
+                        "Every Month",
+                        "The end of the month",
+                        "Every 2 Month",
+                        "Every 3 Month",
+                        "Every 4 Month",
+                        "Every 6 Month",
+                        "Anually",
+                      ].map((p) => (
+                        <option key={p} value={p}>
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* End Date (Optional) */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      End Date (Optional)
+                    </label>
+                    <Input
+                      type="date"
+                      value={endDateStr}
+                      onChange={(e) => setEndDateStr(e.target.value)}
+                      className="h-11"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Form Actions */}
