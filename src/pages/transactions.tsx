@@ -2,7 +2,7 @@ import { useState, useMemo } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 import { cn, formatCurrency } from "@/lib/utils"
-import { Link } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import {
   ChevronLeft,
   ChevronRight,
@@ -17,7 +17,17 @@ import {
   type EnrichedTransaction,
 } from "@/components/transaction-group"
 
+interface EnrichedTransactionGroup {
+  date: Date
+  income: number
+  expense: number
+  transactions: EnrichedTransaction[]
+}
+
 export function TransactionsPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const pocketIdFilter = searchParams.get("pocketId")
+
   const [currentDate, setCurrentDate] = useState(() => {
     const d = new Date()
     d.setDate(1)
@@ -45,6 +55,15 @@ export function TransactionsPage() {
       > = {}
 
       for (const tx of txs) {
+        // If a pocket filter is specified, only show transactions belonging to it (source or destination)
+        if (
+          pocketIdFilter &&
+          tx.pocketId !== pocketIdFilter &&
+          tx.destinationPocketId !== pocketIdFilter
+        ) {
+          continue
+        }
+
         const d = new Date(tx.date)
 
         // Filter by month if showAll is false
@@ -98,18 +117,26 @@ export function TransactionsPage() {
         (a, b) => b.date.getTime() - a.date.getTime()
       )
 
-      return transactionGroups
+      const activePocket = pocketIdFilter
+        ? pockets.find((p) => p.id === pocketIdFilter)
+        : undefined
+
+      return {
+        groups: transactionGroups,
+        activePocket,
+      }
     },
-    [currentDate, showAll],
-    []
+    [currentDate, showAll, pocketIdFilter],
+    { groups: [] as EnrichedTransactionGroup[], activePocket: undefined }
   )
 
+  const { groups = [], activePocket } = data || {}
+
   const summary = useMemo(() => {
-    if (!data) return { income: 0, expense: 0, net: 0 }
-    const income = data.reduce((s, g) => s + g.income, 0)
-    const expense = data.reduce((s, g) => s + g.expense, 0)
+    const income = groups.reduce((s, g) => s + g.income, 0)
+    const expense = groups.reduce((s, g) => s + g.expense, 0)
     return { income, expense, net: income - expense }
-  }, [data])
+  }, [groups])
 
   const handlePrevMonth = () => {
     setCurrentDate((prev) => {
@@ -197,6 +224,33 @@ export function TransactionsPage() {
       </div>
 
       <div className="p-4">
+        {/* Pocket Filter Chip */}
+        {activePocket && (
+          <div className="mb-4 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm">
+            <div className="flex items-center gap-2 text-foreground">
+              <span className="flex h-2 w-2 animate-pulse rounded-full bg-primary" />
+              <span>
+                Pocket:{" "}
+                <strong className="font-semibold text-primary">
+                  {activePocket.name}
+                </strong>
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+              onClick={() => {
+                const params = new URLSearchParams(searchParams)
+                params.delete("pocketId")
+                setSearchParams(params)
+              }}
+            >
+              Clear Filter
+            </Button>
+          </div>
+        )}
+
         {/* Monthly Summary Card */}
         {!showAll && (
           <div className="mb-4 overflow-hidden rounded-xl border bg-card shadow-sm">
@@ -229,13 +283,13 @@ export function TransactionsPage() {
           </div>
         )}
 
-        {data.length === 0 ? (
+        {groups.length === 0 ? (
           <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
             <p>No transactions found.</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {data.map((group) => (
+            {groups.map((group) => (
               <TransactionGroup key={group.date.toISOString()} group={group} />
             ))}
           </div>

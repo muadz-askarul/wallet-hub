@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { formatCurrency } from "@/lib/utils"
 import { db } from "@/lib/db"
+import { Link } from "react-router-dom"
 import { getPocketBalance } from "@/lib/services/transaction-service"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -129,15 +130,16 @@ function SortableWallet({
 
       <div className="space-y-1 py-1">
         {pockets.map((pocket) => (
-          <div
+          <Link
             key={pocket.id}
-            className="flex items-center justify-between px-4 py-2.5"
+            to={`/transactions?pocketId=${pocket.id}`}
+            className="flex items-center justify-between px-4 py-2.5 transition-colors hover:bg-muted/40 active:bg-muted/80"
           >
             <span className="font-medium">{pocket.name}</span>
-            <span className="font-medium">
+            <span className="font-medium text-foreground">
               Rp {formatCurrency(pocketBalances[pocket.id] || 0)}
             </span>
-          </div>
+          </Link>
         ))}
         {pockets.length === 0 && (
           <p className="py-2 text-center text-sm text-muted-foreground">
