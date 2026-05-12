@@ -11,5 +11,6 @@
 | 7 | Phase 2: Build Recurring Services Engine | `done` |
 | 8 | Phase 2: Connect Recurring Engine to Init | `done` |
 | 9 | Phase 2: Add Option in Create Transaction Form | `done` |
-| 10| Phase 2: Build Schedules & Templates Hub | `todo` |
-| 11| Phase 2: Build Dashboard Bills Widget | `todo` |
+| 10| Phase 2: Build Schedules & Templates Hub | `done` |
+| 11| Phase 2: Build Dashboard Bills Widget | `done` |
+
