@@ -68,7 +68,7 @@ export async function triggerBillPayment(scheduleId: string) {
       id: crypto.randomUUID(),
       type: schedule.transactionType,
       amount: schedule.amount,
-      date: schedule.nextDueDate, // Bill completed on its due date schedule
+      date: Date.now(), // Bill completed now
       note: schedule.note,
       pocketId: schedule.pocketId,
       categoryId: schedule.categoryId,

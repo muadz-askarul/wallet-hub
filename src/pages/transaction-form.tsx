@@ -341,7 +341,11 @@ export function TransactionFormPage({
         <div className="space-y-4">
           {/* Date Picker */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">Date & Time</label>
+            <label className="text-sm font-medium">
+              {isRecurring && recurringType === "bill"
+                ? "Due Date"
+                : "Date & Time"}
+            </label>
             <Input
               type="datetime-local"
               value={date}
