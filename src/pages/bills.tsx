@@ -14,6 +14,8 @@ import {
   Check,
   Trash2,
   Wallet as WalletIcon,
+  Plus,
+  Edit,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -71,16 +73,26 @@ export function BillsPage() {
   return (
     <>
       {/* Sticky Header — Matches standard form header */}
-      <div className="sticky top-0 z-20 flex h-16 items-center border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="-ml-2 h-10 w-10 shrink-0"
+          >
+            <ArrowLeft className="size-5" />
+          </Button>
+          <h1 className="ml-2 text-lg font-bold">Recurring & Schedules</h1>
+        </div>
         <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(-1)}
-          className="-ml-2 h-10 w-10 shrink-0"
+          size="sm"
+          className="cursor-pointer gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold"
+          onClick={() => navigate("/bills/new")}
         >
-          <ArrowLeft className="size-5" />
+          <Plus className="size-4" />
+          Add
         </Button>
-        <h1 className="ml-2 text-lg font-bold">Recurring & Schedules</h1>
       </div>
 
       <div className="p-4 pb-24">
@@ -200,9 +212,17 @@ export function BillsPage() {
                         </span>
                         <div className="flex items-center gap-2">
                           <Button
+                            variant="outline"
+                            size="icon"
+                            className="size-8 cursor-pointer"
+                            onClick={() => navigate(`/bills/edit/${bill.id}`)}
+                          >
+                            <Edit className="size-4" />
+                          </Button>
+                          <Button
                             variant="destructive"
                             size="icon"
-                            className="size-8"
+                            className="size-8 cursor-pointer"
                             onClick={() => handleDeactivateSchedule(bill.id)}
                           >
                             <Trash2 className="size-4" />
@@ -317,14 +337,28 @@ export function BillsPage() {
                         <span className="text-sm font-bold text-foreground">
                           Rp {formatCurrency(template.amount)}
                         </span>
-                        <Button
-                          variant="destructive"
-                          size="icon"
-                          className="size-8"
-                          onClick={() => handleDeactivateSchedule(template.id)}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="size-8 cursor-pointer"
+                            onClick={() =>
+                              navigate(`/bills/edit/${template.id}`)
+                            }
+                          >
+                            <Edit className="size-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="size-8 cursor-pointer"
+                            onClick={() =>
+                              handleDeactivateSchedule(template.id)
+                            }
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
