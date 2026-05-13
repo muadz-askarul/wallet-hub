@@ -195,7 +195,8 @@ export function DashboardPage() {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-medium text-foreground">Bills</h3>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth -mx-6 px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth -mx-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="w-6 shrink-0" /> {/* Left padding spacer */}
               {data.enrichedBills.map((bill) => (
                 <div
                   key={bill.id}
@@ -264,6 +265,7 @@ export function DashboardPage() {
                   See All ({data.enrichedBills.length})
                 </span>
               </Link>
+              <div className="w-6 shrink-0" /> {/* Right padding spacer */}
             </div>
           </div>
         )}
