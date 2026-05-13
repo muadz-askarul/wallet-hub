@@ -227,10 +227,13 @@ export function DashboardPage() {
                       </p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         Due{" "}
-                        {new Date(bill.nextDueDate).toLocaleDateString("id-ID", {
-                          day: "numeric",
-                          month: "short",
-                        })}{" "}
+                        {new Date(bill.nextDueDate).toLocaleDateString(
+                          "id-ID",
+                          {
+                            day: "numeric",
+                            month: "short",
+                          }
+                        )}{" "}
                         • {bill.walletName}
                       </p>
                     </div>
@@ -244,7 +247,9 @@ export function DashboardPage() {
                       size="icon"
                       className="size-8 shrink-0 cursor-pointer rounded-lg"
                       disabled={processingId === bill.id}
-                      onClick={() => handlePayBill(bill.id, bill.note || "Bill")}
+                      onClick={() =>
+                        handlePayBill(bill.id, bill.note || "Bill")
+                      }
                     >
                       {processingId === bill.id ? (
                         "..."
@@ -258,10 +263,10 @@ export function DashboardPage() {
             </div>
           </div>
         )}
+        <h3 className="mt-4 mb-4 text-lg font-medium">Recent Transactions</h3>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pb-24 pt-2">
-        <h3 className="mb-4 text-lg font-medium">Recent Transactions</h3>
+      <div className="flex-1 overflow-y-auto px-6 pt-2 pb-24">
         {data.transactionGroups.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No recent transactions.
