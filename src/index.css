@@ -144,6 +144,15 @@
   html {
     @apply font-sans;
     }
+
+  /* Hide scrollbar for all elements */
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes pageSlideIn {

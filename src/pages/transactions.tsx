@@ -223,7 +223,7 @@ export function TransactionsPage() {
         </div>
       </div>
 
-      <div className="flex-1 scrollbar-none overflow-y-auto">
+      <div className="flex-1 overflow-y-auto">
         <div className="sticky top-0 z-10 space-y-4 bg-background/95 p-4 pb-2 backdrop-blur supports-backdrop-filter:bg-background/60">
           {/* Pocket Filter Chip */}
           {activePocket && (

@@ -199,7 +199,7 @@ export function DashboardPage() {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-medium text-foreground">Bills</h3>
             </div>
-            <div className="-mx-6 flex snap-x snap-mandatory scroll-pr-6 scroll-pl-6 scrollbar-none gap-4 overflow-x-auto scroll-smooth px-6 pb-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="-mx-6 flex snap-x snap-mandatory scroll-pr-6 scroll-pl-6 gap-4 overflow-x-auto scroll-smooth px-6 pb-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {data.enrichedBills.map((bill) => (
                 <div
                   key={bill.id}
@@ -275,7 +275,7 @@ export function DashboardPage() {
         <h3 className="mt-4 mb-4 text-lg font-medium">Recent Transactions</h3>
       </div>
 
-      <div className="flex-1 scrollbar-none overflow-y-auto px-6 pt-2 pb-6">
+      <div className="flex-1 overflow-y-auto px-6 pt-2 pb-6">
         {data.transactionGroups.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No recent transactions.
