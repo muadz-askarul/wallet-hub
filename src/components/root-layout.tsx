@@ -20,9 +20,30 @@ export function RootLayout() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    processAutoRepeatTransactions().catch((err) => {
-      console.error("Failed to process auto-repeat schedules:", err)
-    })
+    const runSchedule = () => {
+      processAutoRepeatTransactions().catch((err) => {
+        console.error("Failed to process auto-repeat schedules:", err)
+      })
+    }
+
+    runSchedule()
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        runSchedule()
+      }
+    }
+    const handleFocus = () => {
+      runSchedule()
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    window.addEventListener("focus", handleFocus)
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+      window.removeEventListener("focus", handleFocus)
+    }
   }, [])
 
   const showNavBar = ["/", "/transactions", "/wallet", "/settings"].includes(

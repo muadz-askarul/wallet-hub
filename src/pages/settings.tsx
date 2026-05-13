@@ -49,17 +49,13 @@ export function SettingsPage() {
     try {
       await db.transaction(
         "rw",
-        db.settings,
-        db.wallets,
-        db.pockets,
-        db.transactions,
-        db.bills,
+        [db.settings, db.wallets, db.pockets, db.transactions, db.schedules],
         async () => {
           await db.settings.clear()
           await db.wallets.clear()
           await db.pockets.clear()
           await db.transactions.clear()
-          await db.bills.clear()
+          await db.schedules.clear()
         }
       )
       toast.success("App reset successfully!")

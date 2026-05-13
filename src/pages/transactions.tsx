@@ -6,7 +6,7 @@ import { Link, useSearchParams } from "react-router-dom"
 import {
   ChevronLeft,
   ChevronRight,
-  Receipt,
+  Repeat,
   PieChart,
   Target,
   ChevronsLeftRightEllipsis,
@@ -207,7 +207,7 @@ export function TransactionsPage() {
           <div className="mx-1 h-6 w-px bg-accent-foreground"></div>
           <Link to="/bills">
             <Button variant="ghost" size="icon" className="size-9">
-              <Receipt className="size-5" />
+              <Repeat className="size-5" />
             </Button>
           </Link>
           <Link to="/budget">

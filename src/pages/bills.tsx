@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import {
   ArrowLeft,
   Calendar,
-  CreditCard,
+  Receipt,
   Repeat,
   Check,
   Trash2,
@@ -96,7 +96,7 @@ export function BillsPage() {
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <CreditCard className="size-4" />
+            <Receipt className="size-4" />
             Active Bills ({bills.length})
           </button>
           <button
@@ -120,7 +120,7 @@ export function BillsPage() {
             {bills.length === 0 ? (
               <div className="flex min-h-[40vh] flex-col items-center justify-center p-6 text-center">
                 <div className="mb-4 rounded-full bg-primary/10 p-4 text-primary">
-                  <CreditCard className="h-10 w-10" />
+                  <Receipt className="h-10 w-10" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground">
                   No active bills
