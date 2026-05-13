@@ -31,8 +31,12 @@ const now = (timestamp?: number) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}T${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
 }
 
-export function TransactionFormPage() {
-  const { id } = useParams()
+export function TransactionFormPage({
+  isScheduleMode,
+}: {
+  isScheduleMode?: boolean
+}) {
+  const { id, scheduleId } = useParams()
   const navigate = useNavigate()
 
   // Form states
@@ -66,8 +70,43 @@ export function TransactionFormPage() {
   const pockets = useLiveQuery(() => db.pockets.toArray(), [], [])
   const categories = useLiveQuery(() => db.categories.toArray(), [], [])
 
-  // Load existing transaction if id is present
   useEffect(() => {
+    if (isScheduleMode) {
+      setIsRecurring(true)
+    }
+  }, [isScheduleMode])
+
+  // Load existing transaction or schedule
+  useEffect(() => {
+    if (isScheduleMode && scheduleId) {
+      const loadSchedule = async () => {
+        const sc = await db.schedules.get(scheduleId)
+        if (sc) {
+          setType(sc.transactionType)
+          setAmount(sc.amount)
+          setDate(now(sc.nextDueDate))
+          setPocketId(sc.pocketId)
+          setDestPocketId(sc.destinationPocketId)
+          setCategoryId(sc.categoryId)
+          setNote(sc.note || "")
+          setIsRecurring(true)
+          setRecurringType(sc.type)
+          setRecurringPeriod(sc.period)
+          if (sc.endDate) {
+            const ed = new Date(sc.endDate)
+            setEndDateStr(
+              `${ed.getFullYear()}-${String(ed.getMonth() + 1).padStart(2, "0")}-${String(ed.getDate()).padStart(2, "0")}`
+            )
+          }
+        } else {
+          toast.error("Schedule not found")
+          navigate("/bills")
+        }
+      }
+      loadSchedule()
+      return
+    }
+
     if (!id) return
     const loadTx = async () => {
       const tx = await db.transactions.get(id)
@@ -85,7 +124,7 @@ export function TransactionFormPage() {
       }
     }
     loadTx()
-  }, [id, navigate])
+  }, [id, scheduleId, isScheduleMode, navigate])
 
   const selectedPocket = pockets?.find((p) => p.id === pocketId)
   const selectedPocketWallet = wallets?.find(
@@ -117,6 +156,37 @@ export function TransactionFormPage() {
 
     setSaving(true)
     try {
+      if (isScheduleMode) {
+        const selectedDate = new Date(date)
+        const scheduleData = {
+          type: recurringType,
+          period: recurringPeriod as any,
+          amount,
+          note: note.trim() || undefined,
+          pocketId: pocketId!,
+          categoryId: type !== "transfer" ? categoryId : undefined,
+          destinationPocketId: type === "transfer" ? destPocketId : undefined,
+          transactionType: type,
+          startDate: selectedDate.getTime(),
+          nextDueDate: selectedDate.getTime(),
+          isActive: 1,
+          endDate: endDateStr ? new Date(endDateStr).getTime() : undefined,
+        }
+
+        if (scheduleId) {
+          await db.schedules.update(scheduleId, scheduleData)
+          toast.success("Recurring schedule updated")
+        } else {
+          await db.schedules.add({
+            id: crypto.randomUUID(),
+            ...scheduleData,
+          })
+          toast.success("Recurring schedule created")
+        }
+        navigate("/bills")
+        return
+      }
+
       const txData = {
         type,
         amount,
@@ -182,6 +252,17 @@ export function TransactionFormPage() {
   }
 
   const handleDelete = async () => {
+    if (isScheduleMode && scheduleId) {
+      try {
+        await db.schedules.delete(scheduleId)
+        toast.success("Schedule deleted")
+        navigate("/bills")
+      } catch {
+        toast.error("Failed to delete schedule")
+      }
+      return
+    }
+
     if (!id) return
     try {
       await db.transactions.delete(id)
@@ -204,7 +285,13 @@ export function TransactionFormPage() {
           Back
         </button>
         <h1 className="text-base font-semibold">
-          {id ? "Edit Transaction" : "New Transaction"}
+          {isScheduleMode
+            ? scheduleId
+              ? "Edit Recurring Schedule"
+              : "New Recurring Schedule"
+            : id
+              ? "Edit Transaction"
+              : "New Transaction"}
         </h1>
         <div className="size-8" /> {/* Balance spacer */}
       </div>
@@ -365,30 +452,37 @@ export function TransactionFormPage() {
             />
           </div>
 
-          {/* Repeating Options (Only for New transactions) */}
-          {!id && (
+          {/* Repeating Options (Only for New transactions or Schedule Mode) */}
+          {(!id || isScheduleMode) && (
             <div className="space-y-4 rounded-2xl border bg-card p-4 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label
-                    htmlFor="recurring-toggle"
-                    className="text-sm font-semibold text-foreground"
-                  >
-                    Set repeating schedule
-                  </label>
-                  <p className="text-xs text-muted-foreground">
-                    Schedule this transaction to repeat
-                  </p>
+              {!isScheduleMode && (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label
+                      htmlFor="recurring-toggle"
+                      className="text-sm font-semibold text-foreground"
+                    >
+                      Set repeating schedule
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      Schedule this transaction to repeat
+                    </p>
+                  </div>
+                  <Checkbox
+                    id="recurring-toggle"
+                    checked={isRecurring}
+                    onCheckedChange={(checked) => setIsRecurring(!!checked)}
+                  />
                 </div>
-                <Checkbox
-                  id="recurring-toggle"
-                  checked={isRecurring}
-                  onCheckedChange={(checked) => setIsRecurring(!!checked)}
-                />
-              </div>
+              )}
 
               {isRecurring && (
-                <div className="space-y-4 border-t pt-4">
+                <div
+                  className={cn(
+                    "space-y-4",
+                    !isScheduleMode && "border-t pt-4"
+                  )}
+                >
                   {/* Schedule Type */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
@@ -474,7 +568,7 @@ export function TransactionFormPage() {
 
         {/* Form Actions */}
         <div className="flex gap-2 pt-4">
-          {id ? (
+          {id || scheduleId ? (
             <>
               <Button
                 type="button"
@@ -496,21 +590,26 @@ export function TransactionFormPage() {
           ) : (
             <>
               <Button
-                className="h-11 w-2/3 text-base font-semibold"
+                className={cn(
+                  "h-11 text-base font-semibold",
+                  isScheduleMode ? "w-full" : "w-2/3"
+                )}
                 onClick={() => handleSave(false)}
                 disabled={saving}
               >
                 {saving ? "Saving..." : "Save"}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11 w-1/3 text-base font-semibold"
-                onClick={() => handleSave(true)}
-                disabled={saving}
-              >
-                Continue
-              </Button>
+              {!isScheduleMode && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 w-1/3 text-base font-semibold"
+                  onClick={() => handleSave(true)}
+                  disabled={saving}
+                >
+                  Continue
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -547,10 +646,13 @@ export function TransactionFormPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Transaction?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {isScheduleMode ? "Delete Schedule?" : "Delete Transaction?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this transaction? This action
-              cannot be undone.
+              Are you sure you want to delete this{" "}
+              {isScheduleMode ? "schedule" : "transaction"}? This action cannot
+              be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
