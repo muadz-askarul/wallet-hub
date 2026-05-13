@@ -36,6 +36,14 @@ function AppContent() {
         <Route path="transactions" element={<TransactionsPage />} />
         <Route path="transactions/new" element={<TransactionFormPage />} />
         <Route path="transactions/edit/:id" element={<TransactionFormPage />} />
+        <Route
+          path="bills/new"
+          element={<TransactionFormPage isScheduleMode />}
+        />
+        <Route
+          path="bills/edit/:scheduleId"
+          element={<TransactionFormPage isScheduleMode />}
+        />
         <Route path="wallet" element={<WalletPage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
