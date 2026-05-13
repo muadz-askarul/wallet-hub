@@ -162,103 +162,105 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="p-6 pb-24">
-      <div className="mt-4 mb-8 flex flex-col items-center justify-center">
-        <h2 className="text-5xl font-bold tracking-tight text-primary">
-          Rp {formatCurrency(data.total)}
-        </h2>
-      </div>
-
-      <div className="mb-8 flex h-14 w-full overflow-hidden rounded-xl border bg-card shadow-sm">
-        <div className="flex flex-1 flex-col justify-center px-4 py-2 text-center">
-          <p className="text-[10px] tracking-wider text-muted-foreground uppercase">
-            Assets
-          </p>
-          <h2 className="text-sm leading-tight font-bold">
-            Rp {formatCurrency(data.assets)}
+    <div className="flex h-[calc(100svh-8rem)] flex-col overflow-hidden">
+      <div className="shrink-0 px-6 pt-6 pb-2">
+        <div className="mt-4 mb-8 flex flex-col items-center justify-center">
+          <h2 className="text-5xl font-bold tracking-tight text-primary">
+            Rp {formatCurrency(data.total)}
           </h2>
         </div>
-        <div className="flex flex-1 flex-col justify-center border-l bg-muted/30 px-4 py-2 text-center">
-          <p className="text-[10px] tracking-wider text-muted-foreground uppercase">
-            Liabilities
-          </p>
-          <h2 className="text-sm leading-tight font-bold">
-            Rp {formatCurrency(data.liabilities)}
-          </h2>
-        </div>
-      </div>
 
-      {/* Bills due this month widget */}
-      {data.enrichedBills && data.enrichedBills.length > 0 && (
-        <div className="mb-8">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-medium text-foreground">
-              Bills Due This Month
-            </h3>
-            <Link
-              to="/bills"
-              className="flex items-center text-xs font-semibold text-primary hover:underline"
-            >
-              See All ({data.enrichedBills.length})
-              <ChevronRight className="ml-1 size-3" />
-            </Link>
+        <div className="mb-8 flex h-14 w-full overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="flex flex-1 flex-col justify-center px-4 py-2 text-center">
+            <p className="text-[10px] tracking-wider text-muted-foreground uppercase">
+              Assets
+            </p>
+            <h2 className="text-sm leading-tight font-bold">
+              Rp {formatCurrency(data.assets)}
+            </h2>
           </div>
-          <div className="space-y-3">
-            {data.enrichedBills.map((bill) => (
-              <div
-                key={bill.id}
-                className="flex items-center justify-between gap-3 rounded-2xl border bg-card p-3.5 shadow-sm"
+          <div className="flex flex-1 flex-col justify-center border-l bg-muted/30 px-4 py-2 text-center">
+            <p className="text-[10px] tracking-wider text-muted-foreground uppercase">
+              Liabilities
+            </p>
+            <h2 className="text-sm leading-tight font-bold">
+              Rp {formatCurrency(data.liabilities)}
+            </h2>
+          </div>
+        </div>
+
+        {/* Bills due this month widget */}
+        {data.enrichedBills && data.enrichedBills.length > 0 && (
+          <div className="mb-4">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-medium text-foreground">
+                Bills Due This Month
+              </h3>
+              <Link
+                to="/bills"
+                className="flex items-center text-xs font-semibold text-primary hover:underline"
               >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
-                    style={{
-                      backgroundColor: bill.categoryColor
-                        ? `${bill.categoryColor}15`
-                        : "#6b728015",
-                    }}
-                  >
-                    {bill.categoryIcon}
+                See All ({data.enrichedBills.length})
+                <ChevronRight className="ml-1 size-3" />
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {data.enrichedBills.map((bill) => (
+                <div
+                  key={bill.id}
+                  className="flex items-center justify-between gap-3 rounded-2xl border bg-card p-3.5 shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                      style={{
+                        backgroundColor: bill.categoryColor
+                          ? `${bill.categoryColor}15`
+                          : "#6b728015",
+                      }}
+                    >
+                      {bill.categoryIcon}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        {bill.note || bill.categoryName}
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        Due{" "}
+                        {new Date(bill.nextDueDate).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                        })}{" "}
+                        • {bill.walletName}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">
-                      {bill.note || bill.categoryName}
-                    </p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      Due{" "}
-                      {new Date(bill.nextDueDate).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                      })}{" "}
-                      • {bill.walletName}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex items-center gap-2.5">
-                  <span className="shrink-0 text-sm font-bold text-foreground">
-                    Rp {formatCurrency(bill.amount)}
-                  </span>
-                  <Button
-                    size="icon"
-                    className="size-8 shrink-0 cursor-pointer rounded-lg"
-                    disabled={processingId === bill.id}
-                    onClick={() => handlePayBill(bill.id, bill.note || "Bill")}
-                  >
-                    {processingId === bill.id ? (
-                      "..."
-                    ) : (
-                      <Check className="size-4" />
-                    )}
-                  </Button>
+                  <div className="flex items-center gap-2.5">
+                    <span className="shrink-0 text-sm font-bold text-foreground">
+                      Rp {formatCurrency(bill.amount)}
+                    </span>
+                    <Button
+                      size="icon"
+                      className="size-8 shrink-0 cursor-pointer rounded-lg"
+                      disabled={processingId === bill.id}
+                      onClick={() => handlePayBill(bill.id, bill.note || "Bill")}
+                    >
+                      {processingId === bill.id ? (
+                        "..."
+                      ) : (
+                        <Check className="size-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      <div>
+      <div className="flex-1 overflow-y-auto px-6 pb-24 pt-2">
         <h3 className="mb-4 text-lg font-medium">Recent Transactions</h3>
         {data.transactionGroups.length === 0 ? (
           <p className="text-sm text-muted-foreground">
