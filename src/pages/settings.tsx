@@ -67,13 +67,13 @@ export function SettingsPage() {
   }
 
   return (
-    <>
+    <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
       {/* Sticky Header — same style as transactions page */}
-      <div className="sticky top-0 z-20 flex h-16 items-center border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="shrink-0 flex h-16 items-center border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
         <h1 className="text-lg font-semibold">Settings</h1>
       </div>
 
-      <div className="p-4 pb-24">
+      <div className="flex-1 overflow-y-auto p-4">
         {/* Preferences */}
         <div className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Preferences
@@ -197,11 +197,12 @@ export function SettingsPage() {
           Wallet Hub v0.0.1
         </div>
       </div>
+    </div>
 
-      <CategoryManagementSheet
-        open={categorySheetOpen}
-        onOpenChange={setCategorySheetOpen}
-      />
-    </>
-  )
+    <CategoryManagementSheet
+      open={categorySheetOpen}
+      onOpenChange={setCategorySheetOpen}
+    />
+  </>
+)
 }

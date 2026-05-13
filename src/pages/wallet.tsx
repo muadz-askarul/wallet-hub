@@ -417,74 +417,76 @@ export function WalletPage() {
 
   return (
     <>
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <h1 className="text-lg font-semibold">Wallets</h1>
+      <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
+        {/* Sticky Header */}
+        <div className="shrink-0 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+          <h1 className="text-lg font-semibold">Wallets</h1>
 
-        {!orderMode && (
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={<Button variant="ghost" size="icon" className="size-9" />}
+          {!orderMode && (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={<Button variant="ghost" size="icon" className="size-9" />}
+              >
+                <MoreVertical className="size-5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={openAddWallet}>
+                  <Plus className="mr-2 size-4" />
+                  Add
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setOrderMode((prev) => !prev)}>
+                  <GripVertical className="mr-2 size-4" />
+                  Order
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          {orderMode && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setOrderMode(false)}
             >
-              <MoreVertical className="size-5" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={openAddWallet}>
-                <Plus className="mr-2 size-4" />
-                Add
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setOrderMode((prev) => !prev)}>
-                <GripVertical className="mr-2 size-4" />
-                Order
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+              Save
+            </Button>
+          )}
+        </div>
 
-        {orderMode && (
-          <Button
-            variant="default"
-            size="sm"
-            onClick={() => setOrderMode(false)}
-          >
-            Save
-          </Button>
-        )}
-      </div>
-
-      <div className="p-4 pb-24">
-        {wallets.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No wallets configured.
-          </p>
-        ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleWalletDragEnd}
-            modifiers={[restrictToVerticalAxis]}
-          >
-            <SortableContext
-              items={wallets.map((w) => w.id)}
-              strategy={verticalListSortingStrategy}
+        <div className="flex-1 overflow-y-auto p-4">
+          {wallets.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No wallets configured.
+            </p>
+          ) : (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleWalletDragEnd}
+              modifiers={[restrictToVerticalAxis]}
             >
-              <div className="space-y-6">
-                {wallets.map((wallet) => (
-                  <SortableWallet
-                    key={wallet.id}
-                    walletId={wallet.id}
-                    walletName={wallet.name}
-                    walletBalance={walletBalances[wallet.id] || 0}
-                    pockets={pockets.filter((p) => p.walletId === wallet.id)}
-                    pocketBalances={pocketBalances}
-                    orderMode={orderMode}
-                    onEdit={() => openEditWallet(wallet)}
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
-        )}
+              <SortableContext
+                items={wallets.map((w) => w.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-6">
+                  {wallets.map((wallet) => (
+                    <SortableWallet
+                      key={wallet.id}
+                      walletId={wallet.id}
+                      walletName={wallet.name}
+                      walletBalance={walletBalances[wallet.id] || 0}
+                      pockets={pockets.filter((p) => p.walletId === wallet.id)}
+                      pocketBalances={pocketBalances}
+                      orderMode={orderMode}
+                      onEdit={() => openEditWallet(wallet)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
+        </div>
       </div>
 
       {/* Full-Screen Wallet Drawer */}

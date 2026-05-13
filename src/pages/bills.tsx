@@ -71,9 +71,9 @@ export function BillsPage() {
   }
 
   return (
-    <>
+    <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
       {/* Sticky Header — Matches standard form header */}
-      <div className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="shrink-0 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="flex items-center">
           <Button
             variant="ghost"
@@ -95,7 +95,7 @@ export function BillsPage() {
         </Button>
       </div>
 
-      <div className="p-4 pb-24">
+      <div className="flex-1 overflow-y-auto p-4">
         {/* Segmented Tab Control */}
         <div className="mb-6 flex rounded-xl bg-muted p-1">
           <button
@@ -368,6 +368,6 @@ export function BillsPage() {
           </div>
         )}
       </div>
-    </>
+    </div>
   )
 }

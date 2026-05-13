@@ -1,8 +1,8 @@
 | Task | Status |
 |---|---|
-| Explore project context | Done |
-| Ask clarifying questions | Done |
-| Propose 2-3 approaches | Done |
-| Present design | Done |
-| Write design doc | In Progress |
-| Transition to implementation | Todo |
+| 1. Update App Routing | Done |
+| 2. Enhance TransactionFormPage Props and Data Loading | Done |
+| 3. Adjust UI for Schedule Mode | Done |
+| 4. Implement Schedule Saving and Deletion Logic | Done |
+| 5. Add Navigation to BillsPage | Done |
+| 6. Final Verification | Done |

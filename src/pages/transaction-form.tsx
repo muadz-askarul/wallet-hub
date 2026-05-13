@@ -292,8 +292,9 @@ export function TransactionFormPage({
 
   return (
     <>
+      <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="shrink-0 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
@@ -313,7 +314,8 @@ export function TransactionFormPage({
         <div className="size-8" /> {/* Balance spacer */}
       </div>
 
-      <div className="mx-auto max-w-md space-y-6 p-4 pb-24">
+      <div className="flex-1 overflow-y-auto p-4 pb-12">
+        <div className="mx-auto max-w-md space-y-6">
         {/* Type Selector Tabs */}
         <div className="flex rounded-xl border bg-muted/20 p-1">
           {(["expense", "income", "transfer"] as TxType[]).map((t) => (
@@ -635,6 +637,8 @@ export function TransactionFormPage({
           )}
         </div>
       </div>
+    </div>
+  </div>
 
       {/* Pocket Selection bottom sheet */}
       <PocketSelectionSheet

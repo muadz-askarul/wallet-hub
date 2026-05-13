@@ -160,9 +160,9 @@ export function TransactionsPage() {
   })
 
   return (
-    <div className="pb-24">
+    <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div className="flex h-16 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -223,77 +223,84 @@ export function TransactionsPage() {
         </div>
       </div>
 
-      <div className="p-4">
-        {/* Pocket Filter Chip */}
-        {activePocket && (
-          <div className="mb-4 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm">
-            <div className="flex items-center gap-2 text-foreground">
-              <span className="flex h-2 w-2 animate-pulse rounded-full bg-primary" />
-              <span>
-                Pocket:{" "}
-                <strong className="font-semibold text-primary">
-                  {activePocket.name}
-                </strong>
-              </span>
+      <div className="flex-1 scrollbar-none overflow-y-auto">
+        <div className="sticky top-0 z-10 space-y-4 bg-background/95 p-4 pb-2 backdrop-blur supports-backdrop-filter:bg-background/60">
+          {/* Pocket Filter Chip */}
+          {activePocket && (
+            <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm">
+              <div className="flex items-center gap-2 text-foreground">
+                <span className="flex h-2 w-2 animate-pulse rounded-full bg-primary" />
+                <span>
+                  Pocket:{" "}
+                  <strong className="font-semibold text-primary">
+                    {activePocket.name}
+                  </strong>
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams)
+                  params.delete("pocketId")
+                  setSearchParams(params)
+                }}
+              >
+                Clear Filter
+              </Button>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 px-2 text-xs text-muted-foreground hover:bg-primary/10 hover:text-foreground"
-              onClick={() => {
-                const params = new URLSearchParams(searchParams)
-                params.delete("pocketId")
-                setSearchParams(params)
-              }}
-            >
-              Clear Filter
-            </Button>
-          </div>
-        )}
+          )}
 
-        {/* Monthly Summary Card */}
-        {!showAll && (
-          <div className="mb-4 overflow-hidden rounded-xl border bg-card shadow-sm">
-            <div className="flex divide-x">
-              <div className="flex flex-1 flex-col items-center py-3">
-                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-                  Income
-                </span>
-                <span className="mt-0.5 text-sm font-bold text-primary">
-                  {formatCurrency(summary.income)}
-                </span>
-              </div>
-              <div className="flex flex-1 flex-col items-center py-3">
-                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-                  Expense
-                </span>
-                <span className="mt-0.5 text-sm font-bold text-destructive">
-                  {formatCurrency(summary.expense)}
-                </span>
-              </div>
-              <div className="flex flex-1 flex-col items-center py-3">
-                <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
-                  Total
-                </span>
-                <span className="mt-0.5 text-sm font-bold">
-                  {formatCurrency(summary.net)}
-                </span>
+          {/* Monthly Summary Card */}
+          {!showAll && (
+            <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+              <div className="flex divide-x">
+                <div className="flex flex-1 flex-col items-center py-3">
+                  <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                    Income
+                  </span>
+                  <span className="mt-0.5 text-sm font-bold text-primary">
+                    {formatCurrency(summary.income)}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col items-center py-3">
+                  <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                    Expense
+                  </span>
+                  <span className="mt-0.5 text-sm font-bold text-destructive">
+                    {formatCurrency(summary.expense)}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col items-center py-3">
+                  <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                    Total
+                  </span>
+                  <span className="mt-0.5 text-sm font-bold">
+                    {formatCurrency(summary.net)}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {groups.length === 0 ? (
-          <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
-            <p>No transactions found.</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {groups.map((group) => (
-              <TransactionGroup key={group.date.toISOString()} group={group} />
-            ))}
-          </div>
-        )}
+        <div className="p-4 pt-0">
+          {groups.length === 0 ? (
+            <div className="flex h-40 flex-col items-center justify-center text-muted-foreground">
+              <p>No transactions found.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {groups.map((group) => (
+                <TransactionGroup
+                  key={group.date.toISOString()}
+                  group={group}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
