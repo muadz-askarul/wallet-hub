@@ -51,7 +51,7 @@ export function RootLayout() {
   )
 
   return (
-    <div className={`flex min-h-svh flex-col ${showNavBar ? "pb-32" : ""}`}>
+    <div className={`flex h-svh flex-col ${showNavBar ? "pb-20" : ""}`}>
       <main className="relative flex-1 overflow-x-hidden">
         <div key={location.pathname} className="page-transition">
           <Outlet />
