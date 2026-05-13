@@ -201,15 +201,25 @@ export function TransactionFormPage({
         await db.transactions.update(id, txData)
         toast.success("Transaction updated")
       } else {
-        const savedTxId = crypto.randomUUID()
-        await db.transactions.add({
-          id: savedTxId,
-          ...txData,
-        })
+        const isBill = isRecurring && recurringType === "bill"
+
+        // Only create immediate transaction if NOT a bill
+        if (!isBill) {
+          const savedTxId = crypto.randomUUID()
+          await db.transactions.add({
+            id: savedTxId,
+            ...txData,
+          })
+        }
 
         if (isRecurring) {
           const selectedDate = new Date(date)
-          const nextDue = calculateNextDueDate(selectedDate, recurringPeriod)
+          // For bills, the selected date is the first due date.
+          // For repeat transactions, we calculate the next one.
+          const nextDue =
+            recurringType === "bill"
+              ? selectedDate
+              : calculateNextDueDate(selectedDate, recurringPeriod)
 
           const schedule: Schedule = {
             id: crypto.randomUUID(),
@@ -228,7 +238,14 @@ export function TransactionFormPage({
           }
 
           await db.schedules.add(schedule)
-          toast.success("Recurring schedule created")
+          toast.success(
+            recurringType === "bill" ? "Bill created" : "Recurring schedule created"
+          )
+
+          if (recurringType === "bill") {
+            navigate("/bills")
+            return
+          }
         } else {
           toast.success("Transaction added")
         }
