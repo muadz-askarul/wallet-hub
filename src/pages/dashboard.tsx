@@ -193,26 +193,17 @@ export function DashboardPage() {
         {data.enrichedBills && data.enrichedBills.length > 0 && (
           <div className="mb-4">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-foreground">
-                Bills Due This Month
-              </h3>
-              <Link
-                to="/bills"
-                className="flex items-center text-xs font-semibold text-primary hover:underline"
-              >
-                See All ({data.enrichedBills.length})
-                <ChevronRight className="ml-1 size-3" />
-              </Link>
+              <h3 className="text-lg font-medium text-foreground">Bills</h3>
             </div>
-            <div className="space-y-3">
+            <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth -mx-6 px-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {data.enrichedBills.map((bill) => (
                 <div
                   key={bill.id}
-                  className="flex items-center justify-between gap-3 rounded-2xl border bg-card p-3.5 shadow-sm"
+                  className="flex w-[240px] shrink-0 flex-col justify-between gap-4 snap-start rounded-2xl border bg-card p-4 shadow-sm"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-start gap-3">
                     <div
-                      className="flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                      className="flex size-10 shrink-0 items-center justify-center rounded-full text-base font-semibold"
                       style={{
                         backgroundColor: bill.categoryColor
                           ? `${bill.categoryColor}15`
@@ -221,8 +212,8 @@ export function DashboardPage() {
                     >
                       {bill.categoryIcon}
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-foreground">
                         {bill.note || bill.categoryName}
                       </p>
                       <p className="mt-0.5 text-xs text-muted-foreground">
@@ -239,27 +230,40 @@ export function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2.5">
-                    <span className="shrink-0 text-sm font-bold text-foreground">
+                  <div className="flex flex-col gap-3">
+                    <span className="text-lg font-bold text-foreground">
                       Rp {formatCurrency(bill.amount)}
                     </span>
                     <Button
-                      size="icon"
-                      className="size-8 shrink-0 cursor-pointer rounded-lg"
+                      size="sm"
+                      className="w-full cursor-pointer rounded-xl font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
                       disabled={processingId === bill.id}
-                      onClick={() =>
-                        handlePayBill(bill.id, bill.note || "Bill")
-                      }
+                      onClick={() => handlePayBill(bill.id, bill.note || "Bill")}
                     >
                       {processingId === bill.id ? (
                         "..."
                       ) : (
-                        <Check className="size-4" />
+                        <>
+                          Pay Bill <Check className="ml-1.5 size-4" />
+                        </>
                       )}
                     </Button>
                   </div>
                 </div>
               ))}
+
+              {/* See All Card */}
+              <Link
+                to="/bills"
+                className="flex w-[160px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed bg-muted/30 transition-colors hover:bg-muted/50"
+              >
+                <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <ChevronRight className="size-6" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">
+                  See All ({data.enrichedBills.length})
+                </span>
+              </Link>
             </div>
           </div>
         )}
