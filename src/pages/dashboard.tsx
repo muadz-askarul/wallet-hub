@@ -195,12 +195,11 @@ export function DashboardPage() {
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg font-medium text-foreground">Bills</h3>
             </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth -mx-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              <div className="w-6 shrink-0" /> {/* Left padding spacer */}
+            <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth -mx-6 px-6 scroll-pl-6 scroll-pr-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {data.enrichedBills.map((bill) => (
                 <div
                   key={bill.id}
-                  className="flex w-[240px] shrink-0 flex-col justify-between gap-4 snap-start rounded-2xl border bg-card p-4 shadow-sm"
+                  className="flex w-[240px] shrink-0 snap-start flex-col justify-between gap-4 rounded-2xl border bg-card p-4 shadow-sm"
                 >
                   <div className="flex items-start gap-3">
                     <div
@@ -239,7 +238,9 @@ export function DashboardPage() {
                       size="sm"
                       className="w-full cursor-pointer rounded-xl font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
                       disabled={processingId === bill.id}
-                      onClick={() => handlePayBill(bill.id, bill.note || "Bill")}
+                      onClick={() =>
+                        handlePayBill(bill.id, bill.note || "Bill")
+                      }
                     >
                       {processingId === bill.id ? (
                         "..."
@@ -252,7 +253,6 @@ export function DashboardPage() {
                   </div>
                 </div>
               ))}
-
               {/* See All Card */}
               <Link
                 to="/bills"
@@ -265,7 +265,6 @@ export function DashboardPage() {
                   See All ({data.enrichedBills.length})
                 </span>
               </Link>
-              <div className="w-6 shrink-0" /> {/* Right padding spacer */}
             </div>
           </div>
         )}
