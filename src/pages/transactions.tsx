@@ -16,6 +16,7 @@ import {
   TransactionGroup,
   type EnrichedTransaction,
 } from "@/components/transaction-group"
+import { PageHeader } from "@/components/ui/page-header"
 
 interface EnrichedTransactionGroup {
   date: Date
@@ -160,9 +161,9 @@ export function TransactionsPage() {
   })
 
   return (
-    <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
+    <div>
       {/* Header */}
-      <div className="flex h-16 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <PageHeader className="justify-between">
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
@@ -221,10 +222,10 @@ export function TransactionsPage() {
             </Button>
           </Link>
         </div>
-      </div>
+      </PageHeader>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="sticky top-0 z-10 space-y-4 bg-background/95 p-4 pb-2 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <div>
+        <div className="sticky top-16 z-10 space-y-4 bg-background/95 p-4 pb-2 backdrop-blur supports-backdrop-filter:bg-background/60">
           {/* Pocket Filter Chip */}
           {activePocket && (
             <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-sm">
