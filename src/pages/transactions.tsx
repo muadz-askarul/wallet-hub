@@ -65,8 +65,18 @@ export function TransactionsPage() {
   )
 
   const MONTH_LABELS = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ]
 
   const data = useLiveQuery(
@@ -197,88 +207,88 @@ export function TransactionsPage() {
       {/* Header */}
       <PageHeader className="justify-between">
         {showAll ? (
-          <span className="text-sm font-semibold text-muted-foreground">
+          <span className="text-sm font-semibold text-primary">
             All Transactions
           </span>
         ) : (
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handlePrevMonth}
-            className="h-8 w-8 text-muted-foreground"
-          >
-            <ChevronLeft className="size-5" />
-          </Button>
-          <div className="relative" ref={pickerRef}>
-            <button
-              type="button"
-              onClick={() => {
-                setPickerYear(currentDate.getFullYear())
-                setPickerOpen((v) => !v)
-              }}
-              className="w-20 cursor-pointer text-center text-sm font-semibold transition-colors hover:text-primary"
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handlePrevMonth}
+              className="h-8 w-8 text-muted-foreground"
             >
-              {monthYearLabel}
-            </button>
+              <ChevronLeft className="size-5" />
+            </Button>
+            <div className="relative" ref={pickerRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setPickerYear(currentDate.getFullYear())
+                  setPickerOpen((v) => !v)
+                }}
+                className="w-20 cursor-pointer text-center text-sm font-semibold transition-colors hover:text-primary"
+              >
+                {monthYearLabel}
+              </button>
 
-            {pickerOpen && (
-              <div className="fixed inset-x-0 top-16 z-50 mx-auto w-[calc(100%-2rem)] max-w-sm rounded-xl border bg-popover p-3 shadow-lg">
-                {/* Year nav */}
-                <div className="mb-2 flex items-center justify-between">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-7"
-                    onClick={() => setPickerYear((y) => y - 1)}
-                  >
-                    <ChevronLeft className="size-4" />
-                  </Button>
-                  <span className="text-sm font-semibold">{pickerYear}</span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-7"
-                    onClick={() => setPickerYear((y) => y + 1)}
-                  >
-                    <ChevronRight className="size-4" />
-                  </Button>
+              {pickerOpen && (
+                <div className="fixed inset-x-0 top-16 z-50 mx-auto w-[calc(100%-2rem)] max-w-sm rounded-xl border bg-popover p-3 shadow-lg">
+                  {/* Year nav */}
+                  <div className="mb-2 flex items-center justify-between">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-7"
+                      onClick={() => setPickerYear((y) => y - 1)}
+                    >
+                      <ChevronLeft className="size-4" />
+                    </Button>
+                    <span className="text-sm font-semibold">{pickerYear}</span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-7"
+                      onClick={() => setPickerYear((y) => y + 1)}
+                    >
+                      <ChevronRight className="size-4" />
+                    </Button>
+                  </div>
+                  {/* Month grid */}
+                  <div className="grid grid-cols-4 gap-1">
+                    {MONTH_LABELS.map((label, i) => {
+                      const isActive =
+                        currentDate.getMonth() === i &&
+                        currentDate.getFullYear() === pickerYear
+                      return (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={() => handlePickMonth(i)}
+                          className={cn(
+                            "rounded-lg py-1.5 text-xs font-medium transition-colors",
+                            isActive
+                              ? "bg-primary text-primary-foreground"
+                              : "hover:bg-muted"
+                          )}
+                        >
+                          {label}
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
-                {/* Month grid */}
-                <div className="grid grid-cols-4 gap-1">
-                  {MONTH_LABELS.map((label, i) => {
-                    const isActive =
-                      currentDate.getMonth() === i &&
-                      currentDate.getFullYear() === pickerYear
-                    return (
-                      <button
-                        key={label}
-                        type="button"
-                        onClick={() => handlePickMonth(i)}
-                        className={cn(
-                          "rounded-lg py-1.5 text-xs font-medium transition-colors",
-                          isActive
-                            ? "bg-primary text-primary-foreground"
-                            : "hover:bg-muted"
-                        )}
-                      >
-                        {label}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleNextMonth}
+              className="h-8 w-8 text-muted-foreground"
+            >
+              <ChevronRight className="size-5" />
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleNextMonth}
-            className="h-8 w-8 text-muted-foreground"
-          >
-            <ChevronRight className="size-5" />
-          </Button>
-        </div>
         )}
 
         <div className="flex items-center gap-2">
