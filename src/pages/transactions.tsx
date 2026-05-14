@@ -7,7 +7,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Repeat,
-  PieChart,
   Target,
   ChevronsLeftRightEllipsis,
 } from "lucide-react"
@@ -209,11 +208,6 @@ export function TransactionsPage() {
           <Link to="/bills">
             <Button variant="ghost" size="icon" className="size-9">
               <Repeat className="size-5" />
-            </Button>
-          </Link>
-          <Link to="/budget">
-            <Button variant="ghost" size="icon" className="size-9">
-              <PieChart className="size-5" />
             </Button>
           </Link>
           <Link to="/goals">

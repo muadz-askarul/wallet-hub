@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { RootLayout } from "@/components/root-layout"
 import { DashboardPage } from "./pages/dashboard"
 import { BillsPage } from "./pages/bills"
-import { BudgetPage } from "./pages/budget"
 import { WalletPage } from "./pages/wallet"
 import { TransactionsPage } from "./pages/transactions"
 import { TransactionFormPage } from "./pages/transaction-form"
@@ -31,7 +30,6 @@ function AppContent() {
       <Route path="/" element={<RootLayout />}>
         <Route index element={<DashboardPage />} />
         <Route path="bills" element={<BillsPage />} />
-        <Route path="budget" element={<BudgetPage />} />
         <Route path="goals" element={<GoalsPage />} />
         <Route path="transactions" element={<TransactionsPage />} />
         <Route path="transactions/new" element={<TransactionFormPage />} />
