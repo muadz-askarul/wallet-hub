@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef, useEffect, useCallback } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 import { cn, formatCurrency } from "@/lib/utils"
@@ -35,6 +35,39 @@ export function TransactionsPage() {
     return d
   })
   const [showAll, setShowAll] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [pickerYear, setPickerYear] = useState(() => new Date().getFullYear())
+  const pickerRef = useRef<HTMLDivElement>(null)
+
+  // Close picker on click outside
+  useEffect(() => {
+    if (!pickerOpen) return
+    const handler = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setPickerOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [pickerOpen])
+
+  const handlePickMonth = useCallback(
+    (month: number) => {
+      setCurrentDate(() => {
+        const d = new Date(pickerYear, month, 1)
+        d.setHours(0, 0, 0, 0)
+        return d
+      })
+      setShowAll(false)
+      setPickerOpen(false)
+    },
+    [pickerYear]
+  )
+
+  const MONTH_LABELS = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+  ]
 
   const data = useLiveQuery(
     async () => {
@@ -173,14 +206,70 @@ export function TransactionsPage() {
           >
             <ChevronLeft className="size-5" />
           </Button>
-          <span
-            className={cn(
-              "w-20 text-center text-sm font-semibold",
-              showAll && "opacity-50"
+          <div className="relative" ref={pickerRef}>
+            <button
+              type="button"
+              onClick={() => {
+                setPickerYear(currentDate.getFullYear())
+                setPickerOpen((v) => !v)
+              }}
+              className={cn(
+                "w-20 cursor-pointer text-center text-sm font-semibold transition-colors hover:text-primary",
+                showAll && "opacity-50"
+              )}
+            >
+              {monthYearLabel}
+            </button>
+
+            {pickerOpen && (
+              <div className="absolute top-10 left-1/2 z-50 w-56 -translate-x-1/2 rounded-xl border bg-popover p-3 shadow-lg">
+                {/* Year nav */}
+                <div className="mb-2 flex items-center justify-between">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-7"
+                    onClick={() => setPickerYear((y) => y - 1)}
+                  >
+                    <ChevronLeft className="size-4" />
+                  </Button>
+                  <span className="text-sm font-semibold">{pickerYear}</span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-7"
+                    onClick={() => setPickerYear((y) => y + 1)}
+                  >
+                    <ChevronRight className="size-4" />
+                  </Button>
+                </div>
+                {/* Month grid */}
+                <div className="grid grid-cols-4 gap-1">
+                  {MONTH_LABELS.map((label, i) => {
+                    const isActive =
+                      !showAll &&
+                      currentDate.getMonth() === i &&
+                      currentDate.getFullYear() === pickerYear
+                    return (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => handlePickMonth(i)}
+                        className={cn(
+                          "rounded-lg py-1.5 text-xs font-medium transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted"
+                        )}
+                      >
+                        {label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
             )}
-          >
-            {monthYearLabel}
-          </span>
+          </div>
           <Button
             variant="ghost"
             size="icon"
