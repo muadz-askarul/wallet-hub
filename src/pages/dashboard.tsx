@@ -166,8 +166,8 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
-      <div className="shrink-0 px-6 pt-6 pb-2">
+    <div>
+      <div className="sticky top-0 z-10 bg-background px-6 pt-6 pb-2">
         <div className="mt-4 mb-8 flex flex-col items-center justify-center">
           <h2 className="text-5xl font-bold tracking-tight text-primary">
             Rp {formatCurrency(data.total)}
@@ -275,7 +275,7 @@ export function DashboardPage() {
         <h3 className="mt-4 mb-4 text-lg font-medium">Recent Transactions</h3>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pt-2 pb-6">
+      <div className="px-6 pt-2 pb-6">
         {data.transactionGroups.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             No recent transactions.
