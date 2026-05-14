@@ -67,7 +67,8 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
+    <>
+      <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
       {/* Sticky Header — same style as transactions page */}
       <div className="shrink-0 flex h-16 items-center border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
         <h1 className="text-lg font-semibold">Settings</h1>
