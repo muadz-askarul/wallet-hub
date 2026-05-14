@@ -8,6 +8,7 @@ import { CategoryManagementSheet } from "@/components/category-management-sheet"
 import { ChevronRight, Moon, Tag, Repeat, Clock, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import { PageHeader } from "@/components/ui/page-header"
 
 export function SettingsPage() {
   const navigate = useNavigate()
@@ -68,13 +69,13 @@ export function SettingsPage() {
 
   return (
     <>
-      <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
-      {/* Sticky Header — same style as transactions page */}
-      <div className="shrink-0 flex h-16 items-center border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <div>
+      {/* Sticky Header */}
+      <PageHeader>
         <h1 className="text-lg font-semibold">Settings</h1>
-      </div>
+      </PageHeader>
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="p-4">
         {/* Preferences */}
         <div className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
           Preferences
