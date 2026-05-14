@@ -12,7 +12,6 @@ import {
   Receipt,
   Repeat,
   Check,
-  Trash2,
   Wallet as WalletIcon,
   Plus,
   Edit,
@@ -45,16 +44,6 @@ export function BillsPage() {
       toast.error("Failed to complete bill payment")
     } finally {
       setProcessingId(null)
-    }
-  }
-
-  const handleDeactivateSchedule = async (id: string) => {
-    try {
-      await db.schedules.update(id, { isActive: 0 })
-      toast.success("Schedule deactivated successfully")
-    } catch (err) {
-      console.error(err)
-      toast.error("Failed to deactivate schedule")
     }
   }
 
@@ -221,14 +210,6 @@ export function BillsPage() {
                             <Edit className="size-4" />
                           </Button>
                           <Button
-                            variant="destructive"
-                            size="icon"
-                            className="size-8 cursor-pointer"
-                            onClick={() => handleDeactivateSchedule(bill.id)}
-                          >
-                            <Trash2 className="size-4" />
-                          </Button>
-                          <Button
                             size="sm"
                             className="h-8 cursor-pointer gap-1 rounded-lg px-2 text-xs"
                             disabled={processingId === bill.id}
@@ -348,16 +329,6 @@ export function BillsPage() {
                             }
                           >
                             <Edit className="size-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="icon"
-                            className="size-8 cursor-pointer"
-                            onClick={() =>
-                              handleDeactivateSchedule(template.id)
-                            }
-                          >
-                            <Trash2 className="size-4" />
                           </Button>
                         </div>
                       </div>
