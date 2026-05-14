@@ -13,6 +13,7 @@ import { toast } from "sonner"
 import { ChevronLeft, ChevronRight, Trash } from "lucide-react"
 import { PocketSelectionSheet } from "@/components/pocket-selection-sheet"
 import { CategorySelectionSheet } from "@/components/category-selection-sheet"
+import { PageHeader } from "@/components/ui/page-header"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -292,9 +293,9 @@ export function TransactionFormPage({
 
   return (
     <>
-      <div className="flex h-[calc(100svh-5rem)] flex-col overflow-hidden">
+    <div>
       {/* Sticky Header */}
-      <div className="shrink-0 flex h-16 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+      <PageHeader className="justify-between">
         <button
           onClick={() => navigate(-1)}
           className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
@@ -312,9 +313,9 @@ export function TransactionFormPage({
               : "New Transaction"}
         </h1>
         <div className="size-8" /> {/* Balance spacer */}
-      </div>
+      </PageHeader>
 
-      <div className="flex-1 overflow-y-auto p-4 pb-12">
+      <div className="p-4 pb-12">
         <div className="mx-auto max-w-md space-y-6">
         {/* Type Selector Tabs */}
         <div className="flex rounded-xl border bg-muted/20 p-1">
