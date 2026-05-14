@@ -222,7 +222,7 @@ export function TransactionsPage() {
             </button>
 
             {pickerOpen && (
-              <div className="absolute top-10 left-1/2 z-50 w-56 -translate-x-1/2 rounded-xl border bg-popover p-3 shadow-lg">
+              <div className="fixed inset-x-0 top-16 z-50 mx-auto w-[calc(100%-2rem)] max-w-sm rounded-xl border bg-popover p-3 shadow-lg">
                 {/* Year nav */}
                 <div className="mb-2 flex items-center justify-between">
                   <Button
