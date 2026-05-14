@@ -196,12 +196,16 @@ export function TransactionsPage() {
     <div>
       {/* Header */}
       <PageHeader className="justify-between">
+        {showAll ? (
+          <span className="text-sm font-semibold text-muted-foreground">
+            All Transactions
+          </span>
+        ) : (
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
             onClick={handlePrevMonth}
-            disabled={showAll}
             className="h-8 w-8 text-muted-foreground"
           >
             <ChevronLeft className="size-5" />
@@ -213,10 +217,7 @@ export function TransactionsPage() {
                 setPickerYear(currentDate.getFullYear())
                 setPickerOpen((v) => !v)
               }}
-              className={cn(
-                "w-20 cursor-pointer text-center text-sm font-semibold transition-colors hover:text-primary",
-                showAll && "opacity-50"
-              )}
+              className="w-20 cursor-pointer text-center text-sm font-semibold transition-colors hover:text-primary"
             >
               {monthYearLabel}
             </button>
@@ -247,7 +248,6 @@ export function TransactionsPage() {
                 <div className="grid grid-cols-4 gap-1">
                   {MONTH_LABELS.map((label, i) => {
                     const isActive =
-                      !showAll &&
                       currentDate.getMonth() === i &&
                       currentDate.getFullYear() === pickerYear
                     return (
@@ -274,12 +274,12 @@ export function TransactionsPage() {
             variant="ghost"
             size="icon"
             onClick={handleNextMonth}
-            disabled={showAll}
             className="h-8 w-8 text-muted-foreground"
           >
             <ChevronRight className="size-5" />
           </Button>
         </div>
+        )}
 
         <div className="flex items-center gap-2">
           <Button
