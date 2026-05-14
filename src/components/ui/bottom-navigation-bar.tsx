@@ -117,8 +117,8 @@ export const BottomNavigationBar = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "fixed bottom-6 left-1/2 z-50 flex w-full max-w-[480px] -translate-x-1/2 items-center gap-4 px-4 transition-transform duration-300 ease-in-out",
-          isVisible ? "translate-y-0" : "translate-y-[calc(100%+2rem)]"
+          "fixed bottom-0 left-1/2 z-50 flex w-full max-w-[480px] -translate-x-1/2 items-end gap-4 px-4 pb-6 transition-transform duration-300 ease-in-out",
+          isVisible ? "translate-y-0" : "translate-y-full"
         )}
         {...props}
       >
