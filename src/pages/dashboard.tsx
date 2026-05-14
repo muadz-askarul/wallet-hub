@@ -203,11 +203,11 @@ export function DashboardPage() {
               {data.enrichedBills.map((bill) => (
                 <div
                   key={bill.id}
-                  className="flex w-[240px] shrink-0 snap-start flex-col justify-between gap-4 rounded-2xl border bg-card p-4 shadow-sm"
+                  className="flex w-[220px] shrink-0 snap-start flex-col gap-3 rounded-2xl border bg-card p-3 shadow-sm"
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-2.5">
                     <div
-                      className="flex size-10 shrink-0 items-center justify-center rounded-full text-base font-semibold"
+                      className="flex size-8 shrink-0 items-center justify-center rounded-full text-base font-semibold"
                       style={{
                         backgroundColor: bill.categoryColor
                           ? `${bill.categoryColor}15`
@@ -217,10 +217,10 @@ export function DashboardPage() {
                       {bill.categoryIcon}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-foreground">
+                      <p className="truncate text-sm font-semibold text-foreground leading-tight">
                         {bill.note || bill.categoryName}
                       </p>
-                      <p className="mt-0.5 text-xs text-muted-foreground">
+                      <p className="mt-1 truncate text-[11px] text-muted-foreground">
                         Due{" "}
                         {new Date(bill.nextDueDate).toLocaleDateString(
                           "id-ID",
@@ -234,13 +234,13 @@ export function DashboardPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3">
-                    <span className="text-lg font-bold text-foreground">
+                  <div className="mt-0.5 flex items-center justify-between gap-2">
+                    <span className="text-base font-bold text-foreground">
                       Rp {formatCurrency(bill.amount)}
                     </span>
                     <Button
                       size="sm"
-                      className="w-full cursor-pointer rounded-xl font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      className="h-8 cursor-pointer rounded-xl px-4 text-xs font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
                       disabled={processingId === bill.id}
                       onClick={() =>
                         handlePayBill(bill.id, bill.note || "Bill")
@@ -250,7 +250,7 @@ export function DashboardPage() {
                         "..."
                       ) : (
                         <>
-                          Pay Bill <Check className="ml-1.5 size-4" />
+                          Pay <Check className="ml-1 size-3.5" />
                         </>
                       )}
                     </Button>
