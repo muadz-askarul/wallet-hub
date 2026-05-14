@@ -37,7 +37,7 @@ export function CategorySelectionSheet({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex max-h-[50svh] flex-col">
+      <DrawerContent className="flex !max-h-[50svh] flex-col">
         <DrawerHeader className="border-b pb-4 text-left">
           <DrawerTitle>Select Category</DrawerTitle>
           <div className="relative mt-3">
