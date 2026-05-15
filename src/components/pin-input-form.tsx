@@ -2,7 +2,7 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Delete } from "lucide-react"
+import { Delete, Fingerprint } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import {
@@ -16,6 +16,8 @@ export interface PinInputFormProps {
   icon?: React.ReactNode
   title?: string
   description?: string
+  isBiometricEnabled?: boolean
+  onBiometricClick?: () => void
   onSubmit: (values: {
     pin: string
   }) => void | boolean | Promise<void | boolean>
@@ -27,6 +29,8 @@ export function PinInputForm({
   icon,
   title,
   description,
+  isBiometricEnabled,
+  onBiometricClick,
   onSubmit,
   className,
 }: PinInputFormProps) {
@@ -147,7 +151,19 @@ export function PinInputForm({
             {num}
           </button>
         ))}
-        <div className="h-16 w-16" /> {/* Empty slot */}
+        {isBiometricEnabled ? (
+          <button
+            type="button"
+            aria-label="Biometric Unlock"
+            disabled={isSubmitting}
+            onClick={onBiometricClick}
+            className="flex h-16 w-16 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted active:scale-95 disabled:cursor-not-allowed"
+          >
+            <Fingerprint className="h-8 w-8" />
+          </button>
+        ) : (
+          <div className="h-16 w-16" />
+        )}
         <button
           type="button"
           disabled={isSubmitting}
