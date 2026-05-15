@@ -6,6 +6,7 @@ import { NumericInput } from "@/components/ui/numeric-input"
 import { seedDefaultCategories } from "@/lib/db"
 import { updateSettings } from "@/lib/services/settings-service"
 import { useAppLock } from "@/lib/providers/app-lock-provider"
+import { hashPin } from "@/lib/utils/crypto"
 import { toast } from "sonner"
 import { PinCreationForm } from "@/components/pin-creation-form"
 import { Wallet, Coins, Plus, Trash, Check } from "lucide-react"
@@ -189,8 +190,9 @@ export function OnboardingPage() {
       }
 
       // 3. Update Settings to complete onboarding and enable lock screen
+      const hashedPin = await hashPin(pin)
       await updateSettings({
-        pin,
+        pin: hashedPin,
         isOnboarded: true,
         lockDelayMinutes: 5,
       })

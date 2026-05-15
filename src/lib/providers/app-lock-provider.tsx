@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from "react"
 import { getSettings } from "../services/settings-service"
+import { hashPin } from "../utils/crypto"
 
 interface AppLockContextType {
   isLocked: boolean
@@ -92,7 +93,8 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
 
   const unlock = async (enteredPin: string): Promise<boolean> => {
     const settings = await getSettings()
-    if (enteredPin === settings.pin) {
+    const hashedEnteredPin = await hashPin(enteredPin)
+    if (hashedEnteredPin === settings.pin) {
       setIsLocked(false)
       // Clear background timestamp upon successful unlock
       localStorage.removeItem("app_background_timestamp")
