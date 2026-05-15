@@ -63,10 +63,25 @@ describe("Biometric Service", () => {
     })
   })
 
-  it("should return true on successful authentication", async () => {
+  it("should return true on successful authentication and use stored ID", async () => {
+    const credentialId = btoa(String.fromCharCode(1, 2, 3))
+    ;(settingsService.getSettings as any).mockResolvedValue({
+      biometricCredentialId: credentialId,
+    })
     ;(navigator.credentials.get as any).mockResolvedValue({ id: "cred-1" })
+
     const result = await authenticateBiometrics()
     expect(result).toBe(true)
-    expect(navigator.credentials.get).toHaveBeenCalled()
+    expect(navigator.credentials.get).toHaveBeenCalledWith({
+      publicKey: expect.objectContaining({
+        allowCredentials: [
+          {
+            id: expect.any(ArrayBuffer),
+            type: "public-key",
+            transports: ["internal"],
+          },
+        ],
+      }),
+    })
   })
 })

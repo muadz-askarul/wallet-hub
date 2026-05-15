@@ -4,7 +4,7 @@
  * to register and verify credentials locally.
  */
 
-import { updateSettings } from "./settings-service"
+import { getSettings, updateSettings } from "./settings-service"
 
 const CHALLENGE = "wallet-hub-local-challenge"
 
@@ -74,10 +74,24 @@ export async function authenticateBiometrics(): Promise<boolean> {
     const encoder = new TextEncoder()
     const challenge = encoder.encode(CHALLENGE)
 
+    const settings = await getSettings()
     const options: PublicKeyCredentialRequestOptions = {
       challenge,
       rpId: window.location.hostname || "localhost",
       userVerification: "required",
+    }
+
+    if (settings.biometricCredentialId) {
+      const idArray = Uint8Array.from(atob(settings.biometricCredentialId), (c) =>
+        c.charCodeAt(0)
+      )
+      options.allowCredentials = [
+        {
+          id: idArray.buffer,
+          type: "public-key",
+          transports: ["internal"],
+        },
+      ]
     }
 
     const assertion = await navigator.credentials.get({ publicKey: options })
