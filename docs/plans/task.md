@@ -1,14 +1,10 @@
-# Task Tracker: Natural Window Scroll Migration
+# Biometric Authentication Task Tracker
 
-| Task | Description | Status |
+| Task | Status | Description |
 | :--- | :--- | :--- |
-| 1 | Create PageHeader Component | completed |
-| 2 | Update index.css — Move overflow-x to body level | completed |
-| 3 | Update root-layout.tsx — Remove viewport constraints | completed |
-| 4 | Update DashboardPage — Remove viewport lock, add sticky sections | completed |
-| 5 | Update TransactionsPage — Use PageHeader, keep summary sticky | completed |
-| 6 | Update WalletPage — Use PageHeader, remove viewport lock | completed |
-| 7 | Update SettingsPage — Use PageHeader, remove viewport lock | completed |
-| 8 | Update BillsPage — Use PageHeader, remove viewport lock | completed |
-| 9 | Update TransactionFormPage — Use PageHeader, remove viewport lock | completed |
-| 10 | Manual Verification — Test scroll behavior | pending |
+| Task 1 | done | PIN Encryption (Hashing) |
+| Task 2 | done | Biometric Service |
+| Task 3 | done | App Lock & Settings State |
+| Task 4 | done | UI Updates - PinInputForm |
+| Task 5 | done | UI Updates - Onboarding |
+| Task 6 | done | UI Updates - Settings |
