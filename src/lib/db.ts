@@ -41,6 +41,7 @@ export interface Settings {
   darkMode: boolean
   currency: string
   pin?: string
+  isBiometricEnabled?: boolean
   lockDelayMinutes?: number
   isOnboarded?: boolean
 }

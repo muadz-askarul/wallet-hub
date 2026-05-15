@@ -7,12 +7,15 @@ import {
 } from "react"
 import { getSettings } from "../services/settings-service"
 import { hashPin } from "../utils/crypto"
+import { authenticateBiometrics } from "../services/biometric-service"
 
 interface AppLockContextType {
   isLocked: boolean
   hasPin: boolean
   isOnboarded: boolean
+  isBiometricEnabled: boolean
   unlock: (pin: string) => Promise<boolean>
+  unlockWithBiometrics: () => Promise<boolean>
   lock: () => void
   refreshLockState: () => Promise<void>
 }
@@ -23,6 +26,7 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
   const [isLocked, setIsLocked] = useState(false)
   const [hasPin, setHasPin] = useState(false)
   const [isOnboarded, setIsOnboarded] = useState(true) // assume true until loaded
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false)
 
   // Load initial lock state and check onboarding
   const refreshLockState = async () => {
@@ -33,6 +37,7 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
 
       setIsOnboarded(onboarded)
       setHasPin(pinSet)
+      setIsBiometricEnabled(!!settings.isBiometricEnabled)
 
       // Only lock if onboarded and a PIN is actually set
       if (onboarded && pinSet) {
@@ -91,12 +96,29 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // Auto-trigger biometric unlock when locked and enabled
+  useEffect(() => {
+    if (isLocked && isBiometricEnabled) {
+      unlockWithBiometrics()
+    }
+  }, [isLocked, isBiometricEnabled])
+
   const unlock = async (enteredPin: string): Promise<boolean> => {
     const settings = await getSettings()
     const hashedEnteredPin = await hashPin(enteredPin)
     if (hashedEnteredPin === settings.pin) {
       setIsLocked(false)
       // Clear background timestamp upon successful unlock
+      localStorage.removeItem("app_background_timestamp")
+      return true
+    }
+    return false
+  }
+
+  const unlockWithBiometrics = async (): Promise<boolean> => {
+    const success = await authenticateBiometrics()
+    if (success) {
+      setIsLocked(false)
       localStorage.removeItem("app_background_timestamp")
       return true
     }
@@ -115,7 +137,9 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
         isLocked,
         hasPin,
         isOnboarded,
+        isBiometricEnabled,
         unlock,
+        unlockWithBiometrics,
         lock,
         refreshLockState,
       }}
