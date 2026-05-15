@@ -31,22 +31,31 @@ export function RootLayout() {
   const [showPwaSuggestion, setShowPwaSuggestion] = useState(false)
 
   useEffect(() => {
+    // Basic platform detection
+    const ua = navigator.userAgent.toLowerCase()
+    const isAndroid = /android/i.test(ua)
+    const isIOS = /iphone|ipad|ipod/i.test(ua)
+    const isMobile = isAndroid || isIOS
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      ("standalone" in navigator &&
+        (navigator as { standalone?: boolean }).standalone) ||
+      document.referrer.includes("android-app://")
+
+    const isDismissed = localStorage.getItem("pwa-suggestion-dismissed")
+
+    // If it's mobile and not already installed and not dismissed, show suggestion
+    if (isMobile && !isStandalone && !isDismissed) {
+      setTimeout(() => {
+        setShowPwaSuggestion(true)
+      }, 0)
+    }
+
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault()
       // Stash the event so it can be triggered later.
       setDeferredPrompt(e as BeforeInstallPromptEvent)
-
-      // Only show suggestion if it's Android and not already in standalone mode
-      const isAndroid = /android/i.test(navigator.userAgent)
-      const isStandalone = window.matchMedia(
-        "(display-mode: standalone)"
-      ).matches
-      const isDismissed = localStorage.getItem("pwa-suggestion-dismissed")
-
-      if (isAndroid && !isStandalone && !isDismissed) {
-        setShowPwaSuggestion(true)
-      }
     }
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
@@ -115,6 +124,9 @@ export function RootLayout() {
     location.pathname
   )
 
+  const ua = navigator.userAgent.toLowerCase()
+  const isIOS = /iphone|ipad|ipod/i.test(ua)
+
   return (
     <div className={`flex min-h-svh flex-col ${showNavBar ? "pb-20" : ""}`}>
       <main className="relative flex-1">
@@ -134,7 +146,9 @@ export function RootLayout() {
                 <div className="flex-1 overflow-hidden text-sm">
                   <p className="font-semibold">Install Wallet Hub</p>
                   <p className="truncate text-muted-foreground">
-                    Add to home screen for a better experience.
+                    {isIOS
+                      ? "Tap Share then 'Add to Home Screen'"
+                      : "Add to home screen for a better experience."}
                   </p>
                 </div>
                 <div className="flex items-center gap-1">
@@ -146,13 +160,16 @@ export function RootLayout() {
                   >
                     <X className="size-4" />
                   </Button>
-                  <Button
-                    size="sm"
-                    className="h-8 rounded-lg px-3 text-xs"
-                    onClick={handleInstallClick}
-                  >
-                    Install
-                  </Button>
+                  {!isIOS && (
+                    <Button
+                      size="sm"
+                      className="h-8 rounded-lg px-3 text-xs"
+                      onClick={handleInstallClick}
+                      disabled={!deferredPrompt}
+                    >
+                      Install
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
