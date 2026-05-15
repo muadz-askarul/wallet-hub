@@ -12,6 +12,7 @@ export interface Pocket {
   id: string
   walletId: string
   name: string
+  initialBalance?: number
   createdAt: number
   deletedAt?: number
   order: number

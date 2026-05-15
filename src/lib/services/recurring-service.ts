@@ -1,4 +1,4 @@
-import { db, type Schedule, type Transaction } from "../db"
+import { db, type Transaction } from "../db"
 import { calculateNextDueDate } from "../utils/date-calculator"
 
 export async function processAutoRepeatTransactions() {

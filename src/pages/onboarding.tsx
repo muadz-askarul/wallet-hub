@@ -7,7 +7,10 @@ import { seedDefaultCategories } from "@/lib/db"
 import { updateSettings } from "@/lib/services/settings-service"
 import { useAppLock } from "@/lib/providers/app-lock-provider"
 import { hashPin } from "@/lib/utils/crypto"
-import { registerBiometrics, isBiometricSupported } from "@/lib/services/biometric-service"
+import {
+  registerBiometrics,
+  isBiometricSupported,
+} from "@/lib/services/biometric-service"
 import { toast } from "sonner"
 import { PinCreationForm } from "@/components/pin-creation-form"
 import { Wallet, Coins, Plus, Trash, Check, Fingerprint } from "lucide-react"

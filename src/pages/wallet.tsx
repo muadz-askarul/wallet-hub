@@ -426,7 +426,9 @@ export function WalletPage() {
           {!orderMode && (
             <DropdownMenu>
               <DropdownMenuTrigger
-                render={<Button variant="ghost" size="icon" className="size-9" />}
+                render={
+                  <Button variant="ghost" size="icon" className="size-9" />
+                }
               >
                 <MoreVertical className="size-5" />
               </DropdownMenuTrigger>

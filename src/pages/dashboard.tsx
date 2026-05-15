@@ -217,7 +217,7 @@ export function DashboardPage() {
                       {bill.categoryIcon}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-foreground leading-tight">
+                      <p className="truncate text-sm leading-tight font-semibold text-foreground">
                         {bill.note || bill.categoryName}
                       </p>
                       <p className="mt-1 truncate text-[11px] text-muted-foreground">

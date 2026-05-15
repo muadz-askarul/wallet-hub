@@ -54,7 +54,7 @@ export function TransactionFormPage({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   // Recurring schedule states
-  const [isRecurring, setIsRecurring] = useState(false)
+  const [isRecurring, setIsRecurring] = useState(!!isScheduleMode)
   const [recurringType, setRecurringType] = useState<"bill" | "repeat">(
     "repeat"
   )
@@ -70,12 +70,6 @@ export function TransactionFormPage({
   const wallets = useLiveQuery(() => db.wallets.toArray(), [], [])
   const pockets = useLiveQuery(() => db.pockets.toArray(), [], [])
   const categories = useLiveQuery(() => db.categories.toArray(), [], [])
-
-  useEffect(() => {
-    if (isScheduleMode) {
-      setIsRecurring(true)
-    }
-  }, [isScheduleMode])
 
   // Load existing transaction or schedule
   useEffect(() => {
@@ -240,7 +234,9 @@ export function TransactionFormPage({
 
           await db.schedules.add(schedule)
           toast.success(
-            recurringType === "bill" ? "Bill created" : "Recurring schedule created"
+            recurringType === "bill"
+              ? "Bill created"
+              : "Recurring schedule created"
           )
 
           if (recurringType === "bill") {
@@ -293,353 +289,353 @@ export function TransactionFormPage({
 
   return (
     <>
-    <div>
-      {/* Sticky Header */}
-      <PageHeader className="justify-between">
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
-        >
-          <ChevronLeft className="mr-1 size-5" />
-          Back
-        </button>
-        <h1 className="text-base font-semibold">
-          {isScheduleMode
-            ? scheduleId
-              ? "Edit Recurring Schedule"
-              : "New Recurring Schedule"
-            : id
-              ? "Edit Transaction"
-              : "New Transaction"}
-        </h1>
-        <div className="size-8" /> {/* Balance spacer */}
-      </PageHeader>
+      <div>
+        {/* Sticky Header */}
+        <PageHeader className="justify-between">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            <ChevronLeft className="mr-1 size-5" />
+            Back
+          </button>
+          <h1 className="text-base font-semibold">
+            {isScheduleMode
+              ? scheduleId
+                ? "Edit Recurring Schedule"
+                : "New Recurring Schedule"
+              : id
+                ? "Edit Transaction"
+                : "New Transaction"}
+          </h1>
+          <div className="size-8" /> {/* Balance spacer */}
+        </PageHeader>
 
-      <div className="p-4 pb-12">
-        <div className="mx-auto max-w-md space-y-6">
-        {/* Type Selector Tabs */}
-        <div className="flex rounded-xl border bg-muted/20 p-1">
-          {(["expense", "income", "transfer"] as TxType[]).map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => {
-                setType(t)
-                setCategoryId(undefined)
-              }}
-              className={cn(
-                "flex-1 rounded-lg py-2 text-sm font-semibold capitalize transition-all",
-                type === t
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-
-        {/* Amount Section */}
-        <div className="space-y-1.5 rounded-2xl border bg-muted/5 p-4">
-          <label className="text-xs font-semibold tracking-wider text-foreground uppercase">
-            Amount
-          </label>
-          <div className="flex items-center justify-between gap-2 border-b pb-2">
-            <span className="shrink-0 text-2xl font-bold text-foreground">
-              Rp
-            </span>
-            <NumericInput
-              value={amount}
-              onValueChange={(v) => setAmount(v ? parseFloat(v) : 0)}
-              className="h-auto flex-1 border-none bg-transparent p-0 text-right text-3xl font-black text-foreground shadow-none focus-visible:ring-0 dark:bg-transparent"
-              placeholder="0"
-            />
-          </div>
-        </div>
-
-        {/* Form Fields */}
-        <div className="space-y-4">
-          {/* Date Picker */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">
-              {isRecurring && recurringType === "bill"
-                ? "Due Date"
-                : "Date & Time"}
-            </label>
-            <Input
-              type="datetime-local"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="h-11 dark:[&::-webkit-calendar-picker-indicator]:invert"
-            />
-          </div>
-
-          {/* Pocket Picker Button */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">
-              {type === "transfer" ? "From Pocket" : "Pocket"}
-            </label>
-            <button
-              type="button"
-              onClick={() => setPocketSheetOpen(true)}
-              className="flex w-full items-center justify-between rounded-xl border bg-card px-4 py-3 text-left transition-colors hover:bg-muted"
-            >
-              {selectedPocket ? (
-                <div>
-                  <div className="text-sm font-semibold text-foreground">
-                    {selectedPocket.name}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {selectedPocketWallet?.name || "Wallet"}
-                  </div>
-                </div>
-              ) : (
-                <span className="text-sm text-muted-foreground">
-                  Select a pocket
-                </span>
-              )}
-              <ChevronRight className="size-4 text-muted-foreground" />
-            </button>
-          </div>
-
-          {/* Destination Pocket (Only for transfers) */}
-          {type === "transfer" && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">To Pocket</label>
-              <button
-                type="button"
-                onClick={() => setDestPocketSheetOpen(true)}
-                className="flex w-full items-center justify-between rounded-xl border bg-card px-4 py-3 text-left transition-colors hover:bg-muted"
-              >
-                {selectedDestPocket ? (
-                  <div>
-                    <div className="text-sm font-semibold text-foreground">
-                      {selectedDestPocket.name}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {selectedDestPocketWallet?.name || "Wallet"}
-                    </div>
-                  </div>
-                ) : (
-                  <span className="text-sm text-muted-foreground">
-                    Select destination pocket
-                  </span>
-                )}
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </button>
-            </div>
-          )}
-
-          {/* Category Picker (Only for income/expense) */}
-          {type !== "transfer" && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Category</label>
-              <button
-                type="button"
-                onClick={() => setCategorySheetOpen(true)}
-                className="flex w-full items-center justify-between rounded-xl border bg-card px-4 py-3 text-left transition-colors hover:bg-muted"
-              >
-                {selectedCategory ? (
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex size-8 items-center justify-center rounded-full text-sm"
-                      style={{
-                        backgroundColor: selectedCategory.color
-                          ? `${selectedCategory.color}20`
-                          : "#6b728020",
-                      }}
-                    >
-                      {selectedCategory.icon}
-                    </div>
-                    <span className="text-sm font-semibold text-foreground">
-                      {selectedCategory.name}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-sm text-muted-foreground">
-                    Select a category
-                  </span>
-                )}
-                <ChevronRight className="size-4 text-muted-foreground" />
-              </button>
-            </div>
-          )}
-
-          {/* Note Input */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium">Note</label>
-            <Textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="e.g. Lunch at Noodle Shop"
-              rows={3}
-            />
-          </div>
-
-          {/* Repeating Options (Only for New transactions or Schedule Mode) */}
-          {(!id || isScheduleMode) && (
-            <div className="space-y-4 rounded-2xl border bg-card p-4 shadow-sm">
-              {!isScheduleMode && (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <label
-                      htmlFor="recurring-toggle"
-                      className="text-sm font-semibold text-foreground"
-                    >
-                      Set repeating schedule
-                    </label>
-                    <p className="text-xs text-muted-foreground">
-                      Schedule this transaction to repeat
-                    </p>
-                  </div>
-                  <Checkbox
-                    id="recurring-toggle"
-                    checked={isRecurring}
-                    onCheckedChange={(checked) => setIsRecurring(!!checked)}
-                  />
-                </div>
-              )}
-
-              {isRecurring && (
-                <div
+        <div className="p-4 pb-12">
+          <div className="mx-auto max-w-md space-y-6">
+            {/* Type Selector Tabs */}
+            <div className="flex rounded-xl border bg-muted/20 p-1">
+              {(["expense", "income", "transfer"] as TxType[]).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => {
+                    setType(t)
+                    setCategoryId(undefined)
+                  }}
                   className={cn(
-                    "space-y-4",
-                    !isScheduleMode && "border-t pt-4"
+                    "flex-1 rounded-lg py-2 text-sm font-semibold capitalize transition-all",
+                    type === t
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
-                  {/* Schedule Type */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                      Schedule Type
-                    </label>
-                    <div className="flex rounded-xl bg-muted p-1">
-                      <button
-                        type="button"
-                        onClick={() => setRecurringType("repeat")}
-                        className={cn(
-                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all",
-                          recurringType === "repeat"
-                            ? "bg-background text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        Auto-Repeat
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setRecurringType("bill")}
-                        className={cn(
-                          "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all",
-                          recurringType === "bill"
-                            ? "bg-background text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        Manual Bill
-                      </button>
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            {/* Amount Section */}
+            <div className="space-y-1.5 rounded-2xl border bg-muted/5 p-4">
+              <label className="text-xs font-semibold tracking-wider text-foreground uppercase">
+                Amount
+              </label>
+              <div className="flex items-center justify-between gap-2 border-b pb-2">
+                <span className="shrink-0 text-2xl font-bold text-foreground">
+                  Rp
+                </span>
+                <NumericInput
+                  value={amount}
+                  onValueChange={(v) => setAmount(v ? parseFloat(v) : 0)}
+                  className="h-auto flex-1 border-none bg-transparent p-0 text-right text-3xl font-black text-foreground shadow-none focus-visible:ring-0 dark:bg-transparent"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+
+            {/* Form Fields */}
+            <div className="space-y-4">
+              {/* Date Picker */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">
+                  {isRecurring && recurringType === "bill"
+                    ? "Due Date"
+                    : "Date & Time"}
+                </label>
+                <Input
+                  type="datetime-local"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  className="h-11 dark:[&::-webkit-calendar-picker-indicator]:invert"
+                />
+              </div>
+
+              {/* Pocket Picker Button */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">
+                  {type === "transfer" ? "From Pocket" : "Pocket"}
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setPocketSheetOpen(true)}
+                  className="flex w-full items-center justify-between rounded-xl border bg-card px-4 py-3 text-left transition-colors hover:bg-muted"
+                >
+                  {selectedPocket ? (
+                    <div>
+                      <div className="text-sm font-semibold text-foreground">
+                        {selectedPocket.name}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {selectedPocketWallet?.name || "Wallet"}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">
+                      Select a pocket
+                    </span>
+                  )}
+                  <ChevronRight className="size-4 text-muted-foreground" />
+                </button>
+              </div>
 
-                  {/* Period Selection */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                      Repeat Period
-                    </label>
-                    <select
-                      value={recurringPeriod}
-                      onChange={(e) => setRecurringPeriod(e.target.value)}
-                      className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+              {/* Destination Pocket (Only for transfers) */}
+              {type === "transfer" && (
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">To Pocket</label>
+                  <button
+                    type="button"
+                    onClick={() => setDestPocketSheetOpen(true)}
+                    className="flex w-full items-center justify-between rounded-xl border bg-card px-4 py-3 text-left transition-colors hover:bg-muted"
+                  >
+                    {selectedDestPocket ? (
+                      <div>
+                        <div className="text-sm font-semibold text-foreground">
+                          {selectedDestPocket.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {selectedDestPocketWallet?.name || "Wallet"}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">
+                        Select destination pocket
+                      </span>
+                    )}
+                    <ChevronRight className="size-4 text-muted-foreground" />
+                  </button>
+                </div>
+              )}
+
+              {/* Category Picker (Only for income/expense) */}
+              {type !== "transfer" && (
+                <div className="space-y-1.5">
+                  <label className="text-sm font-medium">Category</label>
+                  <button
+                    type="button"
+                    onClick={() => setCategorySheetOpen(true)}
+                    className="flex w-full items-center justify-between rounded-xl border bg-card px-4 py-3 text-left transition-colors hover:bg-muted"
+                  >
+                    {selectedCategory ? (
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="flex size-8 items-center justify-center rounded-full text-sm"
+                          style={{
+                            backgroundColor: selectedCategory.color
+                              ? `${selectedCategory.color}20`
+                              : "#6b728020",
+                          }}
+                        >
+                          {selectedCategory.icon}
+                        </div>
+                        <span className="text-sm font-semibold text-foreground">
+                          {selectedCategory.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">
+                        Select a category
+                      </span>
+                    )}
+                    <ChevronRight className="size-4 text-muted-foreground" />
+                  </button>
+                </div>
+              )}
+
+              {/* Note Input */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium">Note</label>
+                <Textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="e.g. Lunch at Noodle Shop"
+                  rows={3}
+                />
+              </div>
+
+              {/* Repeating Options (Only for New transactions or Schedule Mode) */}
+              {(!id || isScheduleMode) && (
+                <div className="space-y-4 rounded-2xl border bg-card p-4 shadow-sm">
+                  {!isScheduleMode && (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <label
+                          htmlFor="recurring-toggle"
+                          className="text-sm font-semibold text-foreground"
+                        >
+                          Set repeating schedule
+                        </label>
+                        <p className="text-xs text-muted-foreground">
+                          Schedule this transaction to repeat
+                        </p>
+                      </div>
+                      <Checkbox
+                        id="recurring-toggle"
+                        checked={isRecurring}
+                        onCheckedChange={(checked) => setIsRecurring(!!checked)}
+                      />
+                    </div>
+                  )}
+
+                  {isRecurring && (
+                    <div
+                      className={cn(
+                        "space-y-4",
+                        !isScheduleMode && "border-t pt-4"
+                      )}
                     >
-                      {[
-                        "Every Day",
-                        "Weekdays",
-                        "Weekend",
-                        "Every Week",
-                        "Every 2 Weeks",
-                        "Every 4 Weeks",
-                        "Every Month",
-                        "The end of the month",
-                        "Every 2 Month",
-                        "Every 3 Month",
-                        "Every 4 Month",
-                        "Every 6 Month",
-                        "Anually",
-                      ].map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                      {/* Schedule Type */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                          Schedule Type
+                        </label>
+                        <div className="flex rounded-xl bg-muted p-1">
+                          <button
+                            type="button"
+                            onClick={() => setRecurringType("repeat")}
+                            className={cn(
+                              "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all",
+                              recurringType === "repeat"
+                                ? "bg-background text-foreground shadow-sm"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                          >
+                            Auto-Repeat
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setRecurringType("bill")}
+                            className={cn(
+                              "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all",
+                              recurringType === "bill"
+                                ? "bg-background text-foreground shadow-sm"
+                                : "text-muted-foreground hover:text-foreground"
+                            )}
+                          >
+                            Manual Bill
+                          </button>
+                        </div>
+                      </div>
 
-                  {/* End Date (Optional) */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                      End Date (Optional)
-                    </label>
-                    <Input
-                      type="date"
-                      value={endDateStr}
-                      onChange={(e) => setEndDateStr(e.target.value)}
-                      className="h-11 dark:[&::-webkit-calendar-picker-indicator]:invert"
-                    />
-                  </div>
+                      {/* Period Selection */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                          Repeat Period
+                        </label>
+                        <select
+                          value={recurringPeriod}
+                          onChange={(e) => setRecurringPeriod(e.target.value)}
+                          className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                        >
+                          {[
+                            "Every Day",
+                            "Weekdays",
+                            "Weekend",
+                            "Every Week",
+                            "Every 2 Weeks",
+                            "Every 4 Weeks",
+                            "Every Month",
+                            "The end of the month",
+                            "Every 2 Month",
+                            "Every 3 Month",
+                            "Every 4 Month",
+                            "Every 6 Month",
+                            "Anually",
+                          ].map((p) => (
+                            <option key={p} value={p}>
+                              {p}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* End Date (Optional) */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                          End Date (Optional)
+                        </label>
+                        <Input
+                          type="date"
+                          value={endDateStr}
+                          onChange={(e) => setEndDateStr(e.target.value)}
+                          className="h-11 dark:[&::-webkit-calendar-picker-indicator]:invert"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-        </div>
 
-        {/* Form Actions */}
-        <div className="flex gap-2 pt-4">
-          {id || scheduleId ? (
-            <>
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                className="h-11 w-11 shrink-0"
-                onClick={() => setDeleteDialogOpen(true)}
-              >
-                <Trash className="size-5" />
-              </Button>
-              <Button
-                className="h-11 flex-1 text-base font-semibold"
-                onClick={() => handleSave(false)}
-                disabled={saving}
-              >
-                {saving ? "Saving..." : "Save Changes"}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                className={cn(
-                  "h-11 text-base font-semibold",
-                  isScheduleMode ? "w-full" : "w-2/3"
-                )}
-                onClick={() => handleSave(false)}
-                disabled={saving}
-              >
-                {saving ? "Saving..." : "Save"}
-              </Button>
-              {!isScheduleMode && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="h-11 w-1/3 text-base font-semibold"
-                  onClick={() => handleSave(true)}
-                  disabled={saving}
-                >
-                  Continue
-                </Button>
+            {/* Form Actions */}
+            <div className="flex gap-2 pt-4">
+              {id || scheduleId ? (
+                <>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="h-11 w-11 shrink-0"
+                    onClick={() => setDeleteDialogOpen(true)}
+                  >
+                    <Trash className="size-5" />
+                  </Button>
+                  <Button
+                    className="h-11 flex-1 text-base font-semibold"
+                    onClick={() => handleSave(false)}
+                    disabled={saving}
+                  >
+                    {saving ? "Saving..." : "Save Changes"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    className={cn(
+                      "h-11 text-base font-semibold",
+                      isScheduleMode ? "w-full" : "w-2/3"
+                    )}
+                    onClick={() => handleSave(false)}
+                    disabled={saving}
+                  >
+                    {saving ? "Saving..." : "Save"}
+                  </Button>
+                  {!isScheduleMode && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-11 w-1/3 text-base font-semibold"
+                      onClick={() => handleSave(true)}
+                      disabled={saving}
+                    >
+                      Continue
+                    </Button>
+                  )}
+                </>
               )}
-            </>
-          )}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
 
       {/* Pocket Selection bottom sheet */}
       <PocketSelectionSheet

@@ -96,13 +96,6 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Auto-trigger biometric unlock when locked and enabled
-  useEffect(() => {
-    if (isLocked && isBiometricEnabled) {
-      unlockWithBiometrics()
-    }
-  }, [isLocked, isBiometricEnabled])
-
   const unlock = async (enteredPin: string): Promise<boolean> => {
     const settings = await getSettings()
     const hashedEnteredPin = await hashPin(enteredPin)
@@ -124,6 +117,13 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
     }
     return false
   }
+
+  // Auto-trigger biometric unlock when locked and enabled
+  useEffect(() => {
+    if (isLocked && isBiometricEnabled) {
+      unlockWithBiometrics()
+    }
+  }, [isLocked, isBiometricEnabled])
 
   const lock = () => {
     if (isOnboarded && hasPin) {

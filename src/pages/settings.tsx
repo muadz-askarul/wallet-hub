@@ -5,7 +5,16 @@ import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 import { Switch } from "@/components/ui/switch"
 import { CategoryManagementSheet } from "@/components/category-management-sheet"
-import { ChevronRight, Moon, Tag, Repeat, Clock, Trash, Fingerprint, Lock } from "lucide-react"
+import {
+  ChevronRight,
+  Moon,
+  Tag,
+  Repeat,
+  Clock,
+  Trash,
+  Fingerprint,
+  Lock,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/ui/page-header"
@@ -21,7 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 export function SettingsPage() {
   const navigate = useNavigate()
@@ -292,7 +301,7 @@ export function SettingsPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="text-destructive-foreground bg-destructive hover:bg-destructive/90"
               onClick={confirmReset}
             >
               Reset Everything
@@ -302,8 +311,8 @@ export function SettingsPage() {
       </AlertDialog>
 
       <Dialog open={bioGateOpen} onOpenChange={setBioGateOpen}>
-        <DialogContent className="p-0 border-none bg-transparent shadow-none max-w-[280px]">
-          <div className="rounded-3xl bg-card p-8 border shadow-xl">
+        <DialogContent className="max-w-[280px] border-none bg-transparent p-0 shadow-none">
+          <div className="rounded-3xl border bg-card p-8 shadow-xl">
             <PinInputForm
               title="Verify PIN"
               description={`Enter your PIN to ${pendingBioValue ? "enable" : "disable"} biometrics`}

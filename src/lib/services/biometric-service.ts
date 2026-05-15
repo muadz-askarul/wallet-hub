@@ -45,8 +45,10 @@ export async function registerBiometrics(): Promise<boolean> {
       timeout: 60000,
     }
 
-    const credential = await navigator.credentials.create({ publicKey: options })
-    
+    const credential = await navigator.credentials.create({
+      publicKey: options,
+    })
+
     if (credential) {
       // In a real app, we would send the public key to a server.
       // Here, just knowing it succeeded is enough for "local-only" verification.
@@ -74,7 +76,7 @@ export async function authenticateBiometrics(): Promise<boolean> {
     }
 
     const assertion = await navigator.credentials.get({ publicKey: options })
-    
+
     if (assertion) {
       return true
     }
