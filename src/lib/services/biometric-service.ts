@@ -82,8 +82,9 @@ export async function authenticateBiometrics(): Promise<boolean> {
     }
 
     if (settings.biometricCredentialId) {
-      const idArray = Uint8Array.from(atob(settings.biometricCredentialId), (c) =>
-        c.charCodeAt(0)
+      const idArray = Uint8Array.from(
+        atob(settings.biometricCredentialId),
+        (c) => c.charCodeAt(0)
       )
       options.allowCredentials = [
         {
