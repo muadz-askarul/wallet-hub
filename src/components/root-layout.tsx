@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Outlet, Link, useLocation, useNavigate } from "react-router-dom"
 import {
   BottomNavigationBar,
@@ -11,13 +11,53 @@ import {
   Plus,
   ArrowUpDown,
   MessageSquareText,
+  Download,
+  X,
 } from "lucide-react"
 import { GestureButton } from "@/components/ui/gesture-button"
 import { processAutoRepeatTransactions } from "@/lib/services/recurring-service"
+import { Button } from "@/components/ui/button"
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
+}
 
 export function RootLayout() {
   const location = useLocation()
   const navigate = useNavigate()
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null)
+  const [showPwaSuggestion, setShowPwaSuggestion] = useState(false)
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault()
+      // Stash the event so it can be triggered later.
+      setDeferredPrompt(e as BeforeInstallPromptEvent)
+
+      // Only show suggestion if it's Android and not already in standalone mode
+      const isAndroid = /android/i.test(navigator.userAgent)
+      const isStandalone = window.matchMedia(
+        "(display-mode: standalone)"
+      ).matches
+      const isDismissed = localStorage.getItem("pwa-suggestion-dismissed")
+
+      if (isAndroid && !isStandalone && !isDismissed) {
+        setShowPwaSuggestion(true)
+      }
+    }
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+
+    return () => {
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt
+      )
+    }
+  }, [])
 
   useEffect(() => {
     const runSchedule = () => {
@@ -46,6 +86,31 @@ export function RootLayout() {
     }
   }, [])
 
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return
+
+    // Show the install prompt
+    await deferredPrompt.prompt()
+
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice
+
+    if (outcome === "accepted") {
+      console.log("User accepted the PWA install prompt")
+    } else {
+      console.log("User dismissed the PWA install prompt")
+    }
+
+    // Clear the deferred prompt
+    setDeferredPrompt(null)
+    setShowPwaSuggestion(false)
+  }
+
+  const handleDismissSuggestion = () => {
+    setShowPwaSuggestion(false)
+    localStorage.setItem("pwa-suggestion-dismissed", "true")
+  }
+
   const showNavBar = ["/", "/transactions", "/wallet", "/settings"].includes(
     location.pathname
   )
@@ -59,62 +124,97 @@ export function RootLayout() {
       </main>
 
       {showNavBar && (
-        <BottomNavigationBar
-          autoShowDelay={500}
-          size={"sm"}
-          endSlot={
-            <GestureButton
-              className="h-14 w-14 shadow-lg"
-              icon={<Plus className="size-6" />}
-              onTap={() => navigate("/transactions/new")}
-              onHold={() => {}}
-              holdTitle="Release for Action"
-              holdTitlePosition="left"
-              swipeActions={[
-                {
-                  direction: "up",
-                  title: "New Transaction",
-                  icon: <MessageSquareText className="size-4" />,
-                  onSwipe: () => navigate("/transactions/new"),
-                },
-              ]}
-            />
-          }
-        >
-          <BottomNavigationItem
-            active={location.pathname === "/"}
-            render={<Link to="/" />}
+        <>
+          {showPwaSuggestion && (
+            <div className="fixed bottom-20 left-1/2 z-50 w-full max-w-120 -translate-x-1/2 px-4 pb-4">
+              <div className="flex items-center gap-3 rounded-2xl border border-border bg-background/95 p-3 shadow-xl backdrop-blur-md dark:border-white/10">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Download className="size-5" />
+                </div>
+                <div className="flex-1 overflow-hidden text-sm">
+                  <p className="font-semibold">Install Wallet Hub</p>
+                  <p className="truncate text-muted-foreground">
+                    Add to home screen for a better experience.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-lg"
+                    onClick={handleDismissSuggestion}
+                  >
+                    <X className="size-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="h-8 rounded-lg px-3 text-xs"
+                    onClick={handleInstallClick}
+                  >
+                    Install
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <BottomNavigationBar
+            autoShowDelay={500}
+            size={"sm"}
+            endSlot={
+              <GestureButton
+                className="h-14 w-14 shadow-lg"
+                icon={<Plus className="size-6" />}
+                onTap={() => navigate("/transactions/new")}
+                onHold={() => {}}
+                holdTitle="Release for Action"
+                holdTitlePosition="left"
+                swipeActions={[
+                  {
+                    direction: "up",
+                    title: "New Transaction",
+                    icon: <MessageSquareText className="size-4" />,
+                    onSwipe: () => navigate("/transactions/new"),
+                  },
+                ]}
+              />
+            }
           >
-            <LayoutDashboard className="size-6" strokeWidth={1.5} />
-            <span className="sr-only">Dashboard</span>
-          </BottomNavigationItem>
-          <BottomNavigationItem
-            active={location.pathname === "/transactions"}
-            render={<Link to="/transactions" />}
-          >
-            <ArrowUpDown className="size-6" strokeWidth={1.5} />
-            <span className="sr-only">Transactions</span>
-          </BottomNavigationItem>
-          <BottomNavigationItem
-            active={location.pathname === "/wallet"}
-            render={<Link to="/wallet" />}
-          >
-            <Wallet
-              className="size-6"
-              strokeWidth={1.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <span className="sr-only">Wallet</span>
-          </BottomNavigationItem>
-          <BottomNavigationItem
-            active={location.pathname === "/settings"}
-            render={<Link to="/settings" />}
-          >
-            <Settings className="size-6" strokeWidth={1.5} />
-            <span className="sr-only">Settings</span>
-          </BottomNavigationItem>
-        </BottomNavigationBar>
+            <BottomNavigationItem
+              active={location.pathname === "/"}
+              render={<Link to="/" />}
+            >
+              <LayoutDashboard className="size-6" strokeWidth={1.5} />
+              <span className="sr-only">Dashboard</span>
+            </BottomNavigationItem>
+            <BottomNavigationItem
+              active={location.pathname === "/transactions"}
+              render={<Link to="/transactions" />}
+            >
+              <ArrowUpDown className="size-6" strokeWidth={1.5} />
+              <span className="sr-only">Transactions</span>
+            </BottomNavigationItem>
+            <BottomNavigationItem
+              active={location.pathname === "/wallet"}
+              render={<Link to="/wallet" />}
+            >
+              <Wallet
+                className="size-6"
+                strokeWidth={1.5}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <span className="sr-only">Wallet</span>
+            </BottomNavigationItem>
+            <BottomNavigationItem
+              active={location.pathname === "/settings"}
+              render={<Link to="/settings" />}
+            >
+              <Settings className="size-6" strokeWidth={1.5} />
+              <span className="sr-only">Settings</span>
+            </BottomNavigationItem>
+          </BottomNavigationBar>
+        </>
       )}
     </div>
   )
