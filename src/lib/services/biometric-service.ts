@@ -4,6 +4,8 @@
  * to register and verify credentials locally.
  */
 
+import { updateSettings } from "./settings-service"
+
 const CHALLENGE = "wallet-hub-local-challenge"
 
 export async function isBiometricSupported(): Promise<boolean> {
@@ -45,13 +47,16 @@ export async function registerBiometrics(): Promise<boolean> {
       timeout: 60000,
     }
 
-    const credential = await navigator.credentials.create({
+    const credential = (await navigator.credentials.create({
       publicKey: options,
-    })
+    })) as PublicKeyCredential
 
     if (credential) {
-      // In a real app, we would send the public key to a server.
-      // Here, just knowing it succeeded is enough for "local-only" verification.
+      // Encode ID to base64 for storage
+      const idBase64 = btoa(
+        String.fromCharCode(...new Uint8Array(credential.rawId))
+      )
+      await updateSettings({ biometricCredentialId: idBase64 })
       return true
     }
     return false

@@ -4,6 +4,12 @@ import {
   registerBiometrics,
   authenticateBiometrics,
 } from "../biometric-service"
+import * as settingsService from "../settings-service"
+
+vi.mock("../settings-service", () => ({
+  updateSettings: vi.fn().mockResolvedValue({}),
+  getSettings: vi.fn().mockResolvedValue({}),
+}))
 
 describe("Biometric Service", () => {
   beforeEach(() => {
@@ -43,11 +49,18 @@ describe("Biometric Service", () => {
     expect(result).toBe(false)
   })
 
-  it("should return true on successful registration", async () => {
-    ;(navigator.credentials.create as any).mockResolvedValue({ id: "cred-1" })
+  it("should return true on successful registration and save ID", async () => {
+    const rawId = new Uint8Array([1, 2, 3]).buffer
+    ;(navigator.credentials.create as any).mockResolvedValue({
+      id: "AQID",
+      rawId,
+    })
     const result = await registerBiometrics()
     expect(result).toBe(true)
     expect(navigator.credentials.create).toHaveBeenCalled()
+    expect(settingsService.updateSettings).toHaveBeenCalledWith({
+      biometricCredentialId: btoa(String.fromCharCode(1, 2, 3)),
+    })
   })
 
   it("should return true on successful authentication", async () => {
