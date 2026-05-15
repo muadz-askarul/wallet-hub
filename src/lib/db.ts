@@ -43,6 +43,7 @@ export interface Settings {
   currency: string
   pin?: string
   isBiometricEnabled?: boolean
+  biometricCredentialId?: string
   lockDelayMinutes?: number
   isOnboarded?: boolean
 }

@@ -1,10 +1,8 @@
-# Biometric Authentication Task Tracker
+# Targeted WebAuthn Implementation Task Tracker
 
 | Task | Status | Description |
 | :--- | :--- | :--- |
-| Task 1 | done | PIN Encryption (Hashing) |
-| Task 2 | done | Biometric Service |
-| Task 3 | done | App Lock & Settings State |
-| Task 4 | done | UI Updates - PinInputForm |
-| Task 5 | done | UI Updates - Onboarding |
-| Task 6 | done | UI Updates - Settings |
+| Task 1 | done | Update Settings Schema |
+| Task 2 | todo | Update Biometric Registration |
+| Task 3 | todo | Update Biometric Authentication |
+| Task 4 | todo | Verification & Cleanup |
