@@ -7,9 +7,10 @@ import { seedDefaultCategories } from "@/lib/db"
 import { updateSettings } from "@/lib/services/settings-service"
 import { useAppLock } from "@/lib/providers/app-lock-provider"
 import { hashPin } from "@/lib/utils/crypto"
+import { registerBiometrics, isBiometricSupported } from "@/lib/services/biometric-service"
 import { toast } from "sonner"
 import { PinCreationForm } from "@/components/pin-creation-form"
-import { Wallet, Coins, Plus, Trash, Check } from "lucide-react"
+import { Wallet, Coins, Plus, Trash, Check, Fingerprint } from "lucide-react"
 
 interface LocalPocket {
   id: string
@@ -25,7 +26,8 @@ interface LocalWallet {
 
 export function OnboardingPage() {
   const { refreshLockState } = useAppLock()
-  const [step, setStep] = useState<1 | 2>(1)
+  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [isBioEnabled, setIsBioEnabled] = useState(false)
 
   // PIN states
   const [pin, setPin] = useState("")
@@ -131,8 +133,29 @@ export function OnboardingPage() {
   }
 
   // Step 1 Submit (called when PinCreationForm completes both enter and confirm steps)
-  const handlePinComplete = (completedPin: string) => {
+  const handlePinComplete = async (completedPin: string) => {
     setPin(completedPin)
+    const supported = await isBiometricSupported()
+    if (supported) {
+      setStep(3)
+    } else {
+      setStep(2)
+    }
+  }
+
+  // Step 3 Submit (Biometric)
+  const handleBiometricSetup = async (enable: boolean) => {
+    if (enable) {
+      const success = await registerBiometrics()
+      if (success) {
+        setIsBioEnabled(true)
+        toast.success("Biometrics enabled!")
+      } else {
+        toast.error(
+          "Failed to enable biometrics. You can try again in settings."
+        )
+      }
+    }
     setStep(2)
   }
 
@@ -195,6 +218,7 @@ export function OnboardingPage() {
         pin: hashedPin,
         isOnboarded: true,
         lockDelayMinutes: 5,
+        isBiometricEnabled: isBioEnabled,
       })
 
       // 4. Force AppLockProvider to refresh states
@@ -227,6 +251,37 @@ export function OnboardingPage() {
         {step === 1 && (
           <div className="flex flex-1 flex-col items-center justify-center p-4">
             <PinCreationForm length={4} onComplete={handlePinComplete} />
+          </div>
+        )}
+
+        {/* Step 3: Biometric Setup */}
+        {step === 3 && (
+          <div className="flex flex-1 flex-col items-center justify-center gap-8 p-4 text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Fingerprint className="size-10" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold">Biometric Unlock</h2>
+              <p className="max-w-[300px] text-sm text-muted-foreground">
+                Would you like to use biometrics (Fingerprint/FaceID) to unlock
+                the app faster?
+              </p>
+            </div>
+            <div className="flex w-full flex-col gap-3 pt-4">
+              <Button
+                className="h-12 w-full cursor-pointer font-bold"
+                onClick={() => handleBiometricSetup(true)}
+              >
+                Enable Biometric
+              </Button>
+              <Button
+                variant="ghost"
+                className="h-12 w-full cursor-pointer text-muted-foreground"
+                onClick={() => handleBiometricSetup(false)}
+              >
+                Maybe Later
+              </Button>
+            </div>
           </div>
         )}
 
