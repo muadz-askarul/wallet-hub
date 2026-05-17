@@ -12,11 +12,11 @@ import { LockScreenOverlay } from "@/components/lock-screen-overlay"
 import { AppLockProvider, useAppLock } from "@/lib/providers/app-lock-provider"
 
 function AppContent() {
-  const { isOnboarded, isLocked } = useAppLock()
+  const { isOnboarded, isLocked, isStorageAvailable } = useAppLock()
 
-  // 1. If not onboarded yet, show ONLY the welcome/setup space
-  if (!isOnboarded) {
-    return <OnboardingPage />
+  // 1. If not onboarded yet or storage unavailable, show ONLY the welcome/setup space
+  if (!isOnboarded || !isStorageAvailable) {
+    return <OnboardingPage storageError={!isStorageAvailable} />
   }
 
   // 2. If app is auto-locked, block with full screen shield lock

@@ -14,6 +14,7 @@ interface AppLockContextType {
   hasPin: boolean
   isOnboarded: boolean
   isBiometricEnabled: boolean
+  isStorageAvailable: boolean
   unlock: (pin: string) => Promise<boolean>
   unlockWithBiometrics: () => Promise<boolean>
   lock: () => void
@@ -22,15 +23,45 @@ interface AppLockContextType {
 
 const AppLockContext = createContext<AppLockContextType | null>(null)
 
+async function checkIndexedDB() {
+  return new Promise<boolean>((resolve) => {
+    try {
+      if (!window.indexedDB) {
+        resolve(false)
+        return
+      }
+      const request = window.indexedDB.open("IDBAvailabilityCheck", 1)
+      request.onerror = () => resolve(false)
+      request.onsuccess = () => {
+        const db = request.result
+        db.close()
+        window.indexedDB.deleteDatabase("IDBAvailabilityCheck")
+        resolve(true)
+      }
+      request.onblocked = () => resolve(false)
+    } catch (e) {
+      resolve(false)
+    }
+  })
+}
+
 export function AppLockProvider({ children }: { children: ReactNode }) {
   const [isLocked, setIsLocked] = useState(false)
   const [hasPin, setHasPin] = useState(false)
   const [isOnboarded, setIsOnboarded] = useState(true) // assume true until loaded
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(false)
+  const [isStorageAvailable, setIsStorageAvailable] = useState(true)
 
   // Load initial lock state and check onboarding
   const refreshLockState = async () => {
     try {
+      const dbAvailable = await checkIndexedDB()
+      if (!dbAvailable) {
+        setIsStorageAvailable(false)
+        setIsOnboarded(false)
+        return
+      }
+
       const settings = await getSettings()
       const onboarded = !!settings.isOnboarded
       const pinSet = !!settings.pin
@@ -138,6 +169,7 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
         hasPin,
         isOnboarded,
         isBiometricEnabled,
+        isStorageAvailable,
         unlock,
         unlockWithBiometrics,
         lock,

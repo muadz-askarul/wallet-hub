@@ -27,7 +27,7 @@ interface LocalWallet {
   pockets: LocalPocket[]
 }
 
-export function OnboardingPage() {
+export function OnboardingPage({ storageError }: { storageError?: boolean }) {
   const { refreshLockState } = useAppLock()
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [isBioEnabled, setIsBioEnabled] = useState(false)
@@ -250,6 +250,17 @@ export function OnboardingPage() {
         <p className="text-sm text-muted-foreground">
           Your sleek, offline-first personal finance space
         </p>
+
+        {storageError && (
+          <div className="mt-6 rounded-xl border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+            <p className="font-bold">Storage Unavailable</p>
+            <p className="mt-1 text-xs leading-relaxed opacity-90">
+              Your browser has disabled IndexedDB (likely Private Browsing mode
+              or restricted settings). Please use normal mode or enable
+              storage to use Wallet Hub.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-between">
