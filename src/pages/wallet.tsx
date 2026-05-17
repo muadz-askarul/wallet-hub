@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { formatCurrency } from "@/lib/utils"
 import { db } from "@/lib/db"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { getPocketBalance } from "@/lib/services/transaction-service"
 import { Button } from "@/components/ui/button"
 import {
@@ -127,6 +127,7 @@ const restrictToVerticalAxis = ({ transform }: { transform: Transform }) => ({
 // ─── Main WalletPage ──────────────────────────────────────────────────────────
 
 export function WalletPage() {
+  const navigate = useNavigate()
   const { wallets, pockets, pocketBalances, walletBalances } = useLiveQuery(
     async () => {
       const w = await db.wallets.toArray()
