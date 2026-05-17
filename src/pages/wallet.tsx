@@ -49,6 +49,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS, type Transform } from "@dnd-kit/utilities"
 import { PageHeader } from "@/components/ui/page-header"
+import { AutoTextSize } from "@/components/ui/auto-text-size"
 
 type DraftPocket = {
   id?: string
@@ -126,10 +127,12 @@ function SortableWallet({
             to={`/transactions?pocketId=${pocket.id}`}
             className="flex items-center justify-between px-4 py-2.5 transition-colors hover:bg-muted/40 active:bg-muted/80"
           >
-            <span className="font-medium">{pocket.name}</span>
-            <span className="font-medium text-foreground">
+            <AutoTextSize className="font-medium text-[12px]">
+              {pocket.name}
+            </AutoTextSize>
+            <AutoTextSize className="font-medium text-[12px] text-foreground">
               Rp {formatCurrency(pocketBalances[pocket.id] || 0)}
-            </span>
+            </AutoTextSize>
           </Link>
         ))}
         {pockets.length === 0 && (
