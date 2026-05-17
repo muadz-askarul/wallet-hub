@@ -55,15 +55,18 @@ export function WalletFormPage() {
 
   // Query lookups
   const wallets = useLiveQuery(() => db.wallets.toArray(), [], [])
-  const pocketBalances = useLiveQuery(async () => {
-    const ps = await db.pockets.toArray()
-    const pb: Record<string, number> = {}
-    for (const p of ps) {
-      pb[p.id] = await getPocketBalance(p.id)
-    }
-    return pb
-  }, [], {} as Record<string, number>)
-
+  const pocketBalances = useLiveQuery(
+    async () => {
+      const ps = await db.pockets.toArray()
+      const pb: Record<string, number> = {}
+      for (const p of ps) {
+        pb[p.id] = await getPocketBalance(p.id)
+      }
+      return pb
+    },
+    [],
+    {} as Record<string, number>
+  )
 
   useEffect(() => {
     if (!id) return

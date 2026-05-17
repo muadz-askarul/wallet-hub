@@ -7,7 +7,6 @@ import { calculateNextDueDate } from "@/lib/utils/date-calculator"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { NumericInput } from "@/components/ui/numeric-input"
-import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 import { ChevronLeft, ChevronRight, Trash, RefreshCw } from "lucide-react"
@@ -63,12 +62,13 @@ export function TransactionFormPage({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   // Recurring schedule states
-  const [isRecurring, setIsRecurring] = useState(!!isScheduleMode)
   const [recurringType, setRecurringType] = useState<"bill" | "repeat">(
     "repeat"
   )
-  const [recurringPeriod, setRecurringPeriod] = useState<string>("Every Month")
+  const [recurringPeriod, setRecurringPeriod] = useState<string>("None")
   const [endDateStr, setEndDateStr] = useState("")
+
+  const isRecurring = recurringPeriod !== "None" || !!isScheduleMode
 
   // Bottom sheets
   const [pocketSheetOpen, setPocketSheetOpen] = useState(false)
@@ -94,9 +94,9 @@ export function TransactionFormPage({
           setDestPocketId(sc.destinationPocketId)
           setCategoryId(sc.categoryId)
           setNote(sc.note || "")
-          setIsRecurring(true)
+          setIsRepeatSheetOpen(false) // Assuming it might have been open, ensure clean state
           setRecurringType(sc.type)
-          setRecurringPeriod(sc.period)
+          setRecurringPeriod(sc.period || "None")
           if (sc.endDate) {
             const ed = new Date(sc.endDate)
             setEndDateStr(
@@ -262,7 +262,7 @@ export function TransactionFormPage({
         setAmount(0)
         setNote("")
         setDate(now())
-        setIsRecurring(false)
+        setRecurringPeriod("None")
         setEndDateStr("")
       } else {
         navigate("/transactions")
@@ -564,108 +564,90 @@ export function TransactionFormPage({
           </DrawerHeader>
           <div className="px-4 py-4">
             <div className="space-y-6">
-              {!isScheduleMode && (
-                <div className="flex items-center justify-between rounded-xl border bg-muted/10 p-4">
-                  <div>
-                    <label
-                      htmlFor="recurring-toggle"
-                      className="font-semibold text-foreground"
-                    >
-                      Set repeating schedule
-                    </label>
-                    <p className="text-xs text-muted-foreground">
-                      Schedule this transaction to repeat
-                    </p>
-                  </div>
-                  <Checkbox
-                    id="recurring-toggle"
-                    checked={isRecurring}
-                    onCheckedChange={(checked) => setIsRecurring(!!checked)}
-                  />
+              <div className="space-y-4">
+                {/* Period Selection */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                    Repeat Period
+                  </label>
+                  <select
+                    value={recurringPeriod}
+                    onChange={(e) => setRecurringPeriod(e.target.value)}
+                    className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                  >
+                    {[
+                      "None",
+                      "Every Day",
+                      "Weekdays",
+                      "Weekend",
+                      "Every Week",
+                      "Every 2 Weeks",
+                      "Every 4 Weeks",
+                      "Every Month",
+                      "The end of the month",
+                      "Every 2 Month",
+                      "Every 3 Month",
+                      "Every 4 Month",
+                      "Every 6 Month",
+                      "Anually",
+                    ].map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              )}
 
-              {isRecurring && (
-                <div className="space-y-4">
-                  {/* Schedule Type */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                      Schedule Type
-                    </label>
-                    <div className="flex rounded-xl bg-muted p-1">
-                      <button
-                        type="button"
-                        onClick={() => setRecurringType("repeat")}
-                        className={cn(
-                          "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
-                          recurringType === "repeat"
-                            ? "bg-background text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        Auto-Repeat
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setRecurringType("bill")}
-                        className={cn(
-                          "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
-                          recurringType === "bill"
-                            ? "bg-background text-foreground shadow-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        )}
-                      >
-                        Manual Bill
-                      </button>
+                {isRecurring && (
+                  <>
+                    {/* Schedule Type */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        Schedule Type
+                      </label>
+                      <div className="flex rounded-xl bg-muted p-1">
+                        <button
+                          type="button"
+                          onClick={() => setRecurringType("repeat")}
+                          className={cn(
+                            "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
+                            recurringType === "repeat"
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          Auto-Repeat
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRecurringType("bill")}
+                          className={cn(
+                            "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
+                            recurringType === "bill"
+                              ? "bg-background text-foreground shadow-sm"
+                              : "text-muted-foreground hover:text-foreground"
+                          )}
+                        >
+                          Manual Bill
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Period Selection */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                      Repeat Period
-                    </label>
-                    <select
-                      value={recurringPeriod}
-                      onChange={(e) => setRecurringPeriod(e.target.value)}
-                      className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                    >
-                      {[
-                        "Every Day",
-                        "Weekdays",
-                        "Weekend",
-                        "Every Week",
-                        "Every 2 Weeks",
-                        "Every 4 Weeks",
-                        "Every Month",
-                        "The end of the month",
-                        "Every 2 Month",
-                        "Every 3 Month",
-                        "Every 4 Month",
-                        "Every 6 Month",
-                        "Anually",
-                      ].map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* End Date (Optional) */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                      End Date (Optional)
-                    </label>
-                    <Input
-                      type="date"
-                      value={endDateStr}
-                      onChange={(e) => setEndDateStr(e.target.value)}
-                      className="h-12 rounded-xl dark:[&::-webkit-calendar-picker-indicator]:invert"
-                    />
-                  </div>
-                </div>
-              )}
+                    {/* End Date (Optional) */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        End Date (Optional)
+                      </label>
+                      <Input
+                        type="date"
+                        value={endDateStr}
+                        onChange={(e) => setEndDateStr(e.target.value)}
+                        className="h-12 rounded-xl dark:[&::-webkit-calendar-picker-indicator]:invert"
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <DrawerFooter className="border-t">
