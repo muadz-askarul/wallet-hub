@@ -351,7 +351,11 @@ export function TransactionFormPage({
                 Amount
               </label>
               <div className="flex items-center justify-between gap-2 border-b pb-2">
-                <AutoTextSize className="shrink-0 font-bold text-foreground" maxSizeRem={1.5} minSizeRem={0.8}>
+                <AutoTextSize
+                  className="shrink-0 font-bold text-foreground"
+                  maxSizeRem={1.5}
+                  minSizeRem={0.8}
+                >
                   Rp
                 </AutoTextSize>
                 <NumericInput
@@ -368,7 +372,12 @@ export function TransactionFormPage({
                     className="ml-2 h-10 w-10 shrink-0 rounded-xl"
                     onClick={() => setIsRepeatSheetOpen(true)}
                   >
-                    <RefreshCw className={cn("size-5", isRecurring && "animate-spin-once")} />
+                    <RefreshCw
+                      className={cn(
+                        "size-5",
+                        isRecurring && "animate-spin-once"
+                      )}
+                    />
                   </Button>
                 )}
               </div>
@@ -492,7 +501,6 @@ export function TransactionFormPage({
                   rows={3}
                 />
               </div>
-
             </div>
           </div>
         </div>

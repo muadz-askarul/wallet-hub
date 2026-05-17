@@ -5,7 +5,7 @@ import { Lock } from "lucide-react"
 import { toast } from "sonner"
 
 export function LockScreenOverlay() {
-  const { unlock, unlockWithBiometrics, isBiometricEnabled } = useAppLock()
+  const { unlock } = useAppLock()
   const [errorCount, setErrorCount] = useState(0)
 
   const handleSubmit = async (values: { pin: string }) => {
@@ -20,15 +20,6 @@ export function LockScreenOverlay() {
     }
   }
 
-  const handleBiometricClick = async () => {
-    const success = await unlockWithBiometrics()
-    if (success) {
-      toast.success("Welcome back!")
-    } else {
-      toast.error("Biometric authentication failed.")
-    }
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm">
@@ -37,8 +28,6 @@ export function LockScreenOverlay() {
           icon={<Lock className="size-6" />}
           title="App Locked"
           description="Enter your 4-digit PIN to unlock Wallet Hub"
-          isBiometricEnabled={isBiometricEnabled}
-          onBiometricClick={handleBiometricClick}
           onSubmit={handleSubmit}
         />
         {errorCount > 0 && (

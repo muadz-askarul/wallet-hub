@@ -26,10 +26,10 @@ export function AutoTextSize({
     const observer = new ResizeObserver(() => {
       const parentWidth = el.parentElement!.clientWidth
       const maxWidth = (parentWidth * maxParentWidthPercent) / 100
-      
+
       // Temporary reset to measure natural width
       el.style.fontSize = `${maxSizeRem}rem`
-      let currentWidth = el.scrollWidth
+      const currentWidth = el.scrollWidth
 
       if (currentWidth > maxWidth) {
         const ratio = maxWidth / currentWidth

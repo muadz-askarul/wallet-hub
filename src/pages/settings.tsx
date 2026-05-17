@@ -5,21 +5,10 @@ import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 import { Switch } from "@/components/ui/switch"
 import { CategoryManagementSheet } from "@/components/category-management-sheet"
-import {
-  ChevronRight,
-  Moon,
-  Tag,
-  Repeat,
-  Clock,
-  Trash,
-  Fingerprint,
-  Lock,
-} from "lucide-react"
+import { ChevronRight, Moon, Tag, Repeat, Clock, Trash } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/ui/page-header"
-import { PinInputForm } from "@/components/pin-input-form"
-import { registerBiometrics } from "@/lib/services/biometric-service"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,19 +19,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
 
 export function SettingsPage() {
   const navigate = useNavigate()
   const { theme, setTheme } = useTheme()
   const [categorySheetOpen, setCategorySheetOpen] = useState(false)
   const [resetDialogOpen, setResetDialogOpen] = useState(false)
-  const [bioGateOpen, setBioGateOpen] = useState(false)
-  const [pendingBioValue, setPendingBioValue] = useState(false)
 
   const settings = useLiveQuery(() => db.settings.get("user_settings"))
   const lockDelay = settings?.lockDelayMinutes ?? 5
-  const isBiometricEnabled = !!settings?.isBiometricEnabled
 
   const isDark =
     theme === "dark" ||
@@ -62,45 +47,6 @@ export function SettingsPage() {
     } catch (err) {
       console.error(err)
       toast.error("Failed to update auto-lock settings")
-    }
-  }
-
-  const handleBiometricToggle = (checked: boolean) => {
-    setPendingBioValue(checked)
-    setBioGateOpen(true)
-  }
-
-  const handleBioGateSubmit = async (values: { pin: string }) => {
-    const { hashPin } = await import("@/lib/utils/crypto")
-    const hashedPin = await hashPin(values.pin)
-
-    if (hashedPin !== settings?.pin) {
-      toast.error("Incorrect PIN")
-      return false
-    }
-
-    try {
-      if (pendingBioValue) {
-        const success = await registerBiometrics()
-        if (!success) {
-          toast.error("Failed to register biometrics")
-          setBioGateOpen(false)
-          return false
-        }
-      }
-
-      await db.settings.update("user_settings", {
-        isBiometricEnabled: pendingBioValue,
-      })
-      toast.success(
-        `Biometric unlock ${pendingBioValue ? "enabled" : "disabled"}`
-      )
-      setBioGateOpen(false)
-      return true
-    } catch (err) {
-      console.error(err)
-      toast.error("Failed to update biometric settings")
-      return false
     }
   }
 
@@ -162,27 +108,6 @@ export function SettingsPage() {
                 onCheckedChange={handleDarkModeToggle}
               />
             </div>
-
-            {/* Biometric Toggle (Disabled)
-            <div className="flex items-center justify-between border-b px-4 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex size-9 items-center justify-center rounded-full bg-muted">
-                  <Fingerprint className="size-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="font-medium">Biometric Unlock</p>
-                  <p className="text-xs text-muted-foreground">
-                    Use fingerprint or FaceID to unlock
-                  </p>
-                </div>
-              </div>
-              <Switch
-                id="biometric-toggle"
-                checked={isBiometricEnabled}
-                onCheckedChange={handleBiometricToggle}
-              />
-            </div>
-            */}
 
             {/* Auto-Lock Delay */}
             <div className="flex items-center justify-between border-t px-4 py-4">
@@ -310,19 +235,6 @@ export function SettingsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <Dialog open={bioGateOpen} onOpenChange={setBioGateOpen}>
-        <DialogContent className="max-w-[280px] border-none bg-transparent p-0 shadow-none">
-          <div className="rounded-3xl border bg-card p-8 shadow-xl">
-            <PinInputForm
-              title="Verify PIN"
-              description={`Enter your PIN to ${pendingBioValue ? "enable" : "disable"} biometrics`}
-              icon={<Lock className="size-6" />}
-              onSubmit={handleBioGateSubmit}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
     </>
   )
 }

@@ -7,13 +7,9 @@ import { seedDefaultCategories } from "@/lib/db"
 import { updateSettings } from "@/lib/services/settings-service"
 import { useAppLock } from "@/lib/providers/app-lock-provider"
 import { hashPin } from "@/lib/utils/crypto"
-import {
-  registerBiometrics,
-  isBiometricSupported,
-} from "@/lib/services/biometric-service"
 import { toast } from "sonner"
 import { PinCreationForm } from "@/components/pin-creation-form"
-import { Wallet, Coins, Plus, Trash, Check, Fingerprint } from "lucide-react"
+import { Wallet, Coins, Plus, Trash, Check } from "lucide-react"
 
 interface LocalPocket {
   id: string
@@ -30,7 +26,6 @@ interface LocalWallet {
 export function OnboardingPage({ storageError }: { storageError?: boolean }) {
   const { refreshLockState } = useAppLock()
   const [step, setStep] = useState<1 | 2 | 3>(1)
-  const [isBioEnabled, setIsBioEnabled] = useState(false)
 
   // PIN states
   const [pin, setPin] = useState("")
@@ -149,22 +144,6 @@ export function OnboardingPage({ storageError }: { storageError?: boolean }) {
     setStep(2)
   }
 
-  // Step 3 Submit (Biometric)
-  const handleBiometricSetup = async (enable: boolean) => {
-    if (enable) {
-      const success = await registerBiometrics()
-      if (success) {
-        setIsBioEnabled(true)
-        toast.success("Biometrics enabled!")
-      } else {
-        toast.error(
-          "Failed to enable biometrics. You can try again in settings."
-        )
-      }
-    }
-    setStep(2)
-  }
-
   // Step 2 Submit
   const handleCompleteSetup = async () => {
     // Basic validations
@@ -224,7 +203,7 @@ export function OnboardingPage({ storageError }: { storageError?: boolean }) {
         pin: hashedPin,
         isOnboarded: true,
         lockDelayMinutes: 5,
-        isBiometricEnabled: isBioEnabled,
+        isBiometricEnabled: false,
       })
 
       // 4. Force AppLockProvider to refresh states
@@ -256,8 +235,8 @@ export function OnboardingPage({ storageError }: { storageError?: boolean }) {
             <p className="font-bold">Storage Unavailable</p>
             <p className="mt-1 text-xs leading-relaxed opacity-90">
               Your browser has disabled IndexedDB (likely Private Browsing mode
-              or restricted settings). Please use normal mode or enable
-              storage to use Wallet Hub.
+              or restricted settings). Please use normal mode or enable storage
+              to use Wallet Hub.
             </p>
           </div>
         )}

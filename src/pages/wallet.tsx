@@ -127,10 +127,11 @@ function SortableWallet({
             to={`/transactions?pocketId=${pocket.id}`}
             className="flex items-center justify-between px-4 py-2.5 transition-colors hover:bg-muted/40 active:bg-muted/80"
           >
-            <AutoTextSize className="font-medium text-[12px]">
-              {pocket.name}
-            </AutoTextSize>
-            <AutoTextSize className="font-medium text-[12px] text-foreground">
+            <span className="text-sm font-medium">{pocket.name}</span>
+            <AutoTextSize
+              maxSizeRem={0.875}
+              className="text-xs font-medium text-foreground"
+            >
               Rp {formatCurrency(pocketBalances[pocket.id] || 0)}
             </AutoTextSize>
           </Link>
