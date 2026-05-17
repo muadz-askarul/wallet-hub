@@ -9,6 +9,9 @@ import { seedDefaultCategories } from "@/lib/db"
 // Seed default categories on first run (no-op if already seeded)
 seedDefaultCategories().catch(console.error)
 
+// Disable context menu app-wide
+document.addEventListener("contextmenu", (e) => e.preventDefault())
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>

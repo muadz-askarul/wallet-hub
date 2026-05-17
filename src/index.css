@@ -135,11 +135,15 @@
     @apply bg-background text-foreground;
     touch-action: manipulation;
     overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
     }
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
     }
   input, textarea {
+    user-select: text;
+    -webkit-user-select: text;
     caret-color: transparent;
     }
   html {

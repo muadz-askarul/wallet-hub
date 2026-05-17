@@ -7,6 +7,7 @@ import { WalletFormPage } from "./pages/wallet-form"
 import { TransactionsPage } from "./pages/transactions"
 import { TransactionFormPage } from "./pages/transaction-form"
 import { SettingsPage } from "./pages/settings"
+import { ChangePinPage } from "./pages/change-pin"
 import { OnboardingPage } from "./pages/onboarding"
 import { LockScreenOverlay } from "@/components/lock-screen-overlay"
 import { AppLockProvider, useAppLock } from "@/lib/providers/app-lock-provider"
@@ -53,6 +54,7 @@ function AppContent() {
         />
         <Route path="wallet" element={<WalletPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="settings/change-pin" element={<ChangePinPage />} />
       </Route>
     </Routes>
   )
