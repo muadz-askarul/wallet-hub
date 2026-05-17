@@ -31,7 +31,10 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable"
 import { PageHeader } from "@/components/ui/page-header"
-import { DraftPocket, SortablePocketRow } from "@/components/sortable-pocket-row"
+import {
+  DraftPocket,
+  SortablePocketRow,
+} from "@/components/sortable-pocket-row"
 
 export function WalletFormPage() {
   const { id } = useParams()
@@ -52,14 +55,18 @@ export function WalletFormPage() {
 
   // Query lookups
   const wallets = useLiveQuery(() => db.wallets.toArray(), [], [])
-  const pocketBalances = useLiveQuery(async () => {
-    const ps = await db.pockets.toArray()
-    const pb: Record<string, number> = {}
-    for (const p of ps) {
-      pb[p.id] = await getPocketBalance(p.id)
-    }
-    return pb
-  }, [], {})
+  const pocketBalances = useLiveQuery(
+    async () => {
+      const ps = await db.pockets.toArray()
+      const pb: Record<string, number> = {}
+      for (const p of ps) {
+        pb[p.id] = await getPocketBalance(p.id)
+      }
+      return pb
+    },
+    [],
+    {}
+  )
 
   useEffect(() => {
     if (!id) return
@@ -70,10 +77,10 @@ export function WalletFormPage() {
         const ps = await db.pockets
           .where("walletId")
           .equals(id)
-          .filter(p => !p.deletedAt)
+          .filter((p) => !p.deletedAt)
           .toArray()
         ps.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-        
+
         const drafts: DraftPocket[] = []
         for (const p of ps) {
           const balance = await getPocketBalance(p.id)
@@ -81,7 +88,7 @@ export function WalletFormPage() {
             id: p.id,
             name: p.name,
             amount: balance.toString(),
-            _key: p.id
+            _key: p.id,
           })
         }
         setDraftPockets(drafts)
@@ -113,7 +120,11 @@ export function WalletFormPage() {
     setDraftPockets(draftPockets.filter((_, i) => i !== index))
   }
 
-  const updateDraftPocket = (index: number, field: "name" | "amount", value: string) => {
+  const updateDraftPocket = (
+    index: number,
+    field: "name" | "amount",
+    value: string
+  ) => {
     const updated = [...draftPockets]
     updated[index] = { ...updated[index], [field]: value }
     setDraftPockets(updated)
@@ -151,7 +162,7 @@ export function WalletFormPage() {
         }
 
         const targetBalance = parseFloat(dp.amount) || 0
-        const currentBalance = dp.id ? (pocketBalances[dp.id] || 0) : 0
+        const currentBalance = dp.id ? pocketBalances[dp.id] || 0 : 0
         const diff = targetBalance - currentBalance
 
         if (diff !== 0) {
@@ -217,7 +228,7 @@ export function WalletFormPage() {
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="font-semibold text-sm">Pockets</h4>
+              <h4 className="text-sm font-semibold">Pockets</h4>
               <Button
                 variant="outline"
                 size="sm"
@@ -242,8 +253,12 @@ export function WalletFormPage() {
                     <SortablePocketRow
                       key={dp._key}
                       pocket={dp}
-                      onUpdateName={(val) => updateDraftPocket(index, "name", val)}
-                      onUpdateAmount={(val) => updateDraftPocket(index, "amount", val)}
+                      onUpdateName={(val) =>
+                        updateDraftPocket(index, "name", val)
+                      }
+                      onUpdateAmount={(val) =>
+                        updateDraftPocket(index, "amount", val)
+                      }
                       onDelete={() => handleDeleteDraftPocket(index, dp.id)}
                     />
                   ))}
@@ -266,7 +281,8 @@ export function WalletFormPage() {
           {confirmDelete ? (
             <div className="flex flex-col gap-3">
               <p className="text-center text-xs font-semibold text-destructive">
-                Permanently delete this wallet and all its pockets? This cannot be undone.
+                Permanently delete this wallet and all its pockets? This cannot
+                be undone.
               </p>
               <div className="flex gap-2">
                 <Button

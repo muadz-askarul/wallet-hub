@@ -36,20 +36,20 @@ describe("AppLockProvider", () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     localStorage.clear()
-    
+
     // Setup mock IndexedDB success
     const request = {
       onsuccess: null as any,
       result: { close: vi.fn() },
     }
     mockIndexedDB.open.mockReturnValue(request)
-    
+
     // Default mock: onboarded with PIN
     vi.mocked(getSettings).mockResolvedValue({
       isOnboarded: true,
       pin: "hashed-1234",
     } as any)
-    
+
     // Trigger onsuccess after a tick
     setTimeout(() => {
       if (request.onsuccess) request.onsuccess()

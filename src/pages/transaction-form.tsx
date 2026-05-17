@@ -299,7 +299,7 @@ export function TransactionFormPage({
 
   return (
     <>
-      <div>
+      <div className="min-h-dvh">
         {/* Sticky Header */}
         <PageHeader className="justify-between">
           <button
