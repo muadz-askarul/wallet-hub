@@ -1,6 +1,7 @@
 import { formatCurrency, cn } from "@/lib/utils"
 import { type Transaction } from "@/lib/db"
 import { Link } from "react-router-dom"
+import { AutoTextSize } from "./ui/auto-text-size"
 
 export type EnrichedTransaction = Transaction & {
   categoryName: string
@@ -41,14 +42,14 @@ export function TransactionGroup({ group }: TransactionGroupProps) {
         </div>
         <div className="flex items-center gap-4 text-sm font-medium">
           {group.income > 0 && (
-            <span className="text-primary">
+            <AutoTextSize className="text-primary" maxSizeRem={0.875}>
               Rp {formatCurrency(group.income)}
-            </span>
+            </AutoTextSize>
           )}
           {group.expense > 0 && (
-            <span className="text-destructive">
+            <AutoTextSize className="text-destructive" maxSizeRem={0.875}>
               Rp {formatCurrency(group.expense)}
-            </span>
+            </AutoTextSize>
           )}
         </div>
       </div>
@@ -79,18 +80,19 @@ export function TransactionGroup({ group }: TransactionGroupProps) {
                   </span>
                 </div>
               </div>
-              <span
+              <AutoTextSize
                 className={cn(
-                  "ml-3 shrink-0 text-[15px] font-medium",
+                  "ml-3 shrink-0 font-medium",
                   tx.type === "income"
                     ? "text-primary"
                     : tx.type === "expense"
                       ? "text-destructive"
                       : "text-foreground"
                 )}
+                maxSizeRem={0.9375}
               >
                 Rp {formatCurrency(tx.amount)}
-              </span>
+              </AutoTextSize>
             </Link>
           ))}
       </div>
