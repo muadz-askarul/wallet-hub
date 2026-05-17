@@ -138,12 +138,15 @@ export function OnboardingPage() {
   // Step 1 Submit (called when PinCreationForm completes both enter and confirm steps)
   const handlePinComplete = async (completedPin: string) => {
     setPin(completedPin)
+    /* Skip Biometrics setup
     const supported = await isBiometricSupported()
     if (supported) {
       setStep(3)
     } else {
       setStep(2)
     }
+    */
+    setStep(2)
   }
 
   // Step 3 Submit (Biometric)
@@ -257,7 +260,7 @@ export function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 3: Biometric Setup */}
+        {/* Step 3: Biometric Setup (Disabled)
         {step === 3 && (
           <div className="flex flex-1 flex-col items-center justify-center gap-8 p-4 text-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -287,6 +290,7 @@ export function OnboardingPage() {
             </div>
           </div>
         )}
+        */}
 
         {/* Step 2: Wallets, Pockets & Balances */}
         {step === 2 && (

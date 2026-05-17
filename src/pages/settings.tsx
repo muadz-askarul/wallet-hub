@@ -163,7 +163,7 @@ export function SettingsPage() {
               />
             </div>
 
-            {/* Biometric Toggle */}
+            {/* Biometric Toggle (Disabled)
             <div className="flex items-center justify-between border-b px-4 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex size-9 items-center justify-center rounded-full bg-muted">
@@ -182,6 +182,7 @@ export function SettingsPage() {
                 onCheckedChange={handleBiometricToggle}
               />
             </div>
+            */}
 
             {/* Auto-Lock Delay */}
             <div className="flex items-center justify-between border-t px-4 py-4">
