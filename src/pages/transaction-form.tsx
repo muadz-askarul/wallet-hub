@@ -342,7 +342,7 @@ export function TransactionFormPage({
           <div className="size-8" /> {/* Balance spacer */}
         </PageHeader>
 
-        <div className="p-4 pb-12">
+        <div className="p-4 pb-32">
           <div className="mx-auto max-w-md space-y-6">
             {/* Type Selector Tabs */}
             <div className="flex rounded-xl border bg-muted/20 p-1">
