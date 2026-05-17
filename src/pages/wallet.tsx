@@ -2,36 +2,16 @@ import { useState } from "react"
 import { useLiveQuery } from "dexie-react-hooks"
 import { formatCurrency } from "@/lib/utils"
 import { db } from "@/lib/db"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { getPocketBalance } from "@/lib/services/transaction-service"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { NumericInput } from "@/components/ui/numeric-input"
-import { Label } from "@/components/ui/label"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerFooter,
-  DrawerClose,
-} from "@/components/ui/drawer"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  createWallet,
-  updateWallet,
-  deleteWallet,
-  createPocket,
-  updatePocket,
-  deletePocket,
-} from "@/lib/services/wallet-service"
-import { Plus, Trash, MoreVertical, GripVertical, Edit } from "lucide-react"
-import { toast } from "sonner"
+import { Plus, GripVertical, Edit, MoreVertical } from "lucide-react"
 import {
   DndContext,
   closestCenter,
@@ -50,13 +30,6 @@ import {
 import { CSS, type Transform } from "@dnd-kit/utilities"
 import { PageHeader } from "@/components/ui/page-header"
 import { AutoTextSize } from "@/components/ui/auto-text-size"
-
-type DraftPocket = {
-  id?: string
-  name: string
-  amount: string
-  _key: string // stable drag key
-}
 
 // ─── Sortable Wallet Card ──────────────────────────────────────────────────────
 
@@ -292,134 +265,6 @@ export function WalletPage() {
     )
   }
 
-  // ── Pocket DnD (draft) ────────────────────────────────────────────────────
-
-  const handlePocketDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    if (!over || active.id === over.id) return
-
-    const oldIndex = draftPockets.findIndex((p) => p._key === active.id)
-    const newIndex = draftPockets.findIndex((p) => p._key === over.id)
-    if (oldIndex === -1 || newIndex === -1) return
-
-    setDraftPockets(arrayMove(draftPockets, oldIndex, newIndex))
-  }
-
-  // ── Wallet CRUD ───────────────────────────────────────────────────────────
-
-  const openAddWallet = () => {
-    setEditingWallet(null)
-    setWalletName("")
-    setDraftPockets([])
-    setDeletedPocketIds([])
-    setConfirmDelete(false)
-    setWalletDrawerOpen(true)
-  }
-
-  const openEditWallet = (wallet: { id: string; name: string }) => {
-    setEditingWallet(wallet)
-    setWalletName(wallet.name)
-    const existingPockets = pockets
-      .filter((p) => p.walletId === wallet.id)
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    setDraftPockets(
-      existingPockets.map((p) => ({
-        id: p.id,
-        name: p.name,
-        amount: (pocketBalances[p.id] || 0).toString(),
-        _key: p.id,
-      }))
-    )
-    setDeletedPocketIds([])
-    setConfirmDelete(false)
-    setWalletDrawerOpen(true)
-  }
-
-  const handleAddDraftPocket = () => {
-    setDraftPockets([
-      ...draftPockets,
-      { name: "", amount: "", _key: crypto.randomUUID() },
-    ])
-  }
-
-  const handleDeleteDraftPocket = (index: number, id?: string) => {
-    if (id) setDeletedPocketIds([...deletedPocketIds, id])
-    setDraftPockets(draftPockets.filter((_, i) => i !== index))
-  }
-
-  const updateDraftPocket = (
-    index: number,
-    field: "name" | "amount",
-    value: string
-  ) => {
-    const updated = [...draftPockets]
-    updated[index] = { ...updated[index], [field]: value }
-    setDraftPockets(updated)
-  }
-
-  const handleSaveWallet = async () => {
-    if (!walletName.trim()) return
-    try {
-      let walletId = ""
-      if (editingWallet) {
-        await updateWallet(editingWallet.id, { name: walletName })
-        walletId = editingWallet.id
-      } else {
-        const newWallet = await createWallet(walletName)
-        walletId = newWallet.id
-        await db.wallets.update(newWallet.id, { order: wallets.length })
-      }
-
-      for (const id of deletedPocketIds) await deletePocket(id)
-
-      for (let i = 0; i < draftPockets.length; i++) {
-        const dp = draftPockets[i]
-        if (!dp.name.trim()) continue
-
-        let pocketId = dp.id
-        if (pocketId) {
-          await updatePocket(pocketId, { name: dp.name, order: i })
-        } else {
-          const newPocket = await createPocket(walletId, dp.name)
-          pocketId = newPocket.id
-          await db.pockets.update(pocketId, { order: i })
-        }
-
-        const targetBalance = parseFloat(dp.amount) || 0
-        const currentBalance = dp.id ? pocketBalances[dp.id] || 0 : 0
-        const diff = targetBalance - currentBalance
-
-        if (diff !== 0) {
-          await db.transactions.add({
-            id: crypto.randomUUID(),
-            type: diff > 0 ? "income" : "expense",
-            amount: Math.abs(diff),
-            date: Date.now(),
-            note: "Balance Adjustment",
-            pocketId: pocketId,
-          })
-        }
-      }
-
-      toast.success(editingWallet ? "Wallet updated" : "Wallet created")
-      setWalletDrawerOpen(false)
-    } catch {
-      toast.error("Failed to save wallet")
-    }
-  }
-
-  const handleDeleteWallet = async () => {
-    if (!editingWallet) return
-    try {
-      await deleteWallet(editingWallet.id)
-      toast.success("Wallet deleted")
-      setWalletDrawerOpen(false)
-      setConfirmDelete(false)
-    } catch {
-      toast.error("Failed to delete wallet")
-    }
-  }
-
   return (
     <>
       <div>
@@ -437,7 +282,7 @@ export function WalletPage() {
                 <MoreVertical className="size-5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={openAddWallet}>
+                <DropdownMenuItem onClick={() => navigate("/wallet/new")}>
                   <Plus className="mr-2 size-4" />
                   Add
                 </DropdownMenuItem>
@@ -486,7 +331,7 @@ export function WalletPage() {
                       pockets={pockets.filter((p) => p.walletId === wallet.id)}
                       pocketBalances={pocketBalances}
                       orderMode={orderMode}
-                      onEdit={() => openEditWallet(wallet)}
+                      onEdit={() => navigate(`/wallet/edit/${wallet.id}`)}
                     />
                   ))}
                 </div>
@@ -495,129 +340,6 @@ export function WalletPage() {
           )}
         </div>
       </div>
-
-      {/* Full-Screen Wallet Drawer */}
-      <Drawer open={walletDrawerOpen} onOpenChange={setWalletDrawerOpen}>
-        <DrawerContent className="mt-0 h-dvh rounded-none">
-          <DrawerHeader className="border-b text-left">
-            <DrawerTitle>
-              {editingWallet ? "Edit Wallet" : "Add Wallet"}
-            </DrawerTitle>
-          </DrawerHeader>
-          <div className="flex-1 overflow-y-auto px-4 py-4">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="walletName">Wallet Name</Label>
-                <Input
-                  id="walletName"
-                  value={walletName}
-                  onChange={(e) => setWalletName(e.target.value)}
-                  placeholder="e.g. Bank BCA"
-                />
-              </div>
-
-              <div className="space-y-3 border-t pt-6">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-semibold">Pockets</h4>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddDraftPocket}
-                  >
-                    <Plus className="mr-2 size-4" /> Add Pocket
-                  </Button>
-                </div>
-
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handlePocketDragEnd}
-                  modifiers={[restrictToVerticalAxis]}
-                >
-                  <SortableContext
-                    items={draftPockets.map((p) => p._key)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-3">
-                      {draftPockets.map((dp, index) => (
-                        <SortablePocketRow
-                          key={dp._key}
-                          pocket={dp}
-                          onUpdateName={(val) =>
-                            updateDraftPocket(index, "name", val)
-                          }
-                          onUpdateAmount={(val) =>
-                            updateDraftPocket(index, "amount", val)
-                          }
-                          onDelete={() => handleDeleteDraftPocket(index, dp.id)}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
-
-                {draftPockets.length === 0 && (
-                  <p className="py-4 text-center text-sm text-muted-foreground">
-                    No pockets added yet.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <DrawerFooter className="border-t bg-background">
-            {confirmDelete ? (
-              <div className="flex w-full flex-col gap-3 p-1">
-                <p className="text-center text-xs leading-relaxed font-semibold text-destructive">
-                  Permanently delete &quot;{editingWallet?.name}&quot; and all
-                  its pockets? This cannot be undone.
-                </p>
-                <div className="flex w-full gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1 cursor-pointer"
-                    onClick={() => setConfirmDelete(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1 cursor-pointer bg-destructive hover:bg-destructive/95"
-                    onClick={handleDeleteWallet}
-                  >
-                    Yes, Delete
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex w-full items-center justify-between">
-                {editingWallet ? (
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => setConfirmDelete(true)}
-                    className="cursor-pointer"
-                  >
-                    <Trash className="size-4" />
-                  </Button>
-                ) : (
-                  <div />
-                )}
-                <div className="flex gap-2">
-                  <DrawerClose asChild>
-                    <Button variant="outline" className="cursor-pointer">
-                      Cancel
-                    </Button>
-                  </DrawerClose>
-                  <Button onClick={handleSaveWallet} className="cursor-pointer">
-                    Save Wallet
-                  </Button>
-                </div>
-              </div>
-            )}
-          </DrawerFooter>
-        </DrawerContent>
-      </Drawer>
     </>
   )
 }
