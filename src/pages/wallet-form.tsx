@@ -30,6 +30,7 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable"
+import { type Transform } from "@dnd-kit/utilities"
 import { PageHeader } from "@/components/ui/page-header"
 import {
   type DraftPocket,
@@ -129,6 +130,11 @@ export function WalletFormPage() {
     updated[index] = { ...updated[index], [field]: value }
     setDraftPockets(updated)
   }
+
+  const restrictToVerticalAxis = ({ transform }: { transform: Transform }) => ({
+    ...transform,
+    x: 0,
+  })
 
   const handleSaveWallet = async () => {
     if (!walletName.trim()) {
@@ -243,6 +249,7 @@ export function WalletFormPage() {
               sensors={sensors}
               collisionDetection={closestCenter}
               onDragEnd={handlePocketDragEnd}
+              modifiers={[restrictToVerticalAxis]}
             >
               <SortableContext
                 items={draftPockets.map((p) => p._key)}

@@ -5,10 +5,28 @@ import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
 import { Switch } from "@/components/ui/switch"
 import { CategoryManagementSheet } from "@/components/category-management-sheet"
-import { ChevronRight, Moon, Tag, Repeat, Clock, Trash } from "lucide-react"
+import {
+  ChevronRight,
+  Moon,
+  Tag,
+  Repeat,
+  Clock,
+  Trash,
+  ShieldCheck,
+  Lock,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { PageHeader } from "@/components/ui/page-header"
+import { PinInputForm } from "@/components/pin-input-form"
+import { PinCreationForm } from "@/components/pin-creation-form"
+import { hashPin } from "@/lib/utils/crypto"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +43,8 @@ export function SettingsPage() {
   const { theme, setTheme } = useTheme()
   const [categorySheetOpen, setCategorySheetOpen] = useState(false)
   const [resetDialogOpen, setResetDialogOpen] = useState(false)
+  const [changePinOpen, setChangePinOpen] = useState(false)
+  const [pinStep, setPinStep] = useState<"verify" | "create">("verify")
 
   const settings = useLiveQuery(() => db.settings.get("user_settings"))
   const lockDelay = settings?.lockDelayMinutes ?? 5
@@ -47,6 +67,30 @@ export function SettingsPage() {
     } catch (err) {
       console.error(err)
       toast.error("Failed to update auto-lock settings")
+    }
+  }
+
+  const handleVerifyOldPin = async (values: { pin: string }) => {
+    const hashed = await hashPin(values.pin)
+    if (hashed === settings?.pin) {
+      setPinStep("create")
+      return true
+    } else {
+      toast.error("Incorrect current PIN")
+      return false
+    }
+  }
+
+  const handleSetNewPin = async (newPin: string) => {
+    try {
+      const hashed = await hashPin(newPin)
+      await db.settings.update("user_settings", { pin: hashed })
+      toast.success("PIN changed successfully")
+      setChangePinOpen(false)
+      setPinStep("verify")
+    } catch (err) {
+      console.error(err)
+      toast.error("Failed to update PIN")
     }
   }
 
@@ -84,6 +128,34 @@ export function SettingsPage() {
         </PageHeader>
 
         <div className="p-4">
+          {/* Security */}
+          <div className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            Security
+          </div>
+          <div className="mb-6 overflow-hidden rounded-xl border bg-card shadow-sm">
+            <Button
+              variant="ghost"
+              className="flex h-auto w-full cursor-pointer items-center justify-between rounded-none px-4 py-4 text-left"
+              onClick={() => {
+                setPinStep("verify")
+                setChangePinOpen(true)
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex size-9 items-center justify-center rounded-full bg-muted">
+                  <ShieldCheck className="size-4 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="font-medium">Change App PIN</p>
+                  <p className="text-xs text-muted-foreground">
+                    Update your 4-digit security code
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="size-4 text-muted-foreground" />
+            </Button>
+          </div>
+
           {/* Preferences */}
           <div className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Preferences
@@ -235,6 +307,34 @@ export function SettingsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Drawer
+        open={changePinOpen}
+        onOpenChange={(open) => {
+          setChangePinOpen(open)
+          if (!open) setPinStep("verify")
+        }}
+      >
+        <DrawerContent className="mt-0 h-[90dvh] rounded-none">
+          <DrawerHeader className="border-b text-left">
+            <DrawerTitle>Change App PIN</DrawerTitle>
+          </DrawerHeader>
+          <div className="flex-1 overflow-y-auto px-4 py-8">
+            <div className="mx-auto max-w-sm">
+              {pinStep === "verify" ? (
+                <PinInputForm
+                  title="Verify Old PIN"
+                  description="Please enter your current 4-digit PIN"
+                  icon={<Lock className="size-6" />}
+                  onSubmit={handleVerifyOldPin}
+                />
+              ) : (
+                <PinCreationForm onComplete={handleSetNewPin} />
+              )}
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </>
   )
 }
