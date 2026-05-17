@@ -12,7 +12,13 @@ import { LockScreenOverlay } from "@/components/lock-screen-overlay"
 import { AppLockProvider, useAppLock } from "@/lib/providers/app-lock-provider"
 
 function AppContent() {
-  const { isOnboarded, isLocked, isStorageAvailable } = useAppLock()
+  const { isOnboarded, isLocked, isStorageAvailable, isInitialized } =
+    useAppLock()
+
+  // 0. Wait for initial state to avoid flash
+  if (!isInitialized) {
+    return null
+  }
 
   // 1. If not onboarded yet or storage unavailable, show ONLY the welcome/setup space
   if (!isOnboarded || !isStorageAvailable) {

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { NumericInput } from "@/components/ui/numeric-input"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-import { ChevronLeft, ChevronRight, Trash, RefreshCw } from "lucide-react"
+import { ChevronLeft, ChevronRight, Trash, Repeat } from "lucide-react"
 import { PocketSelectionSheet } from "@/components/pocket-selection-sheet"
 import { CategorySelectionSheet } from "@/components/category-selection-sheet"
 import { PageHeader } from "@/components/ui/page-header"
@@ -76,7 +76,6 @@ export function TransactionFormPage({
   const [draftEndDateStr, setDraftEndDateStr] = useState("")
 
   const isRecurring = recurringPeriod !== "None" || !!isScheduleMode
-  const isDraftRecurring = draftRecurringPeriod !== "None" || !!isScheduleMode
 
   // Bottom sheets
   const [pocketSheetOpen, setPocketSheetOpen] = useState(false)
@@ -389,12 +388,15 @@ export function TransactionFormPage({
                 {(!id || isScheduleMode) && (
                   <Button
                     type="button"
-                    variant={isRecurring ? "default" : "outline"}
+                    variant="ghost"
                     size="icon"
-                    className="ml-2 h-10 w-10 shrink-0 rounded-xl"
+                    className={cn(
+                      "ml-2 h-10 w-10 shrink-0 rounded-xl",
+                      isRecurring && "text-primary"
+                    )}
                     onClick={handleOpenRepeatSheet}
                   >
-                    <RefreshCw
+                    <Repeat
                       className={cn(
                         "size-5",
                         isRecurring && "animate-spin-once"
@@ -587,6 +589,39 @@ export function TransactionFormPage({
           <div className="px-4 py-4">
             <div className="space-y-6">
               <div className="space-y-4">
+                {/* Schedule Type */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                    Schedule Type
+                  </label>
+                  <div className="flex rounded-xl bg-muted p-1">
+                    <button
+                      type="button"
+                      onClick={() => setDraftRecurringType("repeat")}
+                      className={cn(
+                        "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
+                        draftRecurringType === "repeat"
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Auto-Repeat
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDraftRecurringType("bill")}
+                      className={cn(
+                        "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
+                        draftRecurringType === "bill"
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Manual Bill
+                    </button>
+                  </div>
+                </div>
+
                 {/* Period Selection */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
@@ -620,55 +655,18 @@ export function TransactionFormPage({
                   </select>
                 </div>
 
-                {isDraftRecurring && (
-                  <>
-                    {/* Schedule Type */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                        Schedule Type
-                      </label>
-                      <div className="flex rounded-xl bg-muted p-1">
-                        <button
-                          type="button"
-                          onClick={() => setDraftRecurringType("repeat")}
-                          className={cn(
-                            "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
-                            draftRecurringType === "repeat"
-                              ? "bg-background text-foreground shadow-sm"
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          Auto-Repeat
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setDraftRecurringType("bill")}
-                          className={cn(
-                            "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
-                            draftRecurringType === "bill"
-                              ? "bg-background text-foreground shadow-sm"
-                              : "text-muted-foreground hover:text-foreground"
-                          )}
-                        >
-                          Manual Bill
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* End Date (Optional) */}
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                        End Date (Optional)
-                      </label>
-                      <Input
-                        type="date"
-                        value={draftEndDateStr}
-                        onChange={(e) => setDraftEndDateStr(e.target.value)}
-                        className="h-12 rounded-xl dark:[&::-webkit-calendar-picker-indicator]:invert"
-                      />
-                    </div>
-                  </>
-                )}
+                {/* End Date (Optional) */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                    End Date (Optional)
+                  </label>
+                  <Input
+                    type="date"
+                    value={draftEndDateStr}
+                    onChange={(e) => setDraftEndDateStr(e.target.value)}
+                    className="h-12 rounded-xl dark:[&::-webkit-calendar-picker-indicator]:invert"
+                  />
+                </div>
               </div>
             </div>
           </div>

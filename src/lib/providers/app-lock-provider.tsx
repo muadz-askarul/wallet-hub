@@ -3,6 +3,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   type ReactNode,
 } from "react"
 import { getSettings } from "../services/settings-service"
@@ -13,6 +14,7 @@ interface AppLockContextType {
   hasPin: boolean
   isOnboarded: boolean
   isStorageAvailable: boolean
+  isInitialized: boolean
   unlock: (pin: string) => Promise<boolean>
   lock: () => void
   refreshLockState: () => Promise<void>
@@ -43,18 +45,29 @@ async function checkIndexedDB() {
 }
 
 export function AppLockProvider({ children }: { children: ReactNode }) {
-  const [isLocked, setIsLocked] = useState(false)
+  const [isLocked, setIsLocked] = useState(() => {
+    // Initial guess from sessionStorage to avoid flash if possible
+    return sessionStorage.getItem("app_is_locked") !== "false"
+  })
   const [hasPin, setHasPin] = useState(false)
   const [isOnboarded, setIsOnboarded] = useState(true) // assume true until loaded
   const [isStorageAvailable, setIsStorageAvailable] = useState(true)
+  const [isInitialized, setIsInitialized] = useState(false)
+
+  // Wrapper to sync state with sessionStorage
+  const setLocked = (locked: boolean) => {
+    setIsLocked(locked)
+    sessionStorage.setItem("app_is_locked", locked.toString())
+  }
 
   // Load initial lock state and check onboarding
-  const refreshLockState = async () => {
+  const refreshLockState = useCallback(async () => {
     try {
       const dbAvailable = await checkIndexedDB()
       if (!dbAvailable) {
         setIsStorageAvailable(false)
         setIsOnboarded(false)
+        setIsInitialized(true)
         return
       }
 
@@ -67,35 +80,43 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
 
       // Only lock if onboarded and a PIN is actually set
       if (onboarded && pinSet) {
-        // Check if there was a previous session background timestamp
-        const bgTimeStr = localStorage.getItem("app_background_timestamp")
-        if (bgTimeStr) {
-          const bgTime = Number(bgTimeStr)
-          const elapsedMinutes = (Date.now() - bgTime) / (1000 * 60)
-          const delay = settings.lockDelayMinutes ?? 5
+        const wasLocked = sessionStorage.getItem("app_is_locked") === "true"
 
-          if (elapsedMinutes >= delay) {
-            setIsLocked(true)
-          } else {
-            setIsLocked(false)
-          }
+        if (wasLocked) {
+          setLocked(true)
         } else {
-          // Fresh open starts locked for security
-          setIsLocked(true)
+          // Check background delay
+          const bgTimeStr = localStorage.getItem("app_background_timestamp")
+          if (bgTimeStr) {
+            const bgTime = Number(bgTimeStr)
+            const elapsedMinutes = (Date.now() - bgTime) / (1000 * 60)
+            const delay = settings.lockDelayMinutes ?? 5
+
+            if (elapsedMinutes >= delay) {
+              setLocked(true)
+            } else {
+              setLocked(false)
+            }
+          } else {
+            // Fresh open (no sessionStorage, no bg timestamp) -> Lock
+            setLocked(true)
+          }
         }
       } else {
-        setIsLocked(false)
+        setLocked(false)
       }
     } catch (err) {
       console.error("Failed to load settings in AppLockProvider:", err)
+    } finally {
+      setIsInitialized(true)
     }
-  }
+  }, [])
 
   useEffect(() => {
-    const init = async () => {
+    const runRefresh = async () => {
       await refreshLockState()
     }
-    init()
+    runRefresh()
 
     const handleVisibilityChange = async () => {
       if (document.visibilityState === "hidden") {
@@ -105,6 +126,12 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
         // App is foregrounded again, evaluate locking delay
         const settings = await getSettings()
         if (settings.isOnboarded && settings.pin) {
+          const wasLocked = sessionStorage.getItem("app_is_locked") === "true"
+          if (wasLocked) {
+            setLocked(true)
+            return
+          }
+
           const bgTimeStr = localStorage.getItem("app_background_timestamp")
           if (bgTimeStr) {
             const bgTime = Number(bgTimeStr)
@@ -112,7 +139,7 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
             const delay = settings.lockDelayMinutes ?? 5
 
             if (elapsedMinutes >= delay) {
-              setIsLocked(true)
+              setLocked(true)
             }
           }
         }
@@ -123,13 +150,13 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange)
     }
-  }, [])
+  }, [refreshLockState])
 
   const unlock = async (enteredPin: string): Promise<boolean> => {
     const settings = await getSettings()
     const hashedEnteredPin = await hashPin(enteredPin)
     if (hashedEnteredPin === settings.pin) {
-      setIsLocked(false)
+      setLocked(false)
       // Clear background timestamp upon successful unlock
       localStorage.removeItem("app_background_timestamp")
       return true
@@ -139,7 +166,7 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
 
   const lock = () => {
     if (isOnboarded && hasPin) {
-      setIsLocked(true)
+      setLocked(true)
     }
   }
 
@@ -150,6 +177,7 @@ export function AppLockProvider({ children }: { children: ReactNode }) {
         hasPin,
         isOnboarded,
         isStorageAvailable,
+        isInitialized,
         unlock,
         lock,
         refreshLockState,
