@@ -2,7 +2,7 @@ import * as React from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Delete, Fingerprint } from "lucide-react"
+import { Delete } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import {
@@ -16,8 +16,6 @@ export interface PinInputFormProps {
   icon?: React.ReactNode
   title?: string
   description?: string
-  isBiometricEnabled?: boolean
-  onBiometricClick?: () => void
   onSubmit: (values: {
     pin: string
   }) => void | boolean | Promise<void | boolean>
@@ -29,8 +27,6 @@ export function PinInputForm({
   icon,
   title,
   description,
-  isBiometricEnabled,
-  onBiometricClick,
   onSubmit,
   className,
 }: PinInputFormProps) {
@@ -146,29 +142,17 @@ export function PinInputForm({
             type="button"
             disabled={isSubmitting}
             onClick={() => handleNumberPress(num.toString())}
-            className="flex h-16 w-16 items-center justify-center rounded-full border border-border text-2xl font-medium transition-colors hover:bg-muted active:scale-95 disabled:cursor-not-allowed"
+            className="flex h-20 w-20 items-center justify-center rounded-full border border-border text-2xl font-medium transition-colors hover:bg-muted active:scale-95 disabled:cursor-not-allowed"
           >
             {num}
           </button>
         ))}
-        {isBiometricEnabled ? (
-          <button
-            type="button"
-            aria-label="Biometric Unlock"
-            disabled={isSubmitting}
-            onClick={onBiometricClick}
-            className="flex h-16 w-16 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted active:scale-95 disabled:cursor-not-allowed"
-          >
-            <Fingerprint className="h-8 w-8" />
-          </button>
-        ) : (
-          <div className="h-16 w-16" />
-        )}
+        <div className="h-20 w-20" />
         <button
           type="button"
           disabled={isSubmitting}
           onClick={() => handleNumberPress("0")}
-          className="flex h-16 w-16 items-center justify-center rounded-full border border-border text-2xl font-medium transition-colors hover:bg-muted active:scale-95 disabled:cursor-not-allowed"
+          className="flex h-20 w-20 items-center justify-center rounded-full border border-border text-2xl font-medium transition-colors hover:bg-muted active:scale-95 disabled:cursor-not-allowed"
         >
           0
         </button>
@@ -176,7 +160,7 @@ export function PinInputForm({
           type="button"
           disabled={isSubmitting}
           onClick={handleBackspace}
-          className="flex h-16 w-16 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:scale-95 disabled:cursor-not-allowed"
+          className="flex h-20 w-20 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:scale-95 disabled:cursor-not-allowed"
         >
           <Delete className="h-8 w-8" />
         </button>
