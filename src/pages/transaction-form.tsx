@@ -20,7 +20,6 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerFooter,
-  DrawerClose,
 } from "@/components/ui/drawer"
 import {
   AlertDialog,
@@ -68,7 +67,16 @@ export function TransactionFormPage({
   const [recurringPeriod, setRecurringPeriod] = useState<string>("None")
   const [endDateStr, setEndDateStr] = useState("")
 
+  // Draft states for the sheet
+  const [draftRecurringType, setDraftRecurringType] = useState<
+    "bill" | "repeat"
+  >("repeat")
+  const [draftRecurringPeriod, setDraftRecurringPeriod] =
+    useState<string>("None")
+  const [draftEndDateStr, setDraftEndDateStr] = useState("")
+
   const isRecurring = recurringPeriod !== "None" || !!isScheduleMode
+  const isDraftRecurring = draftRecurringPeriod !== "None" || !!isScheduleMode
 
   // Bottom sheets
   const [pocketSheetOpen, setPocketSheetOpen] = useState(false)
@@ -140,6 +148,20 @@ export function TransactionFormPage({
     (w) => w.id === selectedDestPocket?.walletId
   )
   const selectedCategory = categories?.find((c) => c.id === categoryId)
+
+  const handleOpenRepeatSheet = () => {
+    setDraftRecurringType(recurringType)
+    setDraftRecurringPeriod(recurringPeriod)
+    setDraftEndDateStr(endDateStr)
+    setIsRepeatSheetOpen(true)
+  }
+
+  const handleConfirmRepeat = () => {
+    setRecurringType(draftRecurringType)
+    setRecurringPeriod(draftRecurringPeriod)
+    setEndDateStr(draftEndDateStr)
+    setIsRepeatSheetOpen(false)
+  }
 
   const handleSave = async (isContinue = false) => {
     if (!amount || amount <= 0) {
@@ -370,7 +392,7 @@ export function TransactionFormPage({
                     variant={isRecurring ? "default" : "outline"}
                     size="icon"
                     className="ml-2 h-10 w-10 shrink-0 rounded-xl"
-                    onClick={() => setIsRepeatSheetOpen(true)}
+                    onClick={handleOpenRepeatSheet}
                   >
                     <RefreshCw
                       className={cn(
@@ -571,8 +593,8 @@ export function TransactionFormPage({
                     Repeat Period
                   </label>
                   <select
-                    value={recurringPeriod}
-                    onChange={(e) => setRecurringPeriod(e.target.value)}
+                    value={draftRecurringPeriod}
+                    onChange={(e) => setDraftRecurringPeriod(e.target.value)}
                     className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
                   >
                     {[
@@ -598,7 +620,7 @@ export function TransactionFormPage({
                   </select>
                 </div>
 
-                {isRecurring && (
+                {isDraftRecurring && (
                   <>
                     {/* Schedule Type */}
                     <div className="space-y-1.5">
@@ -608,10 +630,10 @@ export function TransactionFormPage({
                       <div className="flex rounded-xl bg-muted p-1">
                         <button
                           type="button"
-                          onClick={() => setRecurringType("repeat")}
+                          onClick={() => setDraftRecurringType("repeat")}
                           className={cn(
                             "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
-                            recurringType === "repeat"
+                            draftRecurringType === "repeat"
                               ? "bg-background text-foreground shadow-sm"
                               : "text-muted-foreground hover:text-foreground"
                           )}
@@ -620,10 +642,10 @@ export function TransactionFormPage({
                         </button>
                         <button
                           type="button"
-                          onClick={() => setRecurringType("bill")}
+                          onClick={() => setDraftRecurringType("bill")}
                           className={cn(
                             "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
-                            recurringType === "bill"
+                            draftRecurringType === "bill"
                               ? "bg-background text-foreground shadow-sm"
                               : "text-muted-foreground hover:text-foreground"
                           )}
@@ -640,8 +662,8 @@ export function TransactionFormPage({
                       </label>
                       <Input
                         type="date"
-                        value={endDateStr}
-                        onChange={(e) => setEndDateStr(e.target.value)}
+                        value={draftEndDateStr}
+                        onChange={(e) => setDraftEndDateStr(e.target.value)}
                         className="h-12 rounded-xl dark:[&::-webkit-calendar-picker-indicator]:invert"
                       />
                     </div>
@@ -651,9 +673,12 @@ export function TransactionFormPage({
             </div>
           </div>
           <DrawerFooter className="border-t">
-            <DrawerClose asChild>
-              <Button className="h-12 w-full rounded-xl font-bold">Done</Button>
-            </DrawerClose>
+            <Button
+              className="h-12 w-full rounded-xl font-bold"
+              onClick={handleConfirmRepeat}
+            >
+              Done
+            </Button>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

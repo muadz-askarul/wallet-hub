@@ -84,7 +84,7 @@ export function PinInputForm({
 
   return (
     <div
-      className={cn("flex flex-col items-center gap-8 text-center", className)}
+      className={cn("flex flex-col items-center gap-12 text-center", className)}
     >
       <div className="flex flex-col items-center gap-6">
         {icon && (
@@ -132,7 +132,7 @@ export function PinInputForm({
       {/* Number Grid */}
       <div
         className={cn(
-          "grid grid-cols-3 gap-4",
+          "grid w-full grid-cols-3 place-items-center gap-4",
           isSubmitting && "pointer-events-none opacity-50"
         )}
       >
