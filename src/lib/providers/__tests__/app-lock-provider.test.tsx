@@ -2,23 +2,32 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import { render, screen, waitFor, cleanup } from "@testing-library/react"
 import { AppLockProvider, useAppLock } from "../app-lock-provider"
 import { getSettings } from "../../services/settings-service"
-import { authenticateBiometrics } from "../../services/biometric-service"
 
 vi.mock("../../services/settings-service")
-vi.mock("../../services/biometric-service")
 vi.mock("../../utils/crypto", () => ({
   hashPin: vi.fn((pin) => Promise.resolve(`hashed-${pin}`)),
 }))
 
+// Mock IndexedDB
+const mockIndexedDB = {
+  open: vi.fn().mockReturnValue({
+    onsuccess: null,
+    onerror: null,
+    onblocked: null,
+    result: { close: vi.fn() },
+  }),
+  deleteDatabase: vi.fn(),
+}
+
+Object.defineProperty(window, "indexedDB", {
+  value: mockIndexedDB,
+})
+
 function TestComponent() {
-  const { isLocked, isBiometricEnabled, unlockWithBiometrics } = useAppLock()
+  const { isLocked } = useAppLock()
   return (
     <div>
       <div data-testid="isLocked">{isLocked.toString()}</div>
-      <div data-testid="isBiometricEnabled">
-        {isBiometricEnabled.toString()}
-      </div>
-      <button onClick={unlockWithBiometrics}>Unlock Biometric</button>
     </div>
   )
 }
@@ -27,12 +36,24 @@ describe("AppLockProvider", () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     localStorage.clear()
-    // Default mock: onboarded with PIN, biometric disabled
+    
+    // Setup mock IndexedDB success
+    const request = {
+      onsuccess: null as any,
+      result: { close: vi.fn() },
+    }
+    mockIndexedDB.open.mockReturnValue(request)
+    
+    // Default mock: onboarded with PIN
     vi.mocked(getSettings).mockResolvedValue({
       isOnboarded: true,
       pin: "hashed-1234",
-      isBiometricEnabled: false,
     } as any)
+    
+    // Trigger onsuccess after a tick
+    setTimeout(() => {
+      if (request.onsuccess) request.onsuccess()
+    }, 0)
   })
 
   afterEach(() => {
@@ -40,55 +61,6 @@ describe("AppLockProvider", () => {
   })
 
   it("should lock by default if onboarded and has PIN", async () => {
-    render(
-      <AppLockProvider>
-        <TestComponent />
-      </AppLockProvider>
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("isLocked").textContent).toBe("true")
-    })
-  })
-
-  it("should unlock with biometrics if enabled", async () => {
-    vi.mocked(getSettings).mockResolvedValue({
-      isOnboarded: true,
-      pin: "hashed-1234",
-      isBiometricEnabled: true,
-    } as any)
-    vi.mocked(authenticateBiometrics).mockResolvedValue(true)
-
-    render(
-      <AppLockProvider>
-        <TestComponent />
-      </AppLockProvider>
-    )
-
-    // Wait for it to be locked first
-    await waitFor(() => {
-      expect(screen.getByTestId("isLocked").textContent).toBe("true")
-    })
-
-    // Then wait for it to be unlocked by biometrics
-    await waitFor(
-      () => {
-        expect(screen.getByTestId("isLocked").textContent).toBe("false")
-      },
-      { timeout: 2000 }
-    )
-
-    expect(authenticateBiometrics).toHaveBeenCalled()
-  })
-
-  it("should not unlock with biometrics if it fails", async () => {
-    vi.mocked(getSettings).mockResolvedValue({
-      isOnboarded: true,
-      pin: "hashed-1234",
-      isBiometricEnabled: true,
-    } as any)
-    vi.mocked(authenticateBiometrics).mockResolvedValue(false)
-
     render(
       <AppLockProvider>
         <TestComponent />
