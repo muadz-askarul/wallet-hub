@@ -10,10 +10,19 @@ import { NumericInput } from "@/components/ui/numeric-input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
-import { ChevronLeft, ChevronRight, Trash } from "lucide-react"
+import { ChevronLeft, ChevronRight, Trash, RefreshCw } from "lucide-react"
 import { PocketSelectionSheet } from "@/components/pocket-selection-sheet"
 import { CategorySelectionSheet } from "@/components/category-selection-sheet"
 import { PageHeader } from "@/components/ui/page-header"
+import { AutoTextSize } from "@/components/ui/auto-text-size"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+  DrawerClose,
+} from "@/components/ui/drawer"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -65,6 +74,7 @@ export function TransactionFormPage({
   const [pocketSheetOpen, setPocketSheetOpen] = useState(false)
   const [destPocketSheetOpen, setDestPocketSheetOpen] = useState(false)
   const [categorySheetOpen, setCategorySheetOpen] = useState(false)
+  const [isRepeatSheetOpen, setIsRepeatSheetOpen] = useState(false)
 
   // Query lookups
   const wallets = useLiveQuery(() => db.wallets.toArray(), [], [])
@@ -341,15 +351,26 @@ export function TransactionFormPage({
                 Amount
               </label>
               <div className="flex items-center justify-between gap-2 border-b pb-2">
-                <span className="shrink-0 text-2xl font-bold text-foreground">
+                <AutoTextSize className="shrink-0 font-bold text-foreground" maxSizeRem={1.5} minSizeRem={0.8}>
                   Rp
-                </span>
+                </AutoTextSize>
                 <NumericInput
                   value={amount}
                   onValueChange={(v) => setAmount(v ? parseFloat(v) : 0)}
                   className="h-auto flex-1 border-none bg-transparent p-0 text-right text-3xl font-black text-foreground shadow-none focus-visible:ring-0 dark:bg-transparent"
                   placeholder="0"
                 />
+                {(!id || isScheduleMode) && (
+                  <Button
+                    type="button"
+                    variant={isRecurring ? "default" : "outline"}
+                    size="icon"
+                    className="ml-2 h-10 w-10 shrink-0 rounded-xl"
+                    onClick={() => setIsRepeatSheetOpen(true)}
+                  >
+                    <RefreshCw className={cn("size-5", isRecurring && "animate-spin-once")} />
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -472,170 +493,180 @@ export function TransactionFormPage({
                 />
               </div>
 
-              {/* Repeating Options (Only for New transactions or Schedule Mode) */}
-              {(!id || isScheduleMode) && (
-                <div className="space-y-4 rounded-2xl border bg-card p-4 shadow-sm">
-                  {!isScheduleMode && (
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <label
-                          htmlFor="recurring-toggle"
-                          className="text-sm font-semibold text-foreground"
-                        >
-                          Set repeating schedule
-                        </label>
-                        <p className="text-xs text-muted-foreground">
-                          Schedule this transaction to repeat
-                        </p>
-                      </div>
-                      <Checkbox
-                        id="recurring-toggle"
-                        checked={isRecurring}
-                        onCheckedChange={(checked) => setIsRecurring(!!checked)}
-                      />
-                    </div>
-                  )}
-
-                  {isRecurring && (
-                    <div
-                      className={cn(
-                        "space-y-4",
-                        !isScheduleMode && "border-t pt-4"
-                      )}
-                    >
-                      {/* Schedule Type */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                          Schedule Type
-                        </label>
-                        <div className="flex rounded-xl bg-muted p-1">
-                          <button
-                            type="button"
-                            onClick={() => setRecurringType("repeat")}
-                            className={cn(
-                              "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all",
-                              recurringType === "repeat"
-                                ? "bg-background text-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground"
-                            )}
-                          >
-                            Auto-Repeat
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setRecurringType("bill")}
-                            className={cn(
-                              "flex-1 rounded-lg py-2 text-center text-xs font-semibold transition-all",
-                              recurringType === "bill"
-                                ? "bg-background text-foreground shadow-sm"
-                                : "text-muted-foreground hover:text-foreground"
-                            )}
-                          >
-                            Manual Bill
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Period Selection */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                          Repeat Period
-                        </label>
-                        <select
-                          value={recurringPeriod}
-                          onChange={(e) => setRecurringPeriod(e.target.value)}
-                          className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                        >
-                          {[
-                            "Every Day",
-                            "Weekdays",
-                            "Weekend",
-                            "Every Week",
-                            "Every 2 Weeks",
-                            "Every 4 Weeks",
-                            "Every Month",
-                            "The end of the month",
-                            "Every 2 Month",
-                            "Every 3 Month",
-                            "Every 4 Month",
-                            "Every 6 Month",
-                            "Anually",
-                          ].map((p) => (
-                            <option key={p} value={p}>
-                              {p}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* End Date (Optional) */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                          End Date (Optional)
-                        </label>
-                        <Input
-                          type="date"
-                          value={endDateStr}
-                          onChange={(e) => setEndDateStr(e.target.value)}
-                          className="h-11 dark:[&::-webkit-calendar-picker-indicator]:invert"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex gap-2 pt-4">
-              {id || scheduleId ? (
-                <>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="h-11 w-11 shrink-0"
-                    onClick={() => setDeleteDialogOpen(true)}
-                  >
-                    <Trash className="size-5" />
-                  </Button>
-                  <Button
-                    className="h-11 flex-1 text-base font-semibold"
-                    onClick={() => handleSave(false)}
-                    disabled={saving}
-                  >
-                    {saving ? "Saving..." : "Save Changes"}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    className={cn(
-                      "h-11 text-base font-semibold",
-                      isScheduleMode ? "w-full" : "w-2/3"
-                    )}
-                    onClick={() => handleSave(false)}
-                    disabled={saving}
-                  >
-                    {saving ? "Saving..." : "Save"}
-                  </Button>
-                  {!isScheduleMode && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="h-11 w-1/3 text-base font-semibold"
-                      onClick={() => handleSave(true)}
-                      disabled={saving}
-                    >
-                      Continue
-                    </Button>
-                  )}
-                </>
-              )}
             </div>
           </div>
         </div>
+
+        {/* Sticky Footer Actions */}
+        <div className="fixed bottom-0 left-0 z-10 w-full border-t bg-background/80 p-4 backdrop-blur-md">
+          <div className="mx-auto flex max-w-md gap-2">
+            {id || scheduleId ? (
+              <>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="h-12 w-12 shrink-0 rounded-xl"
+                  onClick={() => setDeleteDialogOpen(true)}
+                >
+                  <Trash className="size-5" />
+                </Button>
+                <Button
+                  className="h-12 flex-1 rounded-xl text-base font-bold"
+                  onClick={() => handleSave(false)}
+                  disabled={saving}
+                >
+                  {saving ? "Saving..." : "Save Changes"}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  className={cn(
+                    "h-12 rounded-xl text-base font-bold",
+                    isScheduleMode ? "w-full" : "w-2/3"
+                  )}
+                  onClick={() => handleSave(false)}
+                  disabled={saving}
+                >
+                  {saving ? "Saving..." : "Save"}
+                </Button>
+                {!isScheduleMode && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-12 w-1/3 rounded-xl text-base font-bold"
+                    onClick={() => handleSave(true)}
+                    disabled={saving}
+                  >
+                    Continue
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Repeating Options Drawer */}
+      <Drawer open={isRepeatSheetOpen} onOpenChange={setIsRepeatSheetOpen}>
+        <DrawerContent>
+          <DrawerHeader className="text-left">
+            <DrawerTitle>Repeating Schedule</DrawerTitle>
+          </DrawerHeader>
+          <div className="px-4 py-4">
+            <div className="space-y-6">
+              {!isScheduleMode && (
+                <div className="flex items-center justify-between rounded-xl border bg-muted/10 p-4">
+                  <div>
+                    <label
+                      htmlFor="recurring-toggle"
+                      className="font-semibold text-foreground"
+                    >
+                      Set repeating schedule
+                    </label>
+                    <p className="text-xs text-muted-foreground">
+                      Schedule this transaction to repeat
+                    </p>
+                  </div>
+                  <Checkbox
+                    id="recurring-toggle"
+                    checked={isRecurring}
+                    onCheckedChange={(checked) => setIsRecurring(!!checked)}
+                  />
+                </div>
+              )}
+
+              {isRecurring && (
+                <div className="space-y-4">
+                  {/* Schedule Type */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                      Schedule Type
+                    </label>
+                    <div className="flex rounded-xl bg-muted p-1">
+                      <button
+                        type="button"
+                        onClick={() => setRecurringType("repeat")}
+                        className={cn(
+                          "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
+                          recurringType === "repeat"
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        Auto-Repeat
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRecurringType("bill")}
+                        className={cn(
+                          "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
+                          recurringType === "bill"
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        Manual Bill
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Period Selection */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                      Repeat Period
+                    </label>
+                    <select
+                      value={recurringPeriod}
+                      onChange={(e) => setRecurringPeriod(e.target.value)}
+                      className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                    >
+                      {[
+                        "Every Day",
+                        "Weekdays",
+                        "Weekend",
+                        "Every Week",
+                        "Every 2 Weeks",
+                        "Every 4 Weeks",
+                        "Every Month",
+                        "The end of the month",
+                        "Every 2 Month",
+                        "Every 3 Month",
+                        "Every 4 Month",
+                        "Every 6 Month",
+                        "Anually",
+                      ].map((p) => (
+                        <option key={p} value={p}>
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* End Date (Optional) */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                      End Date (Optional)
+                    </label>
+                    <Input
+                      type="date"
+                      value={endDateStr}
+                      onChange={(e) => setEndDateStr(e.target.value)}
+                      className="h-12 rounded-xl dark:[&::-webkit-calendar-picker-indicator]:invert"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <DrawerFooter className="border-t">
+            <DrawerClose asChild>
+              <Button className="h-12 w-full rounded-xl font-bold">Done</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
 
       {/* Pocket Selection bottom sheet */}
       <PocketSelectionSheet
