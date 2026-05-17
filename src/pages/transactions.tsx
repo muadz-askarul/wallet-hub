@@ -149,7 +149,7 @@ export function TransactionsPage() {
           ...tx,
           categoryName:
             category?.name ||
-            (tx.type === "transfer" ? "Transfer" : "Uncategorized"),
+            (tx.type === "transfer" ? "Transfer" : "Adjustment"),
           categoryIcon: category?.icon || fallbackIcon,
           pocketName: pocket?.name || "Unknown Pocket",
           walletName: wallet?.name || "Unknown Wallet",

@@ -61,7 +61,7 @@ export function DashboardPage() {
           ...b,
           pocketName: pocket?.name || "Unknown Pocket",
           walletName: wallet?.name || "Unknown Wallet",
-          categoryName: category?.name || "Uncategorized",
+          categoryName: category?.name || "Adjustment",
           categoryIcon: category?.icon || "📋",
           categoryColor: category?.color || "#6b7280",
         }
@@ -123,7 +123,7 @@ export function DashboardPage() {
           ...tx,
           categoryName:
             category?.name ||
-            (tx.type === "transfer" ? "Transfer" : "Uncategorized"),
+            (tx.type === "transfer" ? "Transfer" : "Adjustment"),
           categoryIcon: category?.icon || fallbackIcon,
           pocketName: pocket?.name || "Unknown Pocket",
           walletName: wallet?.name || "Unknown Wallet",
