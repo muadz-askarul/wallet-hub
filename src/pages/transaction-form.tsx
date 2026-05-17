@@ -320,9 +320,9 @@ export function TransactionFormPage({
 
   return (
     <>
-      <div className="min-h-dvh">
+      <div className="flex h-dvh flex-col overflow-hidden">
         {/* Sticky Header */}
-        <PageHeader className="justify-between">
+        <PageHeader className="shrink-0 justify-between">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground"
@@ -342,7 +342,8 @@ export function TransactionFormPage({
           <div className="size-8" /> {/* Balance spacer */}
         </PageHeader>
 
-        <div className="p-4 pb-32">
+        {/* Scrollable Form Body */}
+        <div className="flex-1 overflow-y-auto p-4">
           <div className="mx-auto max-w-md space-y-6">
             {/* Type Selector Tabs */}
             <div className="flex rounded-xl border bg-muted/20 p-1">
@@ -408,7 +409,7 @@ export function TransactionFormPage({
             </div>
 
             {/* Form Fields */}
-            <div className="space-y-4">
+            <div className="space-y-4 pb-4">
               {/* Date Picker */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium">
@@ -529,8 +530,8 @@ export function TransactionFormPage({
           </div>
         </div>
 
-        {/* Sticky Footer Actions */}
-        <div className="fixed bottom-0 left-0 z-10 w-full border-t bg-background/80 p-4 backdrop-blur-md">
+        {/* Footer Actions */}
+        <div className="w-full shrink-0 border-t bg-background p-4">
           <div className="mx-auto flex max-w-md gap-2">
             {id || scheduleId ? (
               <>
