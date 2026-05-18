@@ -113,7 +113,7 @@ db.version(4).stores({
 const DEFAULT_EXPENSE_CATEGORIES: Omit<Category, "id">[] = [
   { name: "Shopping", type: "expense", icon: "🛍️", color: "#f59e0b50" },
   { name: "Grocery", type: "expense", icon: "🛒", color: "#10b98150" },
-  { name: "Bill", type: "expense", icon: "📋", color: "#6366f150" },
+  { name: "Reminder", type: "expense", icon: "📋", color: "#6366f150" },
   { name: "Health", type: "expense", icon: "🏥", color: "#ef444450" },
   { name: "Beauty", type: "expense", icon: "💄", color: "#ec489950" },
   { name: "Food", type: "expense", icon: "🍜", color: "#f9731650" },

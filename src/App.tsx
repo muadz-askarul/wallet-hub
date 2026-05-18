@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { RootLayout } from "@/components/root-layout"
 import { DashboardPage } from "./pages/dashboard"
-import { BillsPage } from "./pages/bills"
+import { RemindersPage } from "./pages/reminders"
 import { WalletPage } from "./pages/wallet"
 import { WalletFormPage } from "./pages/wallet-form"
 import { TransactionsPage } from "./pages/transactions"
@@ -36,7 +36,7 @@ function AppContent() {
     <Routes>
       <Route path="/" element={<RootLayout />}>
         <Route index element={<DashboardPage />} />
-        <Route path="bills" element={<BillsPage />} />
+        <Route path="reminders" element={<RemindersPage />} />
         <Route path="wallet" element={<WalletPage />} />
         <Route path="wallet/new" element={<WalletFormPage />} />
         <Route path="wallet/edit/:id" element={<WalletFormPage />} />
@@ -45,11 +45,11 @@ function AppContent() {
         <Route path="transactions/new" element={<TransactionFormPage />} />
         <Route path="transactions/edit/:id" element={<TransactionFormPage />} />
         <Route
-          path="bills/new"
+          path="reminders/new"
           element={<TransactionFormPage isScheduleMode />}
         />
         <Route
-          path="bills/edit/:scheduleId"
+          path="reminders/edit/:scheduleId"
           element={<TransactionFormPage isScheduleMode />}
         />
         <Route path="wallet" element={<WalletPage />} />

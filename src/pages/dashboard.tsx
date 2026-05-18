@@ -7,7 +7,7 @@ import {
 } from "@/components/transaction-group"
 import { formatCurrency } from "../lib/utils"
 import { getPocketBalance } from "../lib/services/transaction-service"
-import { triggerBillPayment } from "@/lib/services/recurring-service"
+import { triggerReminderPayment } from "@/lib/services/recurring-service"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -32,7 +32,7 @@ export function DashboardPage() {
         else liabilities += Math.abs(balance)
       }
 
-      // Load upcoming bills for the current month
+      // Load upcoming reminders for the current month
       const now = new Date()
       const endOfMonth = new Date(
         now.getFullYear(),
@@ -40,17 +40,17 @@ export function DashboardPage() {
         1
       ).getTime()
 
-      const bills = await db.schedules
+      const reminders = await db.schedules
         .where("type")
         .equals("bill")
         .filter((s) => s.isActive === 1 && s.nextDueDate <= endOfMonth)
         .toArray()
 
-      const sortedBills = bills
+      const sortedReminders = reminders
         .sort((a, b) => a.nextDueDate - b.nextDueDate)
         .slice(0, 5)
 
-      const enrichedBills = sortedBills.map((b) => {
+      const enrichedReminders = sortedReminders.map((b) => {
         const pocket = pockets.find((pk) => pk.id === b.pocketId)
         const wallet = pocket
           ? wallets.find((wl) => wl.id === pocket.walletId)
@@ -139,7 +139,7 @@ export function DashboardPage() {
         liabilities,
         total: assets - liabilities,
         transactionGroups,
-        enrichedBills,
+        enrichedReminders,
       }
     },
     [],
@@ -148,18 +148,18 @@ export function DashboardPage() {
       liabilities: 0,
       total: 0,
       transactionGroups: [],
-      enrichedBills: [],
+      enrichedReminders: [],
     }
   )
 
-  const handlePayBill = async (id: string, note: string) => {
+  const handlePayReminder = async (id: string, note: string) => {
     setProcessingId(id)
     try {
-      await triggerBillPayment(id)
-      toast.success(`Bill completed: ${note}`)
+      await triggerReminderPayment(id)
+      toast.success(`Reminder completed: ${note}`)
     } catch (err) {
       console.error(err)
-      toast.error("Failed to complete bill payment")
+      toast.error("Failed to complete reminder payment")
     } finally {
       setProcessingId(null)
     }
@@ -193,60 +193,63 @@ export function DashboardPage() {
           </div>
         </div>
 
-        {/* Bills due this month widget */}
-        {data.enrichedBills && data.enrichedBills.length > 0 && (
+        {/* Reminders due this month widget */}
+        {data.enrichedReminders && data.enrichedReminders.length > 0 && (
           <div className="mb-4">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-foreground">Bills</h3>
+              <h3 className="text-lg font-medium text-foreground">Reminders</h3>
             </div>
             <div className="-mx-6 flex snap-x snap-mandatory scroll-pr-6 scroll-pl-6 gap-4 overflow-x-auto scroll-smooth px-6 pb-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
-              {data.enrichedBills.map((bill) => (
+              {data.enrichedReminders.map((reminder) => (
                 <div
-                  key={bill.id}
+                  key={reminder.id}
                   className="flex w-[220px] shrink-0 snap-start flex-col gap-3 rounded-2xl border bg-card p-3 shadow-sm"
                 >
                   <div className="flex items-start gap-2.5">
                     <div
                       className="flex size-8 shrink-0 items-center justify-center rounded-full text-base font-semibold"
                       style={{
-                        backgroundColor: bill.categoryColor
-                          ? `${bill.categoryColor}15`
+                        backgroundColor: reminder.categoryColor
+                          ? `${reminder.categoryColor}15`
                           : "#6b728015",
                       }}
                     >
-                      {bill.categoryIcon}
+                      {reminder.categoryIcon}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm leading-tight font-semibold text-foreground">
-                        {bill.note || bill.categoryName}
+                        {reminder.note || reminder.categoryName}
                       </p>
                       <p className="mt-1 truncate text-[11px] text-muted-foreground">
                         Due{" "}
-                        {new Date(bill.nextDueDate).toLocaleDateString(
+                        {new Date(reminder.nextDueDate).toLocaleDateString(
                           "id-ID",
                           {
                             day: "numeric",
                             month: "short",
                           }
                         )}{" "}
-                        • {bill.walletName}
+                        • {reminder.walletName}
                       </p>
                     </div>
                   </div>
 
                   <div className="mt-0.5 flex items-center justify-between gap-2">
                     <span className="text-base font-bold text-foreground">
-                      Rp {formatCurrency(bill.amount)}
+                      Rp {formatCurrency(reminder.amount)}
                     </span>
                     <Button
                       size="sm"
                       className="h-8 cursor-pointer rounded-xl px-4 text-xs font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
-                      disabled={processingId === bill.id}
+                      disabled={processingId === reminder.id}
                       onClick={() =>
-                        handlePayBill(bill.id, bill.note || "Bill")
+                        handlePayReminder(
+                          reminder.id,
+                          reminder.note || "Reminder"
+                        )
                       }
                     >
-                      {processingId === bill.id ? (
+                      {processingId === reminder.id ? (
                         "..."
                       ) : (
                         <>
@@ -259,14 +262,14 @@ export function DashboardPage() {
               ))}
               {/* See All Card */}
               <Link
-                to="/bills"
+                to="/reminders"
                 className="flex w-[160px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed bg-muted/30 transition-colors hover:bg-muted/50"
               >
                 <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <ChevronRight className="size-6" />
                 </div>
                 <span className="text-sm font-semibold text-foreground">
-                  See All ({data.enrichedBills.length})
+                  See All ({data.enrichedReminders.length})
                 </span>
               </Link>
             </div>

@@ -59,7 +59,7 @@ export async function processAutoRepeatTransactions() {
   })
 }
 
-export async function triggerBillPayment(scheduleId: string) {
+export async function triggerReminderPayment(scheduleId: string) {
   const schedule = await db.schedules.get(scheduleId)
   if (!schedule) return
 

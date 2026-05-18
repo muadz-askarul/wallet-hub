@@ -112,7 +112,7 @@ export function TransactionFormPage({
           }
         } else {
           toast.error("Schedule not found")
-          navigate("/bills")
+          navigate("/reminders")
         }
       }
       loadSchedule()
@@ -209,7 +209,7 @@ export function TransactionFormPage({
           })
           toast.success("Recurring schedule created")
         }
-        navigate("/bills")
+        navigate("/reminders")
         return
       }
 
@@ -227,10 +227,10 @@ export function TransactionFormPage({
         await db.transactions.update(id, txData)
         toast.success("Transaction updated")
       } else {
-        const isBill = isRecurring && recurringType === "bill"
+        const isReminder = isRecurring && recurringType === "bill"
 
-        // Only create immediate transaction if NOT a bill
-        if (!isBill) {
+        // Only create immediate transaction if NOT a reminder
+        if (!isReminder) {
           const savedTxId = crypto.randomUUID()
           await db.transactions.add({
             id: savedTxId,
@@ -240,7 +240,7 @@ export function TransactionFormPage({
 
         if (isRecurring) {
           const selectedDate = new Date(date)
-          // For bills, the selected date is the first due date.
+          // For manual reminders, the selected date is the first due date.
           // For repeat transactions, we calculate the next one.
           const nextDue =
             recurringType === "bill"
@@ -266,12 +266,12 @@ export function TransactionFormPage({
           await db.schedules.add(schedule)
           toast.success(
             recurringType === "bill"
-              ? "Bill created"
+              ? "Reminder created"
               : "Recurring schedule created"
           )
 
           if (recurringType === "bill") {
-            navigate("/bills")
+            navigate("/reminders")
             return
           }
         } else {
@@ -618,7 +618,7 @@ export function TransactionFormPage({
                           : "text-muted-foreground hover:text-foreground"
                       )}
                     >
-                      Manual Bill
+                      Manual Reminder
                     </button>
                   </div>
                 </div>

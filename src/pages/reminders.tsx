@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
-import { triggerBillPayment } from "@/lib/services/recurring-service"
+import { triggerReminderPayment } from "@/lib/services/recurring-service"
 import { formatCurrency } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -19,9 +19,11 @@ import {
 import { cn } from "@/lib/utils"
 import { PageHeader } from "@/components/ui/page-header"
 
-export function BillsPage() {
+export function RemindersPage() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<"bills" | "templates">("bills")
+  const [activeTab, setActiveTab] = useState<"reminders" | "templates">(
+    "reminders"
+  )
   const [processingId, setProcessingId] = useState<string | null>(null)
 
   // Load all schedules, wallets, pockets, and categories
@@ -34,21 +36,21 @@ export function BillsPage() {
   const pockets = useLiveQuery(() => db.pockets.toArray(), [], [])
   const categories = useLiveQuery(() => db.categories.toArray(), [], [])
 
-  const handleCompleteBill = async (id: string, note: string) => {
+  const handleCompleteReminder = async (id: string, note: string) => {
     setProcessingId(id)
     try {
-      await triggerBillPayment(id)
-      toast.success(`Completed bill payment: ${note}`)
+      await triggerReminderPayment(id)
+      toast.success(`Completed reminder payment: ${note}`)
     } catch (err) {
       console.error(err)
-      toast.error("Failed to complete bill payment")
+      toast.error("Failed to complete reminder payment")
     } finally {
       setProcessingId(null)
     }
   }
 
-  // Filter bills vs auto-repeat templates
-  const bills = schedules?.filter((s) => s.type === "bill") || []
+  // Filter reminders vs auto-repeat templates
+  const reminders = schedules?.filter((s) => s.type === "bill") || []
   const templates = schedules?.filter((s) => s.type === "repeat") || []
 
   const formatDate = (timestamp: number) => {
@@ -73,12 +75,12 @@ export function BillsPage() {
           >
             <ArrowLeft className="size-5" />
           </Button>
-          <h1 className="ml-2 text-lg font-bold">Recurring & Schedules</h1>
+          <h1 className="ml-2 text-lg font-bold">Recurring & Reminders</h1>
         </div>
         <Button
           size="sm"
           className="cursor-pointer gap-1 rounded-lg px-3 py-1.5 text-xs font-semibold"
-          onClick={() => navigate("/bills/new")}
+          onClick={() => navigate("/reminders/new")}
         >
           <Plus className="size-4" />
           Add
@@ -90,16 +92,16 @@ export function BillsPage() {
         <div className="mb-6 flex rounded-xl bg-muted p-1">
           <button
             type="button"
-            onClick={() => setActiveTab("bills")}
+            onClick={() => setActiveTab("reminders")}
             className={cn(
               "flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-center text-sm font-semibold transition-all",
-              activeTab === "bills"
+              activeTab === "reminders"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
             <Receipt className="size-4" />
-            Active Bills ({bills.length})
+            Active Reminders ({reminders.length})
           </button>
           <button
             type="button"
@@ -117,40 +119,42 @@ export function BillsPage() {
         </div>
 
         {/* Tab Content */}
-        {activeTab === "bills" ? (
+        {activeTab === "reminders" ? (
           <div className="space-y-4">
-            {bills.length === 0 ? (
+            {reminders.length === 0 ? (
               <div className="flex min-h-[40vh] flex-col items-center justify-center p-6 text-center">
                 <div className="mb-4 rounded-full bg-primary/10 p-4 text-primary">
                   <Receipt className="h-10 w-10" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground">
-                  No active bills
+                  No active reminders
                 </h3>
                 <p className="max-w-xs text-sm text-muted-foreground">
-                  Create a manual bill from the New Transaction page to track
-                  upcoming items.
+                  Create a manual reminder from the New Transaction page to
+                  track upcoming items.
                 </p>
               </div>
             ) : (
-              bills.map((bill) => {
-                const p = pockets?.find((pk) => pk.id === bill.pocketId)
+              reminders.map((reminder) => {
+                const p = pockets?.find((pk) => pk.id === reminder.pocketId)
                 const w = wallets?.find((wl) => wl.id === p?.walletId)
-                const c = categories?.find((cg) => cg.id === bill.categoryId)
+                const c = categories?.find(
+                  (cg) => cg.id === reminder.categoryId
+                )
                 const destP = pockets?.find(
-                  (pk) => pk.id === bill.destinationPocketId
+                  (pk) => pk.id === reminder.destinationPocketId
                 )
                 const destW = wallets?.find((wl) => wl.id === destP?.walletId)
 
                 return (
                   <div
-                    key={bill.id}
+                    key={reminder.id}
                     className="overflow-hidden rounded-2xl border bg-card p-4 shadow-sm transition-all hover:shadow-md"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
                         {/* Category Icon */}
-                        {bill.transactionType !== "transfer" ? (
+                        {reminder.transactionType !== "transfer" ? (
                           <div
                             className="flex size-10 shrink-0 items-center justify-center rounded-full text-base font-semibold"
                             style={{
@@ -169,28 +173,28 @@ export function BillsPage() {
 
                         <div>
                           <p className="text-sm font-semibold text-foreground">
-                            {bill.note ||
-                              (bill.transactionType === "transfer"
+                            {reminder.note ||
+                              (reminder.transactionType === "transfer"
                                 ? "Transfer"
                                 : c?.name || "Expense")}
                           </p>
                           <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <WalletIcon className="size-3" />
-                              {bill.transactionType === "transfer"
+                              {reminder.transactionType === "transfer"
                                 ? `${w?.name} (${p?.name}) → ${destW?.name} (${destP?.name})`
                                 : `${w?.name} (${p?.name})`}
                             </span>
                             <span>•</span>
                             <span className="flex items-center gap-1 font-medium text-amber-500 dark:text-amber-400">
                               <Calendar className="size-3" />
-                              {bill.period}
+                              {reminder.period}
                             </span>
                           </div>
                           <p className="mt-2 text-xs font-medium text-muted-foreground">
                             Next due:{" "}
                             <span className="font-semibold text-foreground">
-                              {formatDate(bill.nextDueDate)}
+                              {formatDate(reminder.nextDueDate)}
                             </span>
                           </p>
                         </div>
@@ -198,26 +202,31 @@ export function BillsPage() {
 
                       <div className="flex shrink-0 flex-col items-end gap-3">
                         <span className="text-sm font-bold text-foreground">
-                          Rp {formatCurrency(bill.amount)}
+                          Rp {formatCurrency(reminder.amount)}
                         </span>
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
                             size="icon"
                             className="size-8 cursor-pointer"
-                            onClick={() => navigate(`/bills/edit/${bill.id}`)}
+                            onClick={() =>
+                              navigate(`/reminders/edit/${reminder.id}`)
+                            }
                           >
                             <Edit className="size-4" />
                           </Button>
                           <Button
                             size="sm"
                             className="h-8 cursor-pointer gap-1 rounded-lg px-2 text-xs"
-                            disabled={processingId === bill.id}
+                            disabled={processingId === reminder.id}
                             onClick={() =>
-                              handleCompleteBill(bill.id, bill.note || "Bill")
+                              handleCompleteReminder(
+                                reminder.id,
+                                reminder.note || "Reminder"
+                              )
                             }
                           >
-                            {processingId === bill.id ? (
+                            {processingId === reminder.id ? (
                               "..."
                             ) : (
                               <>
@@ -325,7 +334,7 @@ export function BillsPage() {
                             size="icon"
                             className="size-8 cursor-pointer"
                             onClick={() =>
-                              navigate(`/bills/edit/${template.id}`)
+                              navigate(`/reminders/edit/${template.id}`)
                             }
                           >
                             <Edit className="size-4" />

@@ -92,31 +92,6 @@ export function SettingsPage() {
         </PageHeader>
 
         <div className="p-4">
-          {/* Security */}
-          <div className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-            Security
-          </div>
-          <div className="mb-6 overflow-hidden rounded-xl border bg-card shadow-sm">
-            <Button
-              variant="ghost"
-              className="flex h-auto w-full cursor-pointer items-center justify-between rounded-none px-4 py-4 text-left"
-              onClick={() => navigate("/settings/change-pin")}
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex size-9 items-center justify-center rounded-full bg-muted">
-                  <ShieldCheck className="size-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="font-medium">Change App PIN</p>
-                  <p className="text-xs text-muted-foreground">
-                    Update your 4-digit security code
-                  </p>
-                </div>
-              </div>
-              <ChevronRight className="size-4 text-muted-foreground" />
-            </Button>
-          </div>
-
           {/* Preferences */}
           <div className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Preferences
@@ -129,7 +104,7 @@ export function SettingsPage() {
                   <Moon className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Dark Mode</p>
+                  <p className="text-sm font-medium">Dark Mode</p>
                   <p className="text-xs text-muted-foreground">
                     {isDark ? "Enabled" : "Disabled"}
                   </p>
@@ -149,7 +124,7 @@ export function SettingsPage() {
                   <Clock className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Auto-Lock Delay</p>
+                  <p className="text-sm font-medium">Auto-Lock Delay</p>
                   <p className="text-xs text-muted-foreground">
                     Lock delay when app is out of focus
                   </p>
@@ -185,7 +160,7 @@ export function SettingsPage() {
                   <Tag className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Categories</p>
+                  <p className="text-sm font-medium">Categories</p>
                   <p className="text-xs text-muted-foreground">
                     Manage income and expense categories
                   </p>
@@ -205,7 +180,7 @@ export function SettingsPage() {
                   <Repeat className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Recurring & Schedules</p>
+                  <p className="text-sm font-medium">Recurring & Schedules</p>
                   <p className="text-xs text-muted-foreground">
                     Manage repeating transactions and bills
                   </p>
@@ -225,13 +200,38 @@ export function SettingsPage() {
                   <Trash className="size-4 text-muted-foreground group-hover:text-destructive" />
                 </div>
                 <div>
-                  <p className="font-medium">Reset System</p>
+                  <p className="text-sm font-medium">Reset System</p>
                   <p className="text-xs text-muted-foreground group-hover:text-destructive/80">
                     Delete all data and start the onboarding wizard again
                   </p>
                 </div>
               </div>
               <ChevronRight className="size-4 text-muted-foreground group-hover:text-destructive" />
+            </Button>
+          </div>
+
+          {/* Security */}
+          <div className="mt-6 mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            Security
+          </div>
+          <div className="mb-6 overflow-hidden rounded-xl border bg-card shadow-sm">
+            <Button
+              variant="ghost"
+              className="flex h-auto w-full cursor-pointer items-center justify-between rounded-none px-4 py-4 text-left"
+              onClick={() => navigate("/settings/change-pin")}
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex size-9 items-center justify-center rounded-full bg-muted">
+                  <ShieldCheck className="size-4 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Change App PIN</p>
+                  <p className="text-xs text-muted-foreground">
+                    Update your 4-digit security code
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="size-4 text-muted-foreground" />
             </Button>
           </div>
 
