@@ -92,8 +92,11 @@ export function SettingsPage() {
     <>
       <div>
         {/* Sticky Header */}
-        <PageHeader>
+        <PageHeader className="justify-between">
           <h1 className="text-lg font-semibold">Settings</h1>
+          <span className="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+            v0.0.1
+          </span>
         </PageHeader>
 
         <div className="p-4">
@@ -120,32 +123,6 @@ export function SettingsPage() {
               </div>
               <ChevronRight className="size-4 text-muted-foreground" />
             </Button>
-          </div>
-
-          {/* Preferences */}
-          <div className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-            Preferences
-          </div>
-          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-            {/* Dark Mode Toggle */}
-            <div className="flex items-center justify-between border-b px-4 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex size-9 items-center justify-center rounded-full bg-muted">
-                  <Moon className="size-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Dark Mode</p>
-                  <p className="text-xs text-muted-foreground">
-                    {isDark ? "Enabled" : "Disabled"}
-                  </p>
-                </div>
-              </div>
-              <Switch
-                id="dark-mode-toggle"
-                checked={isDark}
-                onCheckedChange={handleDarkModeToggle}
-              />
-            </div>
 
             {/* Auto-Lock Delay */}
             <div className="flex items-center justify-between border-t px-4 py-4">
@@ -171,6 +148,32 @@ export function SettingsPage() {
                 <option value={30}>30 Minutes</option>
                 <option value={99999}>Never</option>
               </select>
+            </div>
+          </div>
+
+          {/* Preferences */}
+          <div className="mb-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+            Preferences
+          </div>
+          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+            {/* Dark Mode Toggle */}
+            <div className="flex items-center justify-between px-4 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex size-9 items-center justify-center rounded-full bg-muted">
+                  <Moon className="size-4 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Dark Mode</p>
+                  <p className="text-xs text-muted-foreground">
+                    {isDark ? "Enabled" : "Disabled"}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                id="dark-mode-toggle"
+                checked={isDark}
+                onCheckedChange={handleDarkModeToggle}
+              />
             </div>
           </div>
 
@@ -299,11 +302,6 @@ export function SettingsPage() {
               </div>
               <ChevronRight className="size-4 text-muted-foreground group-hover:text-destructive" />
             </Button>
-          </div>
-
-          {/* App Info */}
-          <div className="mt-8 text-center text-xs text-muted-foreground">
-            Wallet Hub v0.0.1
           </div>
         </div>
       </div>
