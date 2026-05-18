@@ -32,18 +32,18 @@ export function DashboardPage() {
         else liabilities += Math.abs(balance)
       }
 
-      // Load upcoming reminders for the current month
+      // Load upcoming reminders within 1 month from today (by calendar date)
       const now = new Date()
-      const endOfMonth = new Date(
+      const oneMonthLater = new Date(
         now.getFullYear(),
         now.getMonth() + 1,
-        1
+        now.getDate()
       ).getTime()
 
       const reminders = await db.schedules
         .where("type")
         .equals("bill")
-        .filter((s) => s.isActive === 1 && s.nextDueDate <= endOfMonth)
+        .filter((s) => s.isActive === 1 && s.nextDueDate <= oneMonthLater)
         .toArray()
 
       const sortedReminders = reminders
@@ -196,18 +196,18 @@ export function DashboardPage() {
         {/* Reminders due this month widget */}
         {data.enrichedReminders && data.enrichedReminders.length > 0 && (
           <div className="mb-4">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-foreground">Reminders</h3>
+            <div className="mb-3 flex items-center justify-between px-1">
+              <h3 className="text-base font-bold text-foreground">Reminders</h3>
             </div>
-            <div className="-mx-6 flex snap-x snap-mandatory scroll-pr-6 scroll-pl-6 gap-4 overflow-x-auto scroll-smooth px-6 pb-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <div className="-mx-6 flex snap-x snap-mandatory scroll-pr-6 scroll-pl-6 gap-3 overflow-x-auto scroll-smooth px-6 pb-2 [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {data.enrichedReminders.map((reminder) => (
                 <div
                   key={reminder.id}
-                  className="flex w-[220px] shrink-0 snap-start flex-col gap-3 rounded-2xl border bg-card p-3 shadow-sm"
+                  className="flex w-[180px] shrink-0 snap-start flex-col gap-2 rounded-xl border bg-card p-2.5 shadow-sm"
                 >
-                  <div className="flex items-start gap-2.5">
+                  <div className="flex items-center gap-2">
                     <div
-                      className="flex size-8 shrink-0 items-center justify-center rounded-full text-base font-semibold"
+                      className="flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
                       style={{
                         backgroundColor: reminder.categoryColor
                           ? `${reminder.categoryColor}15`
@@ -217,30 +217,30 @@ export function DashboardPage() {
                       {reminder.categoryIcon}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm leading-tight font-semibold text-foreground">
+                      <p className="truncate text-xs leading-tight font-bold text-foreground">
                         {reminder.note || reminder.categoryName}
                       </p>
-                      <p className="mt-1 truncate text-[11px] text-muted-foreground">
-                        Due{" "}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-1">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[10px] font-medium text-muted-foreground">
                         {new Date(reminder.nextDueDate).toLocaleDateString(
                           "id-ID",
                           {
                             day: "numeric",
                             month: "short",
                           }
-                        )}{" "}
-                        • {reminder.walletName}
+                        )}
+                      </p>
+                      <p className="truncate text-[10px] font-bold text-foreground">
+                        Rp {formatCurrency(reminder.amount)}
                       </p>
                     </div>
-                  </div>
-
-                  <div className="mt-0.5 flex items-center justify-between gap-2">
-                    <span className="text-base font-bold text-foreground">
-                      Rp {formatCurrency(reminder.amount)}
-                    </span>
                     <Button
                       size="sm"
-                      className="h-8 cursor-pointer rounded-xl px-4 text-xs font-bold transition-all hover:scale-[1.02] active:scale-[0.98]"
+                      className="h-7 cursor-pointer rounded-lg px-2.5 text-[10px] font-black transition-all hover:scale-[1.02] active:scale-[0.98]"
                       disabled={processingId === reminder.id}
                       onClick={() =>
                         handlePayReminder(
@@ -253,7 +253,7 @@ export function DashboardPage() {
                         "..."
                       ) : (
                         <>
-                          Pay <Check className="ml-1 size-3.5" />
+                          Pay <Check className="ml-1 size-3" />
                         </>
                       )}
                     </Button>
@@ -263,13 +263,13 @@ export function DashboardPage() {
               {/* See All Card */}
               <Link
                 to="/reminders"
-                className="flex w-[160px] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed bg-muted/30 transition-colors hover:bg-muted/50"
+                className="flex w-[120px] shrink-0 snap-start flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed bg-muted/30 transition-colors hover:bg-muted/50"
               >
-                <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <ChevronRight className="size-6" />
+                <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <ChevronRight className="size-5" />
                 </div>
-                <span className="text-sm font-semibold text-foreground">
-                  See All ({data.enrichedReminders.length})
+                <span className="text-xs font-bold text-foreground">
+                  See All
                 </span>
               </Link>
             </div>

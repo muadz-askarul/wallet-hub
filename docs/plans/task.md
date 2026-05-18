@@ -2,9 +2,9 @@
 
 | Task | Status | Description |
 | :--- | :--- | :--- |
-| Task 1 | in_progress | Rename Bill to Reminder |
-| Task 2 | not_started | Improve Amount Input UX |
-| Task 4 | not_started | Wallet Creation UX (Auto-focus) |
-| Task 5 | not_started | Smart Navigation History |
-| Task 6 | not_started | Dashboard Refinements |
-| Task 7 | not_started | CSV Backup & Restore |
+| Task 1 | done | Rename Bill to Reminder |
+| Task 2 | done | Improve Amount Input UX |
+| Task 4 | done | Wallet Creation UX (Auto-focus) |
+| Task 5 | done | Smart Navigation History |
+| Task 6 | done | Dashboard Refinements |
+| Task 7 | in_progress | CSV Backup & Restore |

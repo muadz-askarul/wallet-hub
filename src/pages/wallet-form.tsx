@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useLiveQuery } from "dexie-react-hooks"
 import { db } from "@/lib/db"
@@ -40,6 +40,7 @@ import {
 export function WalletFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const nameInputRef = useRef<HTMLInputElement>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -100,6 +101,16 @@ export function WalletFormPage() {
     }
     loadWallet()
   }, [id, navigate])
+
+  useEffect(() => {
+    // Focus name input on mount for new wallets
+    if (!id) {
+      const timer = setTimeout(() => {
+        nameInputRef.current?.focus()
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [id])
 
   const handlePocketDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -167,7 +178,7 @@ export function WalletFormPage() {
           await db.pockets.update(pocketId, { order: i })
         }
 
-        const targetBalance = parseFloat(dp.amount) || 0
+        const targetBalance = parseFloat(dp.amount || "0") || 0
         const currentBalance = dp.id ? pocketBalances[dp.id] || 0 : 0
         const diff = targetBalance - currentBalance
 
@@ -184,7 +195,7 @@ export function WalletFormPage() {
       }
 
       toast.success(id ? "Wallet updated" : "Wallet created")
-      navigate("/wallet")
+      navigate("/wallet", { replace: true })
     } catch {
       toast.error("Failed to save wallet")
     } finally {
@@ -225,6 +236,7 @@ export function WalletFormPage() {
             <Label htmlFor="walletName">Wallet Name</Label>
             <Input
               id="walletName"
+              ref={nameInputRef}
               value={walletName}
               onChange={(e) => setWalletName(e.target.value)}
               placeholder="e.g. Bank BCA"

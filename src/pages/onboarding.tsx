@@ -14,7 +14,7 @@ import { Wallet, Coins, Plus, Trash, Check } from "lucide-react"
 interface LocalPocket {
   id: string
   name: string
-  initialBalance: number
+  initialBalance: number | undefined
 }
 
 interface LocalWallet {
@@ -35,7 +35,9 @@ export function OnboardingPage({ storageError }: { storageError?: boolean }) {
     {
       id: "w-cash",
       name: "Cash",
-      pockets: [{ id: "p-cash-main", name: "Main Cash", initialBalance: 0 }],
+      pockets: [
+        { id: "p-cash-main", name: "Main Cash", initialBalance: undefined },
+      ],
     },
   ])
 
@@ -46,12 +48,12 @@ export function OnboardingPage({ storageError }: { storageError?: boolean }) {
       ...prev,
       {
         id: newWalletId,
-        name: `Wallet ${prev.length + 1}`,
+        name: "",
         pockets: [
           {
             id: `p-custom-${Date.now()}`,
             name: "Main Pocket",
-            initialBalance: 0,
+            initialBalance: undefined,
           },
         ],
       },
@@ -86,7 +88,7 @@ export function OnboardingPage({ storageError }: { storageError?: boolean }) {
             {
               id: `p-custom-${Date.now()}`,
               name: `Pocket ${w.pockets.length + 1}`,
-              initialBalance: 0,
+              initialBalance: undefined,
             },
           ],
         }
@@ -184,13 +186,14 @@ export function OnboardingPage({ storageError }: { storageError?: boolean }) {
             order: pocketOrder++,
           })
 
-          if (localP.initialBalance > 0) {
+          const balance = localP.initialBalance || 0
+          if (balance > 0) {
             await db.transactions.add({
               id: crypto.randomUUID(),
               type: "income",
-              amount: localP.initialBalance,
+              amount: balance,
               date: Date.now(),
-              note: "Starting Balance",
+              note: "Initial Balance",
               pocketId: localP.id,
             })
           }

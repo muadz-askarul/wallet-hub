@@ -49,7 +49,7 @@ export function TransactionFormPage({
 
   // Form states
   const [type, setType] = useState<TxType>("expense")
-  const [amount, setAmount] = useState(0)
+  const [amount, setAmount] = useState<number | undefined>(undefined)
   const [date, setDate] = useState(now())
   const [pocketId, setPocketId] = useState<string | undefined>(undefined)
   const [destPocketId, setDestPocketId] = useState<string | undefined>(
@@ -280,13 +280,15 @@ export function TransactionFormPage({
       }
 
       if (isContinue) {
-        setAmount(0)
+        setAmount(undefined)
         setNote("")
         setDate(now())
         setRecurringPeriod("None")
         setEndDateStr("")
       } else {
-        navigate("/transactions")
+        // Use replace if we came from transactions or reminders to avoid history loops
+        const from = isScheduleMode ? "/reminders" : "/transactions"
+        navigate(from, { replace: true })
       }
     } catch (e) {
       console.error(e)

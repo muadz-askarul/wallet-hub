@@ -9,7 +9,7 @@ import { GripVertical, Trash } from "lucide-react"
 export type DraftPocket = {
   id?: string
   name: string
-  amount: string
+  amount: string | undefined
   _key: string // stable drag key
 }
 
