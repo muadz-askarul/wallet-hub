@@ -12,7 +12,6 @@ import {
   ArrowUpDown,
   MessageSquareText,
   Download,
-  Calendar,
   X,
 } from "lucide-react"
 import { GestureButton } from "@/components/ui/gesture-button"
@@ -121,13 +120,9 @@ export function RootLayout() {
     localStorage.setItem("pwa-suggestion-dismissed", "true")
   }
 
-  const showNavBar = [
-    "/",
-    "/transactions",
-    "/wallet",
-    "/settings",
-    "/reminders",
-  ].includes(location.pathname)
+  const showNavBar = ["/", "/transactions", "/wallet", "/settings"].includes(
+    location.pathname
+  )
 
   const ua = navigator.userAgent.toLowerCase()
   const isIOS = /iphone|ipad|ipod/i.test(ua)
@@ -215,13 +210,6 @@ export function RootLayout() {
             >
               <ArrowUpDown className="size-6" strokeWidth={1.5} />
               <span className="sr-only">Transactions</span>
-            </BottomNavigationItem>
-            <BottomNavigationItem
-              active={location.pathname === "/reminders"}
-              render={<Link to="/reminders" />}
-            >
-              <Calendar className="size-6" strokeWidth={1.5} />
-              <span className="sr-only">Reminders</span>
             </BottomNavigationItem>
             <BottomNavigationItem
               active={location.pathname === "/wallet"}
