@@ -112,7 +112,7 @@ export function SettingsPage() {
                   <ShieldCheck className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Change App PIN</p>
+                  <p className="text-sm font-medium">Change App PIN</p>
                   <p className="text-xs text-muted-foreground">
                     Update your 4-digit security code
                   </p>
@@ -134,7 +134,7 @@ export function SettingsPage() {
                   <Moon className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Dark Mode</p>
+                  <p className="text-sm font-medium">Dark Mode</p>
                   <p className="text-xs text-muted-foreground">
                     {isDark ? "Enabled" : "Disabled"}
                   </p>
@@ -154,7 +154,7 @@ export function SettingsPage() {
                   <Clock className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Auto-Lock Delay</p>
+                  <p className="text-sm font-medium">Auto-Lock Delay</p>
                   <p className="text-xs text-muted-foreground">
                     Lock delay when app is out of focus
                   </p>
@@ -190,7 +190,7 @@ export function SettingsPage() {
                   <Tag className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Categories</p>
+                  <p className="text-sm font-medium">Categories</p>
                   <p className="text-xs text-muted-foreground">
                     Manage income and expense categories
                   </p>
@@ -210,7 +210,7 @@ export function SettingsPage() {
                   <Repeat className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Recurring & Reminders</p>
+                  <p className="text-sm font-medium">Recurring & Reminders</p>
                   <p className="text-xs text-muted-foreground">
                     Manage repeating transactions and reminders
                   </p>
@@ -233,7 +233,7 @@ export function SettingsPage() {
                   <Download className="size-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-medium">Export Backup</p>
+                  <p className="text-sm font-medium">Export Backup</p>
                   <p className="text-xs text-muted-foreground">
                     Download or share your data as CSV
                   </p>
@@ -270,7 +270,7 @@ export function SettingsPage() {
                     <Download className="size-4 rotate-180 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="font-medium">Restore Backup</p>
+                    <p className="text-sm font-medium">Restore Backup</p>
                     <p className="text-xs text-muted-foreground">
                       Upload a previously exported CSV file
                     </p>
